@@ -1,7 +1,7 @@
 using System;
 using BrewMatic3000.Interfaces;
 
-namespace BrewMatic3000
+namespace BrewMatic3000.PID
 {
     public delegate float GetFloat();
     public delegate void SetFloat(float value);
@@ -10,7 +10,6 @@ namespace BrewMatic3000
     //PID tuning help: http://en.wikipedia.org/wiki/PID_controller
     public class PID : IPID
     {
-
 
         //Gains
         private const float Kp = 3.5f; // Decrease to make the slowdown start earlier (to stop overshoot)
@@ -29,7 +28,15 @@ namespace BrewMatic3000
         private float _lastPv;
         private float _errSum;
 
+        //Logging of values
+        private LogValue[] _logValues;
+        private TimeSpan _logInterval = new TimeSpan(0, 0, 15);
+        private DateTime _nextLog = DateTime.MinValue;
 
+        public PID()
+        {
+            _logValues = new LogValue[0];
+        }
 
         public float GetValue(float currentTemperature, float preferredTemperature)
         {
@@ -78,6 +85,22 @@ namespace BrewMatic3000
 
             outReal = Clamp(outReal, 0, 1.0f); //Clamp(outReal, -1.0f, 1.0f);
             outReal = ScaleValue(outReal, 0, 1.0f, OutMin, OutMax); //ScaleValue(outReal, -1.0f, 1.0f, OutMin, OutMax);
+
+            //log this adjustment
+            if (_nextLog == DateTime.MinValue || _nextLog < DateTime.Now)
+            {
+                var nuArray = new LogValue[_logValues.Length + 1];
+                Array.Copy(_logValues, nuArray, _logValues.Length);
+                _logValues = nuArray;
+                _logValues[_logValues.Length - 1] = new LogValue()
+                {
+                    Effect = outReal,
+                    Temperature = currentTemperature,
+                    TimeStamp = DateTime.Now
+                };
+                _nextLog = DateTime.Now.Add(_logInterval);
+            }
+
 
             //Write it out to the world
             return outReal;
