@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Threading;
+using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States
 {
@@ -59,23 +60,15 @@ namespace BrewMatic3000.States
             {
                 if (_mainDisplayVisible)
                 {
-                    var strLine1 = "T1:" + BrewData.TempReader.GetValue().ToString("f1") + " T2:" + "0.0";
-                    var strLine2 = "H1:" + PadLeft(BrewData.Heater1.GetCurrentValue(), 3) + "% H2:" + PadLeft(BrewData.Heater2.GetCurrentValue(), 3) + "%";
+                    var strLine1 = "T1:" + BrewData.TempReader1.GetValue().ToString("f1").PadLeft(4) + " T2:" + BrewData.TempReader2.GetValue().ToString("f1").PadLeft(4);
+                    var strLine2 = "H1:" + BrewData.Heater1.GetCurrentValue().PadLeft(3) + "% H2:" + BrewData.Heater2.GetCurrentValue().PadLeft(3) + "%";
                     WriteToLcd(strLine1, strLine2);
                 }
                 Thread.Sleep(1000);
             }
         }
 
-        private string PadLeft(float input, int length)
-        {
-            var returnValue = input.ToString();
-            while (returnValue.Length < length)
-            {
-                returnValue = " " + returnValue;
-            }
-            return returnValue;
-        }
+
 
     }
 }

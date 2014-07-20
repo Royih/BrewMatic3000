@@ -14,7 +14,9 @@ namespace BrewMatic3000
 
         private NavigateButton NavButtonManager { get; set; }
 
-        private PT100Reader TempReader { get; set; }
+        private PT100Reader TempReader1 { get; set; }
+
+        private PT100Reader TempReader2 { get; set; }
 
         private OutputPort PortHeater1 { get; set; }
 
@@ -28,13 +30,14 @@ namespace BrewMatic3000
 
         private string[] _currentlyOnDisplay;
 
-        public BrewGuide(InterruptPort pushButton, LiquidCrystal lcd, PT100Reader tempReader, OutputPort portHeater1, OutputPort portHeater2)
+        public BrewGuide(InterruptPort pushButton, LiquidCrystal lcd, PT100Reader tempReader1, PT100Reader tempReader2, OutputPort portHeater1, OutputPort portHeater2)
         {
             Lcd = lcd;
 
             NavButtonManager = new NavigateButton(pushButton);
 
-            TempReader = tempReader;
+            TempReader1 = tempReader1;
+            TempReader2 = tempReader2;
 
             PortHeater1 = portHeater1;
             PortHeater2 = portHeater2;
@@ -143,7 +146,7 @@ namespace BrewMatic3000
             NavButtonManager.KeyPressLong += NavButton_KeyPressLong;
             NavButtonManager.KeyPressLongCancelled += NavButton_KeyPressLongCancelled;
 
-            var brewData = new BrewData(TempReader, Heater1, Heater2);
+            var brewData = new BrewData(TempReader1, TempReader2, Heater1, Heater2);
             ApplyState(new StateDashboard(brewData));
 
             while (true)

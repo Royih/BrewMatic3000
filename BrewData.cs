@@ -14,7 +14,9 @@ namespace BrewMatic3000
 
         public float SpargeWaterTemperature { get; set; }
 
-        public PT100Reader TempReader { get; set; }
+        public PT100Reader TempReader1 { get; set; }
+
+        public PT100Reader TempReader2 { get; set; }
 
         public HeatElement3000W Heater1 { get; set; }
 
@@ -29,13 +31,14 @@ namespace BrewMatic3000
         public float SpargePIDKd = -105.0f; //Increase (with negative sign) to decrease overshoot..
 
 
-        public BrewData(PT100Reader tempReader, HeatElement3000W heater1, HeatElement3000W heater2)
+        public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
             StrikeTemperature = 70;
             MashTemperature = 66;
             SpargeWaterTemperature = 86;
             MashTime = 65;
-            TempReader = tempReader;
+            TempReader1 = tempReader1;
+            TempReader2 = tempReader2;
             Heater1 = heater1;
             Heater2 = heater2;
         }

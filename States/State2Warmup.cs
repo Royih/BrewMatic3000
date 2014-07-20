@@ -1,19 +1,25 @@
 
 using System.Threading;
+using BrewMatic3000.Extensions;
 using BrewMatic3000.Interfaces;
-using BrewMatic3000.PID;
 using Microsoft.SPOT;
 
 namespace BrewMatic3000.States
 {
     public class State2Warmup : State
     {
-        private readonly ITempReader _tempReader;
+        private readonly ITempReader _tempReader1;
+        private readonly ITempReader _tempReader2;
+
         private readonly IHeatDevice _heater1;
+        private readonly IHeatDevice _heater2;
+
+
         private readonly PID.PID _mashPID;
         private readonly PID.PID _spargePID;
 
-        private float _maxTemp = 0f;
+        private float _maxTemp1;
+        private float _maxTemp2;
 
         private Thread _worker;
 
@@ -35,12 +41,16 @@ namespace BrewMatic3000.States
         public State2Warmup(BrewData brewData)
             : base(brewData)
         {
-            _maxTemp = 0;
+            _maxTemp1 = 0;
+            _maxTemp2 = 0;
 
-            _tempReader = brewData.TempReader;
+            _tempReader1 = brewData.TempReader1;
+            _tempReader2 = brewData.TempReader2;
             _heater1 = brewData.Heater1;
-            _mashPID = new PID.PID(brewData.MashPIDKp, brewData.MashPIDKi, brewData.MashPIDKd);
+            _heater2 = brewData.Heater2;
 
+            _mashPID = new PID.PID(brewData.MashPIDKp, brewData.MashPIDKi, brewData.MashPIDKd);
+            _spargePID = new PID.PID(brewData.SpargePIDKp, brewData.SpargePIDKi, brewData.SpargePIDKd);
         }
 
         public override void OnKeyPressLongWarning()
@@ -116,29 +126,40 @@ namespace BrewMatic3000.States
         {
             while (!_abort)
             {
-                var currentTemp = _tempReader.GetValue();
+                var currentTemp1 = _tempReader1.GetValue();
+                var currentTemp2 = _tempReader2.GetValue();
 
                 //keep the highest temp (for pid tuning purposes)
-                if (_maxTemp < currentTemp)
+                if (_maxTemp1 < currentTemp1)
                 {
-                    _maxTemp = currentTemp;
+                    _maxTemp1 = currentTemp1;
+                }
+                if (_maxTemp2 < currentTemp2)
+                {
+                    _maxTemp2 = currentTemp2;
                 }
 
-                var pidOutput = _mashPID.GetValue(currentTemp, BrewData.StrikeTemperature);
-                _heater1.SetValue(pidOutput);
+                var pidOutputMash = _mashPID.GetValue(currentTemp1, BrewData.StrikeTemperature);
+                _heater1.SetValue(pidOutputMash);
+
+                var pidOutputSparge = _spargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
+                _heater2.SetValue(pidOutputSparge);
 
                 if (_mainDisplayVisible)
                 {
-                    var currentTempString = currentTemp.ToString("f1");
-                    var desiredTempString = BrewData.StrikeTemperature.ToString("f1");
-
-                    var line1String = currentTempString + "|" + desiredTempString + "|W:" + (int)_heater1.GetCurrentValue() + "%"; //58.9|68.0|W:100%"
-
-                    var line2String = "Max:" + _maxTemp.ToString("f1");
+                    var line1String = GetLineString(currentTemp1, BrewData.StrikeTemperature, _heater1.GetCurrentValue());
+                    var line2String = GetLineString(currentTemp2, BrewData.SpargeWaterTemperature, _heater2.GetCurrentValue());
                     WriteToLcd(line1String, line2String);
                 }
                 Thread.Sleep(750);
             }
+        }
+
+        private string GetLineString(float currentTemp, float desiredTemp, float watt)
+        {
+            var currentTempString = currentTemp.ToString("f1").PadLeft(4);
+            var desiredTempString = desiredTemp.ToString("f1").PadLeft(4);
+            return currentTempString + "|" + desiredTempString + "|W:" + (int)watt + "%"; //58.9|68.0|W:100%"
         }
     }
 }

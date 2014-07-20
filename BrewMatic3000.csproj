@@ -38,6 +38,8 @@
   <ItemGroup>
     <Compile Include="BrewGuide.cs" />
     <Compile Include="BrewData.cs" />
+    <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="Extensions\FloatExtension.cs" />
     <Compile Include="FakeHW\FakeEnvironment.cs" />
     <Compile Include="FakeHW\FakeHeater.cs" />
     <Compile Include="Interfaces\IHeatDevice.cs" />
