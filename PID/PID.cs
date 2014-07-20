@@ -66,17 +66,19 @@ namespace BrewMatic3000.PID
 
             if (_lastUpdate != DateTime.MinValue)
             {
-                float dT = (nowTime - _lastUpdate).Seconds;
+                var dT = nowTime - _lastUpdate;
+
+                float dTSecs = dT.Seconds + (dT.Milliseconds / 1000f);
 
                 //Compute the integral if we have to...
                 if (pv >= PvMin && pv <= PvMax)
                 {
-                    partialSum = _errSum + dT * err;
+                    partialSum = _errSum + (dTSecs * err);
                     iTerm = Ki * partialSum;
                 }
 
-                if (dT != 0.0f)
-                    dTerm = Kd * (pv - _lastPv) / dT;
+                if (dTSecs != 0.0f)
+                    dTerm = Kd * (pv - _lastPv) / dTSecs;
             }
 
             _lastUpdate = nowTime;
@@ -90,10 +92,10 @@ namespace BrewMatic3000.PID
             outReal = ScaleValue(outReal, 0, 1.0f, OutMin, OutMax); //ScaleValue(outReal, -1.0f, 1.0f, OutMin, OutMax);
 
             //This is to prevent further heating if the setpoint is reached. Even though this is probably due to improper tuning of the PID
-            if (currentTemperature >= preferredTemperature)
+            /*if (currentTemperature >= preferredTemperature)
             {
                 outReal = 0;
-            }
+            }*/
 
             //log this adjustment
             if (_nextLog == DateTime.MinValue || _nextLog < DateTime.Now)

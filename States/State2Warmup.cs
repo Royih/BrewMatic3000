@@ -77,6 +77,11 @@ namespace BrewMatic3000.States
             var action = GetSelectedAction(Actions);
             if (action != null)
             {
+                if (action.StateType == typeof(State1Initial))
+                {
+                    this.BrewData.Heater1.SetValue(0);
+                    this.BrewData.Heater2.SetValue(0);
+                }
                 RiseStateChangedEvent(action.StateType);
             }
             else
