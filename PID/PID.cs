@@ -12,7 +12,7 @@ namespace BrewMatic3000.PID
     {
 
         //Gains
-        private readonly float Kp; 
+        private readonly float Kp;
         private readonly float Ki;
         private readonly float Kd;
 
@@ -88,6 +88,12 @@ namespace BrewMatic3000.PID
 
             outReal = Clamp(outReal, 0, 1.0f); //Clamp(outReal, -1.0f, 1.0f);
             outReal = ScaleValue(outReal, 0, 1.0f, OutMin, OutMax); //ScaleValue(outReal, -1.0f, 1.0f, OutMin, OutMax);
+
+            //This is to prevent further heating if the setpoint is reached. Even though this is probably due to improper tuning of the PID
+            if (currentTemperature >= preferredTemperature)
+            {
+                outReal = 0;
+            }
 
             //log this adjustment
             if (_nextLog == DateTime.MinValue || _nextLog < DateTime.Now)
