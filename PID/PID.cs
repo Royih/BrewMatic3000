@@ -12,9 +12,9 @@ namespace BrewMatic3000.PID
     {
 
         //Gains
-        private const float Kp = 3.5f; // Decrease to make the slowdown start earlier (to stop overshoot)
-        private const float Ki = 0.1f; //
-        private const float Kd = -105.0f; //Increase (with negative sign) to decrease overshoot..
+        private readonly float Kp; 
+        private readonly float Ki;
+        private readonly float Kd;
 
 
         //Max/Min Calculation
@@ -33,9 +33,12 @@ namespace BrewMatic3000.PID
         private TimeSpan _logInterval = new TimeSpan(0, 0, 15);
         private DateTime _nextLog = DateTime.MinValue;
 
-        public PID()
+        public PID(float kp, float ki, float kd)
         {
             _logValues = new LogValue[0];
+            Kp = kp;
+            Ki = ki;
+            Kd = kd;
         }
 
         public float GetValue(float currentTemperature, float preferredTemperature)
@@ -127,5 +130,11 @@ namespace BrewMatic3000.PID
             return value;
         }
 
+
+
+        public LogValue[] GetLogValues()
+        {
+            return _logValues;
+        }
     }
 }

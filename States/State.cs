@@ -72,9 +72,9 @@ namespace BrewMatic3000.States
             {
                 return new State1Initial(BrewData);
             }
-            if (stateType == typeof(State2StrikeWarmup))
+            if (stateType == typeof(State2Warmup))
             {
-                return new State2StrikeWarmup(BrewData);
+                return new State2Warmup(BrewData);
             }
             if (stateType == typeof(StateSetupMashTemp))
             {

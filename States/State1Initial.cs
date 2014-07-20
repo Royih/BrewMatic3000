@@ -19,7 +19,7 @@ namespace BrewMatic3000.States
 
         public override void OnKeyPressLong()
         {
-            RiseStateChangedEvent(typeof(State2StrikeWarmup));
+            RiseStateChangedEvent(typeof(State2Warmup));
         }
 
         public override void OnKeyPressLongCancelled()

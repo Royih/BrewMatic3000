@@ -1,7 +1,6 @@
 
 using System.Threading;
 using BrewMatic3000.Interfaces;
-using BrewMatic3000.PID;
 
 namespace BrewMatic3000.States
 {
@@ -10,7 +9,7 @@ namespace BrewMatic3000.States
         private readonly ITempReader _tempReader;
         private readonly IHeatDevice _heater1;
         //private readonly FakeEnvironment _fakeEnvironment;
-        private readonly PID.PID _tempController;
+        private readonly PID _tempController;
 
         private float _maxTemp = 0f;
 
@@ -39,7 +38,7 @@ namespace BrewMatic3000.States
             _tempReader = brewData.TempReader;
             //_heater = new FakeHeater(10);
             _heater1 = brewData.Heater1;
-            _tempController = new PID.PID();
+            _tempController = new PID();
 
             //_fakeEnvironment = new FakeEnvironment(_tempReader);
         }

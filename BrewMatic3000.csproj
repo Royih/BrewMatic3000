@@ -61,7 +61,7 @@
     <Compile Include="States\Setup\StateSetupMashTemp.cs" />
     <Compile Include="NavigateButton.cs" />
     <Compile Include="LedBlinker.cs" />
-    <Compile Include="States\State2StrikeWarmup.cs" />
+    <Compile Include="States\State2Warmup.cs" />
     <Compile Include="States\State1Initial.cs" />
     <Compile Include="States\State.cs" />
     <Compile Include="Kobush.NETMF.Hardware.LCD\BaseShifterLiquidCrystalTransferProvicer.cs" />

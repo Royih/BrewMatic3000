@@ -40,6 +40,8 @@ namespace BrewMatic3000.RealHW
         /// 162 ohm resistors gives: 
         /// 0*C = 162 * 4e-3 = 0,648V
         /// 100*C = 162 * 20e-3 = 3.24V
+        /// 
+        /// 100 / (20e-3 - 4e-3) = 6250 
         /// </summary>
         /// <returns></returns>
         private float ReadNewValue()
