@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additional", "Additional", 
 		Documentation\Overview.pdf = Documentation\Overview.pdf
 		Documentation\Overview.png = Documentation\Overview.png
 		Documentation\Overview.vsdx = Documentation\Overview.vsdx
+		Documentation\OverviewNoHeading.png = Documentation\OverviewNoHeading.png
 	EndProjectSection
 EndProject
 Global
