@@ -23,7 +23,7 @@ namespace BrewMatic3000
         public HeatElement3000W Heater2 { get; set; }
 
         public float MashPIDKp = 4.0f; 
-        public float MashPIDKi = 0.02f; // Decrease to avoid overshoot
+        public float MashPIDKi = 0.08f; // Decrease to avoid overshoot. 0.08 is too low. Shoulkd try 0.17 next
         public float MashPIDKd = 1.0f; 
 
         public float SpargePIDKp = 4.0f;
@@ -33,7 +33,7 @@ namespace BrewMatic3000
 
         public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
-            StrikeTemperature = 50;
+            StrikeTemperature = 70;
             MashTemperature = 66;
             SpargeWaterTemperature = 86;
             MashTime = 65;

@@ -142,8 +142,8 @@ namespace BrewMatic3000.States
                 var pidOutputMash = _mashPID.GetValue(currentTemp1, BrewData.StrikeTemperature);
                 _heater1.SetValue(pidOutputMash);
 
-                /*var pidOutputSparge = _spargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
-                _heater2.SetValue(pidOutputSparge);*/
+                var pidOutputSparge = _spargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
+                _heater2.SetValue(pidOutputSparge);
 
                 if (_mainDisplayVisible)
                 {
