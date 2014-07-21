@@ -24,7 +24,7 @@ namespace BrewMatic3000.RealHW
         
         //F2: Variables used to ignore measurments out
         private float _lastMeasure; // Holds the last valid measurement
-        private const float IgnoreThreshold = 0.4f; //The maximum allowed diff to be allowed compared to the last measurement
+        private const float IgnoreThreshold = 0.8f; //The maximum allowed diff to be allowed compared to the last measurement
         private const int NumberOfTimesToIgnoreValuesOutsideThreshold = 3; //Measurments outside allowed threshold will be ignored this number of times before made valid
         private int _ignoredValuesOutsideThresholdCounter; //A counter to keep 
 

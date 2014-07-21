@@ -12,5 +12,9 @@ namespace BrewMatic3000.Extensions
             }
             return returnValue;
         }
+        public static string DisplayHeat(this float input)
+        {
+            return input.PadLeft(3) + "%";
+        }
     }
 }

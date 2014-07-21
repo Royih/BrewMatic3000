@@ -20,7 +20,16 @@ namespace BrewMatic3000.States.Setup
 
         public override void OnKeyPressShort()
         {
-            RiseStateChangedEvent(typeof(StateDashboard));
+            if (BrewData.Heater1.GetCurrentValue() > 0 || BrewData.Heater2.GetCurrentValue() > 0)
+            {
+                RiseStateChangedEvent(typeof (StateTurnOffHeat));
+            }
+            else
+            {
+                RiseStateChangedEvent(typeof(StateDashboard));
+            }
+                
+
         }
 
         public override void OnKeyPressLongWarning()

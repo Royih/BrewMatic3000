@@ -22,18 +22,18 @@ namespace BrewMatic3000
 
         public HeatElement3000W Heater2 { get; set; }
 
-        public float MashPIDKp = 5.5f; // Decrease to make the slowdown start earlier (to stop overshoot)
-        public float MashPIDKi = 0.1f; //
-        public float MashPIDKd = 10.0f; //Increase to decrease overshoot??
+        public float MashPIDKp = 4.0f; 
+        public float MashPIDKi = 0.02f; // Decrease to avoid overshoot
+        public float MashPIDKd = 1.0f; 
 
-        public float SpargePIDKp = 3.5f; // Decrease to make the slowdown start earlier (to stop overshoot)
-        public float SpargePIDKi = 0.1f; //
-        public float SpargePIDKd = -105.0f; //Increase to decrease overshoot??
+        public float SpargePIDKp = 4.0f;
+        public float SpargePIDKi = 0.08f; // Decrease to avoid overshoot
+        public float SpargePIDKd = 1.0f;
 
 
         public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
-            StrikeTemperature = 70;
+            StrikeTemperature = 50;
             MashTemperature = 66;
             SpargeWaterTemperature = 86;
             MashTime = 65;

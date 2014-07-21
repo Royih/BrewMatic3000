@@ -6,27 +6,26 @@ namespace BrewMatic3000.PID
     public delegate float GetFloat();
     public delegate void SetFloat(float value);
 
-    //Source: http://www.codeproject.com/Articles/49548/Industrial-NET-PID-Controllers
-    //PID tuning help: http://en.wikipedia.org/wiki/PID_controller
+    // Source: http://playground.arduino.cc/Main/BarebonesPIDForEspresso#pid
+    // Credits and lots of gratitude to Tim Hirzel for sharing his code (December 2007). 
+    // Tim Hirzels Arduino code was ported to .Net Microframework by Roy Ingar Hansen (July 2014)
+    // PID tuning help: http://en.wikipedia.org/wiki/PID_controller
     public class PID : IPID
     {
+        private const float WindupGuardGain = 1.0f;
 
         //Gains
-        private readonly float Kp;
-        private readonly float Ki;
-        private readonly float Kd;
+        private readonly float _kp;
+        private readonly float _ki;
+        private readonly float _kd;
 
 
-        //Max/Min Calculation
-        private const float PvMax = 100;
-        private const float PvMin = 0;
-        private const float OutMax = 100;
-        private const float OutMin = 0;
+        private float _pTerm;
+        private float _iTerm;
+        private float _dTerm;
+        private float _iState;
+        private float _lastTemp;
 
-        //Running Values
-        private DateTime _lastUpdate = DateTime.MinValue;
-        private float _lastPv;
-        private float _errSum;
 
         //Logging of values
         private LogValue[] _logValues;
@@ -36,9 +35,9 @@ namespace BrewMatic3000.PID
         public PID(float kp, float ki, float kd)
         {
             _logValues = new LogValue[0];
-            Kp = kp;
-            Ki = ki;
-            Kd = kd;
+            _kp = kp;
+            _ki = ki;
+            _kd = kd;
         }
 
         public float GetValue(float currentTemperature, float preferredTemperature)
@@ -46,58 +45,63 @@ namespace BrewMatic3000.PID
             var pv = currentTemperature;
             var sp = preferredTemperature;
 
-            //We need to scale the pv to +/- 100%, but first clamp it
-            pv = Clamp(pv, PvMin, PvMax);
-            pv = ScaleValue(pv, PvMin, PvMax, 0, 1.0f); //ScaleValue(pv, PvMin, PvMax, -1.0f, 1.0f);
+            // these local variables can be factored out if memory is an issue, 
+            // but they make it more readable
+            double result;
+            float error;
+            float windupGaurd;
 
-            //We also need to scale the setpoint
-            sp = Clamp(sp, PvMin, PvMax);
-            sp = ScaleValue(sp, PvMin, PvMax, 0, 1.0f); //ScaleValue(sp, PvMin, PvMax, -1.0f, 1.0f);
+            // determine how badly we are doing
+            error = sp - pv;
 
-            //Now the error is in percent...
-            float err = sp - pv;
+            // the pTerm is the view from now, the pgain judges 
+            // how much we care about error we are this instant.
+            _pTerm = _kp * error;
 
-            var pTerm = err * Kp;
-            var iTerm = 0.0f;
-            var dTerm = 0.0f;
+            // iState keeps changing over time; it's 
+            // overall "performance" over time, or accumulated error
+            _iState += error;
 
-            var partialSum = 0.0f;
-            var nowTime = DateTime.Now;
+            // to prevent the iTerm getting huge despite lots of 
+            //  error, we use a "windup guard" 
+            // (this happens when the machine is first turned on and
+            // it cant help be cold despite its best efforts)
 
-            if (_lastUpdate != DateTime.MinValue)
-            {
-                var dT = nowTime - _lastUpdate;
+            // not necessary, but this makes windup guard values 
+            // relative to the current iGain
+            windupGaurd = WindupGuardGain / _ki;
 
-                float dTSecs = dT.Seconds + (dT.Milliseconds / 1000f);
+            if (_iState > windupGaurd)
+                _iState = windupGaurd;
+            else if (_iState < -windupGaurd)
+                _iState = -windupGaurd;
+            _iTerm = _ki * _iState;
 
-                //Compute the integral if we have to...
-                if (pv >= PvMin && pv <= PvMax)
-                {
-                    partialSum = _errSum + (dTSecs * err);
-                    iTerm = Ki * partialSum;
-                }
+            // the dTerm, the difference between the temperature now
+            //  and our last reading, indicated the "speed," 
+            // how quickly the temp is changing. (aka. Differential)
+            _dTerm = (_kd * (pv - _lastTemp));
 
-                if (dTSecs != 0.0f)
-                    dTerm = Kd * (pv - _lastPv) / dTSecs;
-            }
+            // now that we've use lastTemp, put the current temp in
+            // our pocket until for the next round
+            _lastTemp = pv;
 
-            _lastUpdate = nowTime;
-            _errSum = partialSum;
-            _lastPv = pv;
-
-            //Now we have to scale the output value to match the requested scale
-            var outReal = pTerm + iTerm + dTerm;
-
-            outReal = Clamp(outReal, 0, 1.0f); //Clamp(outReal, -1.0f, 1.0f);
-            outReal = ScaleValue(outReal, 0, 1.0f, OutMin, OutMax); //ScaleValue(outReal, -1.0f, 1.0f, OutMin, OutMax);
-
-            //This is to prevent further heating if the setpoint is reached. Even though this is probably due to improper tuning of the PID
-            /*if (currentTemperature >= preferredTemperature)
-            {
+            // the magic feedback bit
+            var outReal = _pTerm + _iTerm - _dTerm;
+            if (outReal > 100)
+                outReal = 100;
+            if (outReal < 0)
                 outReal = 0;
-            }*/
 
-            //log this adjustment
+            LogValue(outReal, pv);
+
+            //Write it out to the world
+            return outReal;
+        }
+
+        public void LogValue(float outReal, float currentTemperature)
+        {
+            //Log this adjustment
             if (_nextLog == DateTime.MinValue || _nextLog < DateTime.Now)
             {
                 var nuArray = new LogValue[_logValues.Length + 1];
@@ -112,33 +116,7 @@ namespace BrewMatic3000.PID
                 _nextLog = DateTime.Now.Add(_logInterval);
             }
 
-
-            //Write it out to the world
-            return outReal;
         }
-
-
-        private float ScaleValue(float value, float valuemin,
-           float valuemax, float scalemin, float scalemax)
-        {
-            float vPerc = (value - valuemin) / (valuemax - valuemin);
-            float bigSpan = vPerc * (scalemax - scalemin);
-
-            float retVal = scalemin + bigSpan;
-
-            return retVal;
-        }
-
-        private float Clamp(float value, float min, float max)
-        {
-            if (value > max)
-                return max;
-            if (value < min)
-                return min;
-            return value;
-        }
-
-
 
         public LogValue[] GetLogValues()
         {

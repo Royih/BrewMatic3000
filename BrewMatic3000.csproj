@@ -43,7 +43,7 @@
     <Compile Include="FakeHW\FakeEnvironment.cs" />
     <Compile Include="FakeHW\FakeHeater.cs" />
     <Compile Include="Interfaces\IHeatDevice.cs" />
-    <Compile Include="Interfaces\IPID.cs" />
+    <Compile Include="PID\IPID.cs" />
     <Compile Include="PID\LogValue.cs" />
     <Compile Include="RealHW\HeatElement3000W.cs" />
     <Compile Include="RealHW\PT100Reader.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="FakeHW\FakeTempReader.cs" />
     <Compile Include="Interfaces\ITempReader.cs" />
     <Compile Include="PID\PID.cs" />
+    <Compile Include="States\StateTurnOffHeat.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Hardware" />

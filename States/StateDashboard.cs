@@ -61,7 +61,7 @@ namespace BrewMatic3000.States
                 if (_mainDisplayVisible)
                 {
                     var strLine1 = "T1:" + BrewData.TempReader1.GetValue().ToString("f1").PadLeft(4) + " T2:" + BrewData.TempReader2.GetValue().ToString("f1").PadLeft(4);
-                    var strLine2 = "H1:" + BrewData.Heater1.GetCurrentValue().PadLeft(3) + "% H2:" + BrewData.Heater2.GetCurrentValue().PadLeft(3) + "%";
+                    var strLine2 = "H1:" + BrewData.Heater1.GetCurrentValue().DisplayHeat() + " H2:" + BrewData.Heater2.GetCurrentValue().DisplayHeat();
                     WriteToLcd(strLine1, strLine2);
                 }
                 Thread.Sleep(1000);

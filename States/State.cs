@@ -128,6 +128,10 @@ namespace BrewMatic3000.States
             {
                 return new StateSetupHeat2EffectChoose(BrewData);
             }
+            if (stateType == typeof (StateTurnOffHeat))
+            {
+                return new StateTurnOffHeat(BrewData);
+            }
 
             throw new NotImplementedException("State type \"" + stateType + "\" is not implemented");
         }
