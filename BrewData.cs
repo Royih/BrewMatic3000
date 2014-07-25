@@ -22,12 +22,15 @@ namespace BrewMatic3000
 
         public HeatElement3000W Heater2 { get; set; }
 
+        public PID.PID MashPID;
+        public PID.PID SpargePID;
+
         public float MashPIDKp = 4.0f; 
-        public float MashPIDKi = 0.08f; // Decrease to avoid overshoot. 0.08 is too low. Shoulkd try 0.17 next
+        public float MashPIDKi = 0.17f; // Decrease to avoid overshoot. 0.08 is too low. Shoulkd try 0.17 next
         public float MashPIDKd = 1.0f; 
 
         public float SpargePIDKp = 4.0f;
-        public float SpargePIDKi = 0.08f; // Decrease to avoid overshoot
+        public float SpargePIDKi = 0.17f; // Decrease to avoid overshoot
         public float SpargePIDKd = 1.0f;
 
 
@@ -41,6 +44,9 @@ namespace BrewMatic3000
             TempReader2 = tempReader2;
             Heater1 = heater1;
             Heater2 = heater2;
+
+            MashPID = new PID.PID(MashPIDKp, MashPIDKi, MashPIDKd);
+            SpargePID = new PID.PID(SpargePIDKp, SpargePIDKi, SpargePIDKd);
         }
 
     }

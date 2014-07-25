@@ -8,15 +8,7 @@ namespace BrewMatic3000.States
 {
     public class State2Warmup : State
     {
-        private readonly ITempReader _tempReader1;
-        private readonly ITempReader _tempReader2;
 
-        private readonly IHeatDevice _heater1;
-        private readonly IHeatDevice _heater2;
-
-
-        private readonly PID.PID _mashPID;
-        private readonly PID.PID _spargePID;
 
         private float _maxTemp1;
         private float _maxTemp2;
@@ -43,14 +35,6 @@ namespace BrewMatic3000.States
         {
             _maxTemp1 = 0;
             _maxTemp2 = 0;
-
-            _tempReader1 = brewData.TempReader1;
-            _tempReader2 = brewData.TempReader2;
-            _heater1 = brewData.Heater1;
-            _heater2 = brewData.Heater2;
-
-            _mashPID = new PID.PID(brewData.MashPIDKp, brewData.MashPIDKi, brewData.MashPIDKd);
-            _spargePID = new PID.PID(brewData.SpargePIDKp, brewData.SpargePIDKi, brewData.SpargePIDKd);
         }
 
         public override void OnKeyPressLongWarning()
@@ -98,7 +82,7 @@ namespace BrewMatic3000.States
                 _mainDisplayVisible = true;
 
                 //Output all logValues to standard output
-                var logValues = _mashPID.GetLogValues();
+                var logValues = BrewData.MashPID.GetLogValues();
                 if (logValues != null)
                 {
                     foreach (var logValue in logValues)
@@ -126,8 +110,8 @@ namespace BrewMatic3000.States
         {
             while (!_abort)
             {
-                var currentTemp1 = _tempReader1.GetValue();
-                var currentTemp2 = _tempReader2.GetValue();
+                var currentTemp1 = BrewData.TempReader1.GetValue();
+                var currentTemp2 = BrewData.TempReader2.GetValue();
 
                 //keep the highest temp (for pid tuning purposes)
                 if (_maxTemp1 < currentTemp1)
@@ -139,16 +123,16 @@ namespace BrewMatic3000.States
                     _maxTemp2 = currentTemp2;
                 }
 
-                var pidOutputMash = _mashPID.GetValue(currentTemp1, BrewData.StrikeTemperature);
-                _heater1.SetValue(pidOutputMash);
+                var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, BrewData.StrikeTemperature);
+                BrewData.Heater1.SetValue(pidOutputMash);
 
-                var pidOutputSparge = _spargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
-                _heater2.SetValue(pidOutputSparge);
+                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
+                BrewData.Heater2.SetValue(pidOutputSparge);
 
                 if (_mainDisplayVisible)
                 {
-                    var line1String = GetLineString(currentTemp1, BrewData.StrikeTemperature, _heater1.GetCurrentValue());
-                    var line2String = GetLineString(currentTemp2, BrewData.SpargeWaterTemperature, _heater2.GetCurrentValue());
+                    var line1String = GetLineString(currentTemp1, BrewData.StrikeTemperature, BrewData.Heater1.GetCurrentValue());
+                    var line2String = GetLineString(currentTemp2, BrewData.SpargeWaterTemperature, BrewData.Heater2.GetCurrentValue());
                     WriteToLcd(line1String, line2String);
                 }
                 Thread.Sleep(1500);
