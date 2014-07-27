@@ -47,6 +47,7 @@
     <Compile Include="PID\LogValue.cs" />
     <Compile Include="RealHW\HeatElement3000W.cs" />
     <Compile Include="RealHW\PT100Reader.cs" />
+    <Compile Include="States\State3MashAddGrain.cs" />
     <Compile Include="States\Setup\StateSetupHeat2Effect.cs" />
     <Compile Include="States\Setup\StateSetupHeat2EffectChoose.cs" />
     <Compile Include="States\Setup\StateSetupHeat1Effect.cs" />

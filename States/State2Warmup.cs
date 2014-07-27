@@ -47,7 +47,7 @@ namespace BrewMatic3000.States
             }
             else
             {
-                WriteToLcd(".start mashing?");
+                WriteToLcd(".start adding grain?");
             }
         }
 
@@ -65,7 +65,7 @@ namespace BrewMatic3000.States
             }
             else
             {
-                RiseStateChangedEvent(typeof(State3Mash));
+                RiseStateChangedEvent(typeof(State3MashAddGrain));
             }
         }
 
