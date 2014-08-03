@@ -73,16 +73,22 @@ namespace BrewMatic3000
                     var buttonWasPressedMillis = tsPressed.Milliseconds + (1000 * tsPressed.Seconds) + (1000 * 60 * tsPressed.Minutes);
                     if (_navButtonState == NavButtonStates.Pressed && buttonWasPressedMillis > TimeoutDisplayWarning)
                     {
-                        _navButtonState = NavButtonStates.Warned;
-                        KeyPressLongWarning();
+                        if (KeyPressLongWarning != null)
+                        {
+                            _navButtonState = NavButtonStates.Warned;
+                            KeyPressLongWarning();
+                        }
                     }
                     else if (_navButtonState == NavButtonStates.Warned && buttonWasPressedMillis > (TimeoutDisplayWarning + TimeoutConfirmed))
                     {
-                        _navButtonState = NavButtonStates.Idle;
-                        KeyPressLong();
+                        if (KeyPressLong != null)
+                        {
+                            _navButtonState = NavButtonStates.Idle;
+                            KeyPressLong();
+                        }
                     }
                 }
-                Thread.Sleep(200);
+                Thread.Sleep(500);
             }
         }
 

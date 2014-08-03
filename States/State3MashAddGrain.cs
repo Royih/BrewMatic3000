@@ -23,6 +23,7 @@ namespace BrewMatic3000.States
             {
                 return new[]
                 {
+                    new NavigateAction("Start mashing", "","..hold to start", typeof(State3Mash)),
                     new NavigateAction("Abort brew", "","..hold to abort", typeof(State1Initial))
                 };
             }
@@ -41,10 +42,6 @@ namespace BrewMatic3000.States
             if (action != null)
             {
                 WriteToLcd(action.Warning);
-            }
-            else
-            {
-                WriteToLcd(".start mashing?");
             }
         }
 
@@ -100,7 +97,10 @@ namespace BrewMatic3000.States
                 var currentTemp1 = BrewData.TempReader1.GetValue();
                 var currentTemp2 = BrewData.TempReader2.GetValue();
 
-                var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, BrewData.MashTemperature);
+                var preferredMashTemp = BrewData.MashTemperature;
+                var preferredSpargeTemp = BrewData.SpargeWaterTemperature;
+
+                var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
                 BrewData.Heater1.SetValue(pidOutputMash);
 
                 var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
@@ -109,8 +109,8 @@ namespace BrewMatic3000.States
 
                 if (_mainDisplayVisible)
                 {
-                    var line1String = GetLineString(currentTemp1, BrewData.StrikeTemperature, BrewData.Heater1.GetCurrentValue());
-                    var line2String = GetLineString(currentTemp2, BrewData.SpargeWaterTemperature, BrewData.Heater2.GetCurrentValue());
+                    var line1String = GetLineString(currentTemp1, preferredMashTemp, BrewData.Heater1.GetCurrentValue());
+                    var line2String = GetLineString(currentTemp2, preferredSpargeTemp, BrewData.Heater2.GetCurrentValue());
                     WriteToLcd(line1String, line2String);
                 }
 

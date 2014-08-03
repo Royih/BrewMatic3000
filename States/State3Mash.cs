@@ -20,6 +20,7 @@ namespace BrewMatic3000.States
             {
                 return new[]
                 {
+                    new NavigateAction("Mash compelete", "","..completed?", typeof(State4MashComplete)),
                     new NavigateAction("Abort brew", "","..hold to abort", typeof(State1Initial))
                 };
             }
@@ -91,16 +92,20 @@ namespace BrewMatic3000.States
                 var currentTemp1 = BrewData.TempReader1.GetValue();
                 var currentTemp2 = BrewData.TempReader2.GetValue();
 
-                var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, BrewData.MashTemperature);
+                var preferredMashTemp = BrewData.MashTemperature;
+                var preferredSpargeTemp = BrewData.SpargeWaterTemperature;
+
+
+                var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
                 BrewData.Heater1.SetValue(pidOutputMash);
 
-                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
+                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, preferredSpargeTemp);
                 BrewData.Heater2.SetValue(pidOutputSparge);
 
                 if (_mainDisplayVisible)
                 {
                     WriteToLcd(" Mash:  " + ts,
-                               "Tg:" + BrewData.MashTemperature + " Ac:" + BrewData.Heater1.GetCurrentValue().ToString("f1").PadLeft(4));
+                               "Tg:" + preferredMashTemp + " Ac:" + currentTemp1.ToString("f1").PadLeft(4));
                 }
 
                 Thread.Sleep(1000);

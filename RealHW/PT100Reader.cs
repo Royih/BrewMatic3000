@@ -13,7 +13,7 @@ namespace BrewMatic3000.RealHW
     {
         private readonly SecretLabs.NETMF.Hardware.AnalogInput _analogInput;
 
-        private const int ReistorOhms = 163;
+        private const int ReistorOhms = 165;
         private const int MaximumValue = 1023;
         private const float AnalogReference = 3.3f;
         private const float MinimumCurrentValue = 0.004f;
@@ -37,9 +37,9 @@ namespace BrewMatic3000.RealHW
         /// Will return a value between 0 and 100 (degreen celcius)
         /// 4mA = 0*C
         /// 20mA = 100*C
-        /// 162 ohm resistors gives: 
-        /// 0*C = 162 * 4e-3 = 0,648V
-        /// 100*C = 162 * 20e-3 = 3.24V
+        /// 165 ohm resistors gives: 
+        /// 0*C = 165 * 4e-3 = ?V
+        /// 100*C = 165 * 20e-3 = 3.3V
         /// 
         /// 100 / (20e-3 - 4e-3) = 6250 
         /// </summary>

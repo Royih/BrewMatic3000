@@ -25,20 +25,20 @@ namespace BrewMatic3000
         public PID.PID MashPID;
         public PID.PID SpargePID;
 
-        public float MashPIDKp = 4.0f; //Previous: 4
-        public float MashPIDKi = 0.3f; // Decrease to avoid overshoot.   Previous 0.17
+        public float MashPIDKp = 25.5f; //Previous: 18.5
+        public float MashPIDKi = 1.9f; // Decrease to avoid overshoot.
         public float MashPIDKd = 1.0f;
 
-        public float SpargePIDKp = 4.0f;
-        public float SpargePIDKi = 0.3f; // Decrease to avoid overshoot
+        public float SpargePIDKp = 23.3f; //Previous 16.3
+        public float SpargePIDKi = 1.9f; // Decrease to avoid overshoot
         public float SpargePIDKd = 1.0f;
 
 
         public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
-            StrikeTemperature = 73.5f;
+            StrikeTemperature = 73.2f;
             MashTemperature = 67;
-            SpargeWaterTemperature = 73.5f;
+            SpargeWaterTemperature = 75.6f;
             MashTime = 60;
             TempReader1 = tempReader1;
             TempReader2 = tempReader2;

@@ -46,7 +46,7 @@ namespace BrewMatic3000.RealHW
                 for (var i = 0; i < 100; i++)
                 {
                     _portHeater.Write(i < _currentPercentage);
-                    Thread.Sleep(10);
+                    Thread.Sleep(1);
                 }
 
             }

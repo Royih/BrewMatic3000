@@ -132,6 +132,11 @@ namespace BrewMatic3000.States
             {
                 return new StateTurnOffHeat(BrewData);
             }
+            if (stateType == typeof(State3MashAddGrain))
+            {
+                return new State3MashAddGrain(BrewData);
+            }
+
 
             throw new NotImplementedException("State type \"" + stateType + "\" is not implemented");
         }

@@ -71,6 +71,10 @@ namespace BrewMatic3000
 
         private void ApplyState(State state)
         {
+            NavButtonManager.KeyPressLong -= NavButton_KeyPressLong;
+            NavButtonManager.KeyPressLongWarning -= NavButton_KeyPressLongWarning;
+            NavButtonManager.KeyPressLongCancelled -= NavButton_KeyPressLongCancelled;
+            NavButtonManager.KeyPressShort -= NavButton_KeyPressShort;
             if (_currentState != state)
             {
                 //abort/dispose currently running job
@@ -87,6 +91,11 @@ namespace BrewMatic3000
 
                 //DisplayLcdContent(state.DisplayUi);
             }
+            NavButtonManager.KeyPressLong += NavButton_KeyPressLong;
+            NavButtonManager.KeyPressLongWarning += NavButton_KeyPressLongWarning;
+            NavButtonManager.KeyPressLongCancelled += NavButton_KeyPressLongCancelled;
+            NavButtonManager.KeyPressShort += NavButton_KeyPressShort;
+
         }
 
         private void DisplayLcdContent(string[] contentToDisplay)

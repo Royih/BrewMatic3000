@@ -25,6 +25,7 @@ namespace BrewMatic3000.States
             {
                 return new[]
                 {
+                    new NavigateAction("Add grain?", "",".start adding grain?", typeof(State3MashAddGrain)),
                     new NavigateAction("Abort brew", "","..hold to abort", typeof(State1Initial))
                 };
             }
@@ -44,11 +45,7 @@ namespace BrewMatic3000.States
             if (action != null)
             {
                 WriteToLcd(action.Warning);
-            }
-            else
-            {
-                WriteToLcd(".start adding grain?");
-            }
+            }            
         }
 
         public override void OnKeyPressLongCancelled()
@@ -81,13 +78,23 @@ namespace BrewMatic3000.States
             {
                 _mainDisplayVisible = true;
 
-                //Output all logValues to standard output
+                //Output all mash logValues to standard output
                 var logValues = BrewData.MashPID.GetLogValues();
                 if (logValues != null)
                 {
                     foreach (var logValue in logValues)
                     {
-                        Debug.Print(logValue.TimeStamp + ";" + logValue.Temperature + ";" + logValue.Effect);
+                        Debug.Print("Mash;" + logValue.TimeStamp + ";" + logValue.Temperature + ";" + logValue.Effect);
+                    }
+                }
+
+                //Output all sparge logValues to standard output
+                logValues = BrewData.SpargePID.GetLogValues();
+                if (logValues != null)
+                {
+                    foreach (var logValue in logValues)
+                    {
+                        Debug.Print("Sparge;" + logValue.TimeStamp + ";" + logValue.Temperature + ";" + logValue.Effect);
                     }
                 }
             }
