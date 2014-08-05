@@ -1,10 +1,12 @@
+using BrewMatic3000.Extensions;
+
 namespace BrewMatic3000.States.Setup
 {
     public class StateSetupMashTempChoose : State
     {
-        private const int MinTemp = 60;
+        private const float MinTemp = 60.0f;
 
-        private const int MaxTemp = 75;
+        private const float MaxTemp = 75.0f;
 
         public StateSetupMashTempChoose(BrewData brewData)
             : base(brewData)
@@ -19,12 +21,13 @@ namespace BrewMatic3000.States.Setup
 
         private void WriteDefaultText()
         {
-            WriteToLcd("Set Mash Temp", "Current: " + BrewData.MashTemperature + "*C");
+            WriteToLcd("Set Mash Temp", "Current: " + BrewData.MashTemperature.ToString("f1").PadLeft(4) + "*C");
         }
 
         public override void OnKeyPressShort()
         {
-            if (++BrewData.MashTemperature > MaxTemp)
+            BrewData.MashTemperature += 0.1f;
+            if (BrewData.MashTemperature > MaxTemp)
             {
                 BrewData.MashTemperature = MinTemp;
             }
@@ -44,7 +47,12 @@ namespace BrewMatic3000.States.Setup
 
         public override void OnKeyPressLong()
         {
-            RiseStateChangedEvent(typeof(State1Initial));
+            RiseStateChangedEvent(new State1Initial(BrewData));
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return null;
         }
 
     }

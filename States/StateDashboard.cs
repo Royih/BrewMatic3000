@@ -38,7 +38,7 @@ namespace BrewMatic3000.States
 
         public override void OnKeyPressShort()
         {
-            RiseStateChangedEvent(typeof(State1Initial));
+            RiseStateChangedEvent(new State1Initial(BrewData));
         }
 
         public override void Start()
@@ -66,6 +66,11 @@ namespace BrewMatic3000.States
                 }
                 Thread.Sleep(1000);
             }
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return null;
         }
 
 

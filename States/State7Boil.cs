@@ -1,18 +1,11 @@
-
+using System;
 using System.Threading;
-using BrewMatic3000.Interfaces;
+using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States
 {
-    public class State2StrikeWarmup : State
+    public class State7Boil : State
     {
-        private readonly ITempReader _tempReader;
-        private readonly IHeatDevice _heater1;
-        //private readonly FakeEnvironment _fakeEnvironment;
-        private readonly PID _tempController;
-
-        private float _maxTemp = 0f;
-
         private Thread _worker;
 
         private bool _abort;
@@ -25,22 +18,16 @@ namespace BrewMatic3000.States
             {
                 return new[]
                 {
-                    new NavigateAction("Abort brew", "","..hold to abort", typeof(State1Initial))
+                    new NavigateAction("Output log?", "","..hold to output", new StateOutputLog(BrewData)),
+                    new NavigateAction("Reset brew?", "","..hold to reset", new State1Initial(BrewData))
                 };
             }
         }
 
-        public State2StrikeWarmup(BrewData brewData)
+        public State7Boil(BrewData brewData)
             : base(brewData)
         {
-            _maxTemp = 0;
-
-            _tempReader = brewData.TempReader;
-            //_heater = new FakeHeater(10);
-            _heater1 = brewData.Heater1;
-            _tempController = new PID();
-
-            //_fakeEnvironment = new FakeEnvironment(_tempReader);
+            
         }
 
         public override void OnKeyPressLongWarning()
@@ -53,7 +40,7 @@ namespace BrewMatic3000.States
             }
             else
             {
-                WriteToLcd(".start mashing?");
+                WriteToLcd("..reset brew?");
             }
         }
 
@@ -67,11 +54,7 @@ namespace BrewMatic3000.States
             var action = GetSelectedAction(Actions);
             if (action != null)
             {
-                RiseStateChangedEvent(action.StateType);
-            }
-            else
-            {
-                RiseStateChangedEvent(typeof(State3Mash));
+                RiseStateChangedEvent(action.NextState);
             }
         }
 
@@ -91,6 +74,8 @@ namespace BrewMatic3000.States
 
         public override void Start()
         {
+            ShowStateName(); //Display info about this new state in n seconds
+            BrewData.BrewSpargeEnd = DateTime.Now;
             _worker = new Thread(
               DoWork
               ) { Priority = ThreadPriority.Normal };
@@ -106,29 +91,17 @@ namespace BrewMatic3000.States
         {
             while (!_abort)
             {
-                var currentTemp = _tempReader.GetValue();
-
-                //keep the highest temp (for pid tuning purposes)
-                if (_maxTemp < currentTemp)
-                {
-                    _maxTemp = currentTemp;
-                }
-
-                var pidOutput = _tempController.GetValue(currentTemp, BrewData.StrikeTemperature);
-                _heater1.SetValue(pidOutput);
-
                 if (_mainDisplayVisible)
                 {
-                    var currentTempString = currentTemp.ToString("f1");
-                    var desiredTempString = BrewData.StrikeTemperature.ToString("f1");
-
-                    var line1String = currentTempString + "|" + desiredTempString + "|W:" + (int)_heater1.GetCurrentValue() + "%"; //58.9|68.0|W:100%"
-
-                    var line2String = "Max:" + _maxTemp.ToString("f1");
-                    WriteToLcd(line1String, line2String);
+                    WriteToLcd("Boiling.", "My wrk is done:)");
                 }
-                Thread.Sleep(750);
+                Thread.Sleep(1000);
             }
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return new[] { "Begin boil..", "In " + secondsLeft + " seconds" };
         }
     }
 }

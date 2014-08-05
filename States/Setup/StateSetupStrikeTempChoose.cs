@@ -1,11 +1,13 @@
 
+using BrewMatic3000.Extensions;
+
 namespace BrewMatic3000.States.Setup
 {
     public class StateSetupStrikeTempChoose : State
     {
-        private const int MinTemp = 55;
+        private const float MinTemp = 70.0f;
 
-        private const int MaxTemp = 95;
+        private const float MaxTemp = 80.0f;
 
         public StateSetupStrikeTempChoose(BrewData brewData)
             : base(brewData)
@@ -20,12 +22,13 @@ namespace BrewMatic3000.States.Setup
 
         private void WriteDefaultText()
         {
-            WriteToLcd("Set Strike Temp", "Current: " + BrewData.StrikeTemperature + "*C");
+            WriteToLcd("Set Strike Temp", "Current: " + BrewData.StrikeTemperature.ToString("f1").PadLeft(4) + "*C");
         }
 
         public override void OnKeyPressShort()
         {
-            if (++BrewData.StrikeTemperature > MaxTemp)
+            BrewData.StrikeTemperature += 0.1f;
+            if (BrewData.StrikeTemperature > MaxTemp)
             {
                 BrewData.StrikeTemperature = MinTemp;
             }
@@ -45,7 +48,12 @@ namespace BrewMatic3000.States.Setup
 
         public override void OnKeyPressLong()
         {
-            RiseStateChangedEvent(typeof(State1Initial));
+            RiseStateChangedEvent((new State1Initial(BrewData)));
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return null;
         }
 
     }

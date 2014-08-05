@@ -93,13 +93,13 @@ namespace BrewMatic3000.PID
             if (outReal < 0)
                 outReal = 0;
 
-            LogValue(outReal, pv);
+            LogValue(outReal, pv, preferredTemperature);
 
             //Write it out to the world
             return outReal;
         }
 
-        public void LogValue(float outReal, float currentTemperature)
+        public void LogValue(float outReal, float currentTemperature, float preferredTemperature)
         {
             //Log this adjustment
             if (_nextLog == DateTime.MinValue || _nextLog < DateTime.Now)
@@ -110,7 +110,8 @@ namespace BrewMatic3000.PID
                 _logValues[_logValues.Length - 1] = new LogValue()
                 {
                     Effect = outReal,
-                    Temperature = currentTemperature,
+                    CurrentTemperature = currentTemperature,
+                    PreferredTemperature = preferredTemperature,
                     TimeStamp = DateTime.Now
                 };
                 _nextLog = DateTime.Now.Add(_logInterval);

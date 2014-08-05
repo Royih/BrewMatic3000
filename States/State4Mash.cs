@@ -4,7 +4,7 @@ using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States
 {
-    public class State3Mash : State
+    public class State4Mash : State
     {
         private Thread _worker;
 
@@ -20,16 +20,16 @@ namespace BrewMatic3000.States
             {
                 return new[]
                 {
-                    new NavigateAction("Mash compelete", "","..completed?", typeof(State4MashComplete)),
-                    new NavigateAction("Abort brew", "","..hold to abort", typeof(State1Initial))
+                    new NavigateAction("Mash complete?", "","..start mashout?", new State5Mashout(BrewData)),
+                    new NavigateAction("Abort brew?", "","..hold to abort", new State1Initial(BrewData))
                 };
             }
         }
 
-        public State3Mash(BrewData brewData)
+        public State4Mash(BrewData brewData)
             : base(brewData)
         {
-            _mashComplete = DateTime.Now.AddMinutes(BrewData.MashTime);
+
         }
 
         public override void OnKeyPressLongWarning()
@@ -39,6 +39,10 @@ namespace BrewMatic3000.States
             if (action != null)
             {
                 WriteToLcd(action.Warning);
+            }
+            else
+            {
+                WriteToLcd("..mash complete?");
             }
         }
 
@@ -52,7 +56,11 @@ namespace BrewMatic3000.States
             var action = GetSelectedAction(Actions);
             if (action != null)
             {
-                RiseStateChangedEvent(action.StateType);
+                RiseStateChangedEvent(action.NextState);
+            }
+            else
+            {
+                RiseStateChangedEvent(new State5Mashout(BrewData));
             }
         }
 
@@ -72,6 +80,9 @@ namespace BrewMatic3000.States
 
         public override void Start()
         {
+            ShowStateName(); //Display info about this new state in n seconds
+            BrewData.BrewMashStart = DateTime.Now;
+            _mashComplete = DateTime.Now.AddMinutes(BrewData.MashTime);
             _worker = new Thread(
               DoWork
               ) { Priority = ThreadPriority.Normal };
@@ -93,7 +104,7 @@ namespace BrewMatic3000.States
                 var currentTemp2 = BrewData.TempReader2.GetValue();
 
                 var preferredMashTemp = BrewData.MashTemperature;
-                var preferredSpargeTemp = BrewData.SpargeWaterTemperature;
+                var preferredSpargeTemp = BrewData.SpargeTemperature;
 
 
                 var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
@@ -104,13 +115,21 @@ namespace BrewMatic3000.States
 
                 if (_mainDisplayVisible)
                 {
-                    WriteToLcd(" Mash:  " + ts,
-                               "Tg:" + preferredMashTemp + " Ac:" + currentTemp1.ToString("f1").PadLeft(4));
+                    WriteToLcd("Mash:   " + ts,
+                               "Tg:" + preferredMashTemp.ToString("f1").PadLeft(4) + " Ac:" + currentTemp1.ToString("f1").PadLeft(4));
                 }
 
                 Thread.Sleep(1000);
             }
-            RiseStateChangedEvent(typeof(State4MashComplete));
+            if (!_abort)
+            {
+                RiseStateChangedEvent(new State5Mashout(BrewData));
+            }
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return new[] { "Start mashing..", "In " + secondsLeft + " seconds" };
         }
     }
 }

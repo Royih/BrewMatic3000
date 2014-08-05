@@ -1,7 +1,7 @@
 
+using System;
 using System.Threading;
 using BrewMatic3000.Extensions;
-using BrewMatic3000.Interfaces;
 using Microsoft.SPOT;
 
 namespace BrewMatic3000.States
@@ -25,8 +25,8 @@ namespace BrewMatic3000.States
             {
                 return new[]
                 {
-                    new NavigateAction("Add grain?", "",".start adding grain?", typeof(State3MashAddGrain)),
-                    new NavigateAction("Abort brew", "","..hold to abort", typeof(State1Initial))
+                    new NavigateAction("Add grain?", "",".start adding grain?", new State3MashAddGrain(BrewData)),
+                    new NavigateAction("Abort brew?", "","..hold to abort", new State1Initial(BrewData))
                 };
             }
         }
@@ -45,7 +45,11 @@ namespace BrewMatic3000.States
             if (action != null)
             {
                 WriteToLcd(action.Warning);
-            }            
+            }
+            else
+            {
+                WriteToLcd("..add grain?");
+            }
         }
 
         public override void OnKeyPressLongCancelled()
@@ -58,11 +62,11 @@ namespace BrewMatic3000.States
             var action = GetSelectedAction(Actions);
             if (action != null)
             {
-                RiseStateChangedEvent(action.StateType);
+                RiseStateChangedEvent(action.NextState);
             }
             else
             {
-                RiseStateChangedEvent(typeof(State3MashAddGrain));
+                RiseStateChangedEvent(new State3MashAddGrain(BrewData));
             }
         }
 
@@ -77,31 +81,13 @@ namespace BrewMatic3000.States
             else
             {
                 _mainDisplayVisible = true;
-
-                //Output all mash logValues to standard output
-                var logValues = BrewData.MashPID.GetLogValues();
-                if (logValues != null)
-                {
-                    foreach (var logValue in logValues)
-                    {
-                        Debug.Print("Mash;" + logValue.TimeStamp + ";" + logValue.Temperature + ";" + logValue.Effect);
-                    }
-                }
-
-                //Output all sparge logValues to standard output
-                logValues = BrewData.SpargePID.GetLogValues();
-                if (logValues != null)
-                {
-                    foreach (var logValue in logValues)
-                    {
-                        Debug.Print("Sparge;" + logValue.TimeStamp + ";" + logValue.Temperature + ";" + logValue.Effect);
-                    }
-                }
             }
         }
 
         public override void Start()
         {
+            ShowStateName(); //Display info about this new state in n seconds
+            BrewData.BrewWarmupStart = DateTime.Now;
             _worker = new Thread(
               DoWork
               ) { Priority = ThreadPriority.Normal };
@@ -133,13 +119,13 @@ namespace BrewMatic3000.States
                 var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, BrewData.StrikeTemperature);
                 BrewData.Heater1.SetValue(pidOutputMash);
 
-                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeWaterTemperature);
+                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeTemperature);
                 BrewData.Heater2.SetValue(pidOutputSparge);
 
                 if (_mainDisplayVisible)
                 {
                     var line1String = GetLineString(currentTemp1, BrewData.StrikeTemperature, BrewData.Heater1.GetCurrentValue());
-                    var line2String = GetLineString(currentTemp2, BrewData.SpargeWaterTemperature, BrewData.Heater2.GetCurrentValue());
+                    var line2String = GetLineString(currentTemp2, BrewData.SpargeTemperature, BrewData.Heater2.GetCurrentValue());
                     WriteToLcd(line1String, line2String);
                 }
                 Thread.Sleep(1500);
@@ -151,6 +137,11 @@ namespace BrewMatic3000.States
             var currentTempString = currentTemp.ToString("f1").PadLeft(4);
             var desiredTempString = desiredTemp.ToString("f1").PadLeft(4);
             return currentTempString + "|" + desiredTempString + "|W:" + (int)watt + "%"; //58.9|68.0|W:100%"
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return new[] { "Warmup..", "In " + secondsLeft + " seconds" };
         }
     }
 }

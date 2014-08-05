@@ -1,13 +1,10 @@
-
 using System;
 using System.Threading;
 using BrewMatic3000.Extensions;
-using BrewMatic3000.FakeHW;
-using BrewMatic3000.Interfaces;
 
 namespace BrewMatic3000.States
 {
-    public class State3MashAddGrain : State
+    public class State5Mashout : State
     {
         private Thread _worker;
 
@@ -15,19 +12,20 @@ namespace BrewMatic3000.States
 
         private bool _mainDisplayVisible = true;
 
+
         private NavigateAction[] Actions
         {
             get
             {
                 return new[]
                 {
-                    new NavigateAction("Start mashing?", "","..hold to start", new State4Mash(BrewData)),
+                    new NavigateAction("Mash out complt?", "","..completed?", new State6Sparge(BrewData)),
                     new NavigateAction("Abort brew?", "","..hold to abort", new State1Initial(BrewData))
                 };
             }
         }
 
-        public State3MashAddGrain(BrewData brewData)
+        public State5Mashout(BrewData brewData)
             : base(brewData)
         {
             
@@ -43,7 +41,7 @@ namespace BrewMatic3000.States
             }
             else
             {
-                WriteToLcd("..start mashing?");
+                WriteToLcd("..mash out complt?");
             }
         }
 
@@ -61,7 +59,7 @@ namespace BrewMatic3000.States
             }
             else
             {
-                RiseStateChangedEvent(new State4Mash(BrewData));
+                RiseStateChangedEvent(new State6Sparge(BrewData));
             }
         }
 
@@ -82,7 +80,7 @@ namespace BrewMatic3000.States
         public override void Start()
         {
             ShowStateName(); //Display info about this new state in n seconds
-            BrewData.BrewAddGrainStart = DateTime.Now;
+            BrewData.BrewMashOutStart = DateTime.Now;
             _worker = new Thread(
               DoWork
               ) { Priority = ThreadPriority.Normal };
@@ -101,36 +99,29 @@ namespace BrewMatic3000.States
                 var currentTemp1 = BrewData.TempReader1.GetValue();
                 var currentTemp2 = BrewData.TempReader2.GetValue();
 
-                var preferredMashTemp = BrewData.MashTemperature;
+                var preferredMashTemp = BrewData.MashOutTemperature;
                 var preferredSpargeTemp = BrewData.SpargeTemperature;
+
 
                 var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
                 BrewData.Heater1.SetValue(pidOutputMash);
 
-                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeTemperature);
+                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, preferredSpargeTemp);
                 BrewData.Heater2.SetValue(pidOutputSparge);
-
 
                 if (_mainDisplayVisible)
                 {
-                    var line1String = GetLineString(currentTemp1, preferredMashTemp, BrewData.Heater1.GetCurrentValue());
-                    var line2String = GetLineString(currentTemp2, preferredSpargeTemp, BrewData.Heater2.GetCurrentValue());
-                    WriteToLcd(line1String, line2String);
+                    WriteToLcd("Mash out| W:" + (int)BrewData.Heater1.GetCurrentValue() + "%",
+                               "Tg:" + preferredMashTemp.ToString("f1").PadLeft(4) + " Ac:" + currentTemp1.ToString("f1").PadLeft(4));
                 }
 
                 Thread.Sleep(1000);
             }
         }
-        private string GetLineString(float currentTemp, float desiredTemp, float watt)
-        {
-            var currentTempString = currentTemp.ToString("f1").PadLeft(4);
-            var desiredTempString = desiredTemp.ToString("f1").PadLeft(4);
-            return currentTempString + "|" + desiredTempString + "|W:" + (int)watt + "%"; //58.9|68.0|W:100%"
-        }
 
         public override string[] GetNewStateIndication(int secondsLeft)
         {
-            return new[] { "Add grain..", "In " + secondsLeft + " seconds" };
+            return new[] { "Start mash out..", "In " + secondsLeft + " seconds" };
         }
     }
 }

@@ -1,5 +1,6 @@
 
 using System;
+using System.Threading;
 using BrewMatic3000.States.Setup;
 
 namespace BrewMatic3000.States
@@ -10,6 +11,8 @@ namespace BrewMatic3000.States
 
     public abstract class State : IDisposable
     {
+        protected int SecondsLeftOfNewStateIndication = 4;
+
         protected BrewData BrewData { get; private set; }
 
         private string[] _currentLcdContent;
@@ -23,10 +26,9 @@ namespace BrewMatic3000.States
             BrewData = brewData;
         }
 
-
-        protected void RiseStateChangedEvent(Type newState)
+        protected void RiseStateChangedEvent(State nextState)
         {
-            StateChanged(InstanciateStateByType(newState));
+            StateChanged(nextState);
         }
 
         public string[] CurrentLcdContent
@@ -66,83 +68,9 @@ namespace BrewMatic3000.States
             return _selectedActionPointer > -1 ? actions[_selectedActionPointer] : null;
         }
 
-        private State InstanciateStateByType(Type stateType)
-        {
-            if (stateType == typeof(State1Initial))
-            {
-                return new State1Initial(BrewData);
-            }
-            if (stateType == typeof(State2Warmup))
-            {
-                return new State2Warmup(BrewData);
-            }
-            if (stateType == typeof(StateSetupMashTemp))
-            {
-                return new StateSetupMashTemp(BrewData);
-            }
-            if (stateType == typeof(StateSetupMashTime))
-            {
-                return new StateSetupMashTime(BrewData);
-            }
-            if (stateType == typeof(StateSetupStrikeTemp))
-            {
-                return new StateSetupStrikeTemp(BrewData);
-            }
-            if (stateType == typeof(StateSetupMashTempChoose))
-            {
-                return new StateSetupMashTempChoose(BrewData);
-            }
-            if (stateType == typeof(StateSetupMashTimeChoose))
-            {
-                return new StateSetupMashTimeChoose(BrewData);
-            }
-            if (stateType == typeof(StateSetupStrikeTempChoose))
-            {
-                return new StateSetupStrikeTempChoose(BrewData);
-            }
-            if (stateType == typeof(State3Mash))
-            {
-                return new State3Mash(BrewData);
-            }
-            if (stateType == typeof(State4MashComplete))
-            {
-                return new State4MashComplete(BrewData);
-            }
-            if (stateType == typeof(StateDashboard))
-            {
-                return new StateDashboard(BrewData);
-            }
-            if (stateType == typeof(StateSetupHeat1Effect))
-            {
-                return new StateSetupHeat1Effect(BrewData);
-            }
-            if (stateType == typeof(StateSetupHeat1EffectChoose))
-            {
-                return new StateSetupHeat1EffectChoose(BrewData);
-            }
-            if (stateType == typeof(StateSetupHeat2Effect))
-            {
-                return new StateSetupHeat2Effect(BrewData);
-            }
-            if (stateType == typeof(StateSetupHeat2EffectChoose))
-            {
-                return new StateSetupHeat2EffectChoose(BrewData);
-            }
-            if (stateType == typeof (StateTurnOffHeat))
-            {
-                return new StateTurnOffHeat(BrewData);
-            }
-            if (stateType == typeof(State3MashAddGrain))
-            {
-                return new State3MashAddGrain(BrewData);
-            }
-
-
-            throw new NotImplementedException("State type \"" + stateType + "\" is not implemented");
-        }
-
         public abstract void Start();
 
+        public abstract string[] GetNewStateIndication(int secondsLeft);
 
         public virtual void Dispose()
         {
@@ -169,6 +97,19 @@ namespace BrewMatic3000.States
 
         }
 
+        public void ShowStateName()
+        {
+            while (SecondsLeftOfNewStateIndication-- > 1)
+            {
+                var indication = GetNewStateIndication(SecondsLeftOfNewStateIndication);
+                if (indication == null)
+                {
+                    return;
+                }
+                WriteToLcd(indication[0], indication[1]);
+                Thread.Sleep(1000);
+            }
+        }
 
 
 

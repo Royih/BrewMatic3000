@@ -1,4 +1,5 @@
 
+using System;
 using BrewMatic3000.RealHW;
 using Microsoft.SPOT.Hardware;
 
@@ -10,9 +11,11 @@ namespace BrewMatic3000
 
         public float MashTemperature { get; set; }
 
+        public float MashOutTemperature { get; set; }
+
         public int MashTime { get; set; }
 
-        public float SpargeWaterTemperature { get; set; }
+        public float SpargeTemperature { get; set; }
 
         public PT100Reader TempReader1 { get; set; }
 
@@ -25,21 +28,28 @@ namespace BrewMatic3000
         public PID.PID MashPID;
         public PID.PID SpargePID;
 
-        public float MashPIDKp = 25.5f; //Previous: 18.5
+        public float MashPIDKp = 25.5f; // Increase if slow or not reaching set value
         public float MashPIDKi = 1.9f; // Decrease to avoid overshoot.
         public float MashPIDKd = 1.0f;
 
-        public float SpargePIDKp = 23.3f; //Previous 16.3
+        public float SpargePIDKp = 23.3f; // Increase if slow or not reaching set value
         public float SpargePIDKi = 1.9f; // Decrease to avoid overshoot
         public float SpargePIDKd = 1.0f;
 
+        public DateTime BrewWarmupStart = DateTime.MinValue;
+        public DateTime BrewAddGrainStart = DateTime.MinValue;
+        public DateTime BrewMashStart = DateTime.MinValue;
+        public DateTime BrewMashOutStart = DateTime.MinValue;
+        public DateTime BrewSpargeStart = DateTime.MinValue;
+        public DateTime BrewSpargeEnd = DateTime.MinValue;
 
         public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
             StrikeTemperature = 73.2f;
-            MashTemperature = 67;
-            SpargeWaterTemperature = 75.6f;
-            MashTime = 60;
+            MashTemperature = 67.0f;
+            MashOutTemperature = 78.0f; //minimum = 76 grader
+            SpargeTemperature = 75.6f;
+            MashTime = 60; //minutes
             TempReader1 = tempReader1;
             TempReader2 = tempReader2;
             Heater1 = heater1;

@@ -22,7 +22,7 @@ namespace BrewMatic3000.States
 
         public override void OnKeyPressShort()
         {
-            RiseStateChangedEvent(typeof(StateDashboard));
+            RiseStateChangedEvent(new StateDashboard(BrewData));
         }
 
         public override void OnKeyPressLongWarning()
@@ -39,8 +39,12 @@ namespace BrewMatic3000.States
         {
             BrewData.Heater1.SetValue(0);
             BrewData.Heater2.SetValue(0);
-            RiseStateChangedEvent(typeof(StateDashboard));
+            RiseStateChangedEvent(new StateDashboard(BrewData));
         }
 
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return null;
+        }
     }
 }

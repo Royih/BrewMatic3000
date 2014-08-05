@@ -45,7 +45,12 @@ namespace BrewMatic3000.States.Setup
 
         public override void OnKeyPressLong()
         {
-            RiseStateChangedEvent(typeof(State1Initial));
+            RiseStateChangedEvent(new State1Initial(BrewData));
+        }
+
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return null;
         }
 
     }

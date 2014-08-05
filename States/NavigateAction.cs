@@ -11,14 +11,14 @@ namespace BrewMatic3000.States
 
         public string Warning { get; private set; }
 
-        public Type StateType { get; private set; }
+        public State NextState { get; private set; }
 
-        public NavigateAction(string line1, string line2, string warning, Type stateType)
+        public NavigateAction(string line1, string line2, string warning, State nextState)
         {
             Line1 = line1;
             Line2 = line2;
             Warning = warning;
-            StateType = stateType;
+            NextState = nextState;
         }
     }
 }

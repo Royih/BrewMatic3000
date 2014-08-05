@@ -2,10 +2,10 @@ using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States.Setup
 {
-    public class StateSetupStrikeTemp : State
+    public class StateSetupMashOutTemp : State
     {
 
-        public StateSetupStrikeTemp(BrewData brewData)
+        public StateSetupMashOutTemp(BrewData brewData)
             : base(brewData)
         {
         }
@@ -17,12 +17,12 @@ namespace BrewMatic3000.States.Setup
 
         private void WriteDefaultText()
         {
-            WriteToLcd("Set Strike Temp", "Current: " + BrewData.StrikeTemperature.ToString("f1").PadLeft(4) + "*C");
+            WriteToLcd("Set Mash out Temp", "Current: " + BrewData.MashOutTemperature.ToString("f1").PadLeft(4) + "*C");
         }
 
         public override void OnKeyPressShort()
         {
-            RiseStateChangedEvent(new StateSetupMashTemp(BrewData));
+            RiseStateChangedEvent(new StateSetupMashTime(BrewData));
         }
 
         public override void OnKeyPressLongWarning()
@@ -37,13 +37,12 @@ namespace BrewMatic3000.States.Setup
 
         public override void OnKeyPressLong()
         {
-            RiseStateChangedEvent(new StateSetupStrikeTempChoose(BrewData));
+            RiseStateChangedEvent(new StateSetupMashOutTempChoose(BrewData));
         }
 
         public override string[] GetNewStateIndication(int secondsLeft)
         {
             return null;
         }
-
     }
 }

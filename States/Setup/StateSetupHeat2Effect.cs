@@ -22,13 +22,13 @@ namespace BrewMatic3000.States.Setup
         {
             if (BrewData.Heater1.GetCurrentValue() > 0 || BrewData.Heater2.GetCurrentValue() > 0)
             {
-                RiseStateChangedEvent(typeof (StateTurnOffHeat));
+                RiseStateChangedEvent(new StateTurnOffHeat(BrewData));
             }
             else
             {
-                RiseStateChangedEvent(typeof(StateDashboard));
+                RiseStateChangedEvent(new StateDashboard(BrewData));
             }
-                
+
 
         }
 
@@ -44,8 +44,12 @@ namespace BrewMatic3000.States.Setup
 
         public override void OnKeyPressLong()
         {
-            RiseStateChangedEvent(typeof(StateSetupHeat2EffectChoose));
+            RiseStateChangedEvent(new StateSetupHeat2EffectChoose(BrewData));
         }
 
+        public override string[] GetNewStateIndication(int secondsLeft)
+        {
+            return null;
+        }
     }
 }

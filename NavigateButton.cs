@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 
 namespace BrewMatic3000
@@ -25,7 +26,6 @@ namespace BrewMatic3000
 
         private DateTime _timeButtonPressed = DateTime.MinValue;
 
-
         public event MyEventHandler KeyPressShort;
 
         public event MyEventHandler KeyPressLongWarning;
@@ -33,6 +33,10 @@ namespace BrewMatic3000
         public event MyEventHandler KeyPressLongCancelled;
 
         public event MyEventHandler KeyPressLong;
+
+        private bool _triggerKeyPressShort = false;
+
+        private bool _triggerKeyPressLongCancelled = false;
 
         public NavigateButton(InterruptPort navButton)
         {
@@ -44,8 +48,11 @@ namespace BrewMatic3000
             worker.Start();
         }
 
+
+
         private void navButton_OnInterrupt(uint data1, uint data2, DateTime time)
         {
+            Debug.Print("Button pressed. Data2: " + data2);
             if (data2 > 0 && _navButtonState == NavButtonStates.Idle)
             {
                 _timeButtonPressed = DateTime.Now;
@@ -53,13 +60,13 @@ namespace BrewMatic3000
             }
             else if (data2 == 0 && _navButtonState == NavButtonStates.Warned)
             {
-                KeyPressLongCancelled();
+                _triggerKeyPressLongCancelled = true;
                 _navButtonState = NavButtonStates.Idle;
             }
             else if (data2 == 0 && _navButtonState == NavButtonStates.Pressed)
             {
-                KeyPressShort();
                 _navButtonState = NavButtonStates.Idle;
+                _triggerKeyPressShort = true;
             }
         }
 
@@ -67,7 +74,17 @@ namespace BrewMatic3000
         {
             while (true)
             {
-                if (_navButtonState != NavButtonStates.Idle)
+                if (_triggerKeyPressLongCancelled)
+                {
+                    KeyPressLongCancelled();
+                    Debug.Print("Navigate Button: Keypress Long Cancelled event");
+                }
+                else if (_triggerKeyPressShort)
+                {
+                    KeyPressShort();
+                    Debug.Print("Navigate Button: Keypress Short event");
+                }
+                else if (_navButtonState != NavButtonStates.Idle)
                 {
                     var tsPressed = DateTime.Now.Subtract(_timeButtonPressed);
                     var buttonWasPressedMillis = tsPressed.Milliseconds + (1000 * tsPressed.Seconds) + (1000 * 60 * tsPressed.Minutes);
@@ -77,6 +94,7 @@ namespace BrewMatic3000
                         {
                             _navButtonState = NavButtonStates.Warned;
                             KeyPressLongWarning();
+                            Debug.Print("Navigate Button: Keypress Long Warning event");
                         }
                     }
                     else if (_navButtonState == NavButtonStates.Warned && buttonWasPressedMillis > (TimeoutDisplayWarning + TimeoutConfirmed))
@@ -85,10 +103,17 @@ namespace BrewMatic3000
                         {
                             _navButtonState = NavButtonStates.Idle;
                             KeyPressLong();
+                            Debug.Print("Navigate Button: Keypress Long event");
                         }
                     }
                 }
+
+                _triggerKeyPressLongCancelled = false;
+                _triggerKeyPressShort = false;
+
                 Thread.Sleep(500);
+
+
             }
         }
 
