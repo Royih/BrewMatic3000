@@ -26,7 +26,7 @@ namespace BrewMatic3000.States
         public State6Sparge(BrewData brewData)
             : base(brewData)
         {
-            
+
         }
 
         public override void OnKeyPressLongWarning()
@@ -96,22 +96,9 @@ namespace BrewMatic3000.States
             BrewData.Heater2.SetValue(0);
             while (!_abort)
             {
-                var currentTemp1 = BrewData.TempReader1.GetValue();
-                var currentTemp2 = BrewData.TempReader2.GetValue();
-
-                var preferredMashTemp = BrewData.MashOutTemperature;
-                var preferredSpargeTemp = BrewData.SpargeTemperature;
-
-
-                var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
-                BrewData.Heater1.SetValue(pidOutputMash);
-
-                var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, preferredSpargeTemp);
-                BrewData.Heater2.SetValue(pidOutputSparge);
-
                 if (_mainDisplayVisible)
                 {
-                    WriteToLcd("Sparge..",
+                    WriteToLcd("Sparging..",
                                "Timer:  " + DateTime.Now.Subtract(BrewData.BrewSpargeStart));
                 }
 
