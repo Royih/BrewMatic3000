@@ -45,7 +45,7 @@ namespace BrewMatic3000
 
         public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
-            StrikeTemperature = 73.2f;
+            StrikeTemperature = 73.6f;
             MashTemperature = 67.0f;
             MashOutTemperature = 78.0f; //minimum = 76 grader
             SpargeTemperature = 75.6f;
