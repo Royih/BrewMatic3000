@@ -46,6 +46,7 @@
     <Compile Include="PID\IPID.cs" />
     <Compile Include="PID\LogValue.cs" />
     <Compile Include="RealHW\HeatElement3000W.cs" />
+    <Compile Include="RealHW\LiquidCrystal_I2C.cs" />
     <Compile Include="RealHW\PT100Reader.cs" />
     <Compile Include="States\StateOutputLog.cs" />
     <Compile Include="States\State6Sparge.cs" />
@@ -74,11 +75,6 @@
     <Compile Include="States\State2Warmup.cs" />
     <Compile Include="States\State1Initial.cs" />
     <Compile Include="States\State.cs" />
-    <Compile Include="Kobush.NETMF.Hardware.LCD\BaseShifterLiquidCrystalTransferProvicer.cs" />
-    <Compile Include="Kobush.NETMF.Hardware.LCD\GpioLiquidCrystalTransferProvider.cs" />
-    <Compile Include="Kobush.NETMF.Hardware.LCD\ILiquidCrystalTransferProvider.cs" />
-    <Compile Include="Kobush.NETMF.Hardware.LCD\LiquidCrystal.cs" />
-    <Compile Include="Kobush.NETMF.Hardware.LCD\Shifter74Hc595LiquidCrystalTransferProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="FakeHW\FakeTempReader.cs" />
@@ -96,9 +92,10 @@
     <Reference Include="SecretLabs.NETMF.Hardware.AnalogInput, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="SecretLabs.NETMF.Hardware.Netduino" />
     <Reference Include="System" />
+    <Reference Include="Toolbox.NETMF.Core, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Toolbox.NETMF.Hardware.Core, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Kobush.NETMF.Hardware.LCD\Kobush.NETMF.Hardware.LCD.csproj" />
     <Content Include="TextFile1.txt" />
   </ItemGroup>
 </Project>

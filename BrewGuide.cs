@@ -1,7 +1,6 @@
-using System;
+using BrewMatic3000.Extensions;
 using BrewMatic3000.RealHW;
 using BrewMatic3000.States;
-using Kobush.NETMF.Hardware.LCD;
 using System.Threading;
 using Microsoft.SPOT.Hardware;
 
@@ -10,7 +9,7 @@ namespace BrewMatic3000
     public class BrewGuide
     {
 
-        private LiquidCrystal Lcd { get; set; }
+        private LiquidCrystal_I2C Lcd { get; set; }
 
         private NavigateButton NavButtonManager { get; set; }
 
@@ -28,9 +27,7 @@ namespace BrewMatic3000
 
         private State _currentState;
 
-        private string[] _currentlyOnDisplay;
-
-        public BrewGuide(InterruptPort pushButton, LiquidCrystal lcd, PT100Reader tempReader1, PT100Reader tempReader2, OutputPort portHeater1, OutputPort portHeater2)
+        public BrewGuide(InterruptPort pushButton, LiquidCrystal_I2C lcd, PT100Reader tempReader1, PT100Reader tempReader2, OutputPort portHeater1, OutputPort portHeater2)
         {
             Lcd = lcd;
 
@@ -41,16 +38,6 @@ namespace BrewMatic3000
 
             PortHeater1 = portHeater1;
             PortHeater2 = portHeater2;
-
-            var worker = new Thread(
-               delegate
-               {
-                   //NavButtonManager.DoWork();
-               }
-               );
-            worker.Start();
-
-            _currentlyOnDisplay = null;
         }
 
         public void Initialize()
@@ -65,8 +52,6 @@ namespace BrewMatic3000
             Heater2.Start();
 
 
-            // set up the LCD's number of columns and rows: 
-            Lcd.Begin(16, 2);
         }
 
         private void ApplyState(State state)
@@ -102,50 +87,21 @@ namespace BrewMatic3000
         {
             lock (Lcd)
             {
-                if (!ContentEquals(contentToDisplay, _currentlyOnDisplay))
+                for (byte i = 0; i < contentToDisplay.Length; i++)
                 {
-                    for (var i = 0; i < contentToDisplay.Length; i++)
+                    var line = contentToDisplay[i];
+                    if (line.Length < Lcd.Columns)
                     {
-                        var line = contentToDisplay[i];
-                        //Update entire display content (since no content exists yet)
-                        if (_currentlyOnDisplay == null)
-                        {
-                            Lcd.SetCursorPosition(0, i);
-                            Lcd.Write(line);
-                        }
-                        else
-                        {
-                            //Update only those characters that have changed
-                            var currentLine = _currentlyOnDisplay[i];
-                            for (var j = 0; j < 16; j++)
-                            {
-                                var characterToDisplay = line.Length <= j ? ' ' : line[j];
-                                if (currentLine.Length <= j || characterToDisplay != currentLine[j])
-                                {
-                                    Lcd.SetCursorPosition(j, i);
-                                    Lcd.WriteByte((byte)characterToDisplay);
-                                }
-                            }
-                        }
+                        //add spaces to the right
+                        line = line.PadRight(Lcd.Columns);
                     }
-                    _currentlyOnDisplay = contentToDisplay;
+                    //Update entire display content (since no content exists yet)
+                    Lcd.setCursor(0, i);
+                    Lcd.write(line);
+
                 }
             }
 
-        }
-
-        private static bool ContentEquals(string[] contentToDisplay, string[] contentAlreadyOnDisplay)
-        {
-            if (contentAlreadyOnDisplay == null)
-                return false;
-            if (contentToDisplay.Length != contentAlreadyOnDisplay.Length)
-                return false;
-            for (var i = 0; i < contentToDisplay.Length; i++)
-            {
-                if (contentToDisplay[i] != contentAlreadyOnDisplay[i])
-                    return false;
-            }
-            return true;
         }
 
         public void Run()

@@ -47,7 +47,7 @@ namespace BrewMatic3000.States
         }
         protected void WriteToLcd(string line1, string line2 = "")
         {
-            _currentLcdContent = new[] { line1, line2 };
+            _currentLcdContent = new[] { line1, "", line2 };
             DisplayContentChanged();
         }
 
