@@ -5,44 +5,69 @@ namespace BrewMatic3000.States.Setup
     public class StateSetupMashTemp : State
     {
 
+        private const float MinTemp = 60.0f;
+
+        private const float MaxTemp = 75.0f;
+
         public StateSetupMashTemp(BrewData brewData)
             : base(brewData)
         {
+
         }
 
-        public override void Start()
+        public enum Screens
         {
-            WriteDefaultText();
+            Default,
         }
 
-        private void WriteDefaultText()
+        public override int GetNumberOfScreens()
         {
-            WriteToLcd("Set Mash Temp", "Current: " + BrewData.MashTemperature.ToString("f1").PadLeft(4) + "*C");
+            return (int)Screens.Default;
         }
 
-        public override void OnKeyPressShort()
+        public override Screen GetScreen(int screenNumber)
         {
-            RiseStateChangedEvent(new StateSetupMashOutTemp(BrewData));
+            switch (screenNumber)
+            {
+                case (int)Screens.Default:
+                    {
+                        return new Screen(screenNumber, new[]
+                        {
+                            "=  Setup  =", 
+                            "Mash temp", 
+                            "", 
+                            "Current: " + BrewData.MashTemperature.DisplayTemperature()
+                        }, "Save");
+                    }
+                default:
+                    {
+                        return GetScreenError(screenNumber);
+                    }
+            }
         }
 
-        public override void OnKeyPressLongWarning()
+        public override void KeyPressNextShort()
         {
-            WriteToLcd("..hold to change");
+            BrewData.MashTemperature += 0.1f;
+            if (BrewData.MashTemperature > MaxTemp)
+            {
+                BrewData.MashTemperature = MinTemp;
+            }
         }
 
-        public override void OnKeyPressLongCancelled()
+        public override void KeyPressPreviousShort()
         {
-            WriteDefaultText();
+            BrewData.MashTemperature -= 0.1f;
+            if (BrewData.MashTemperature < MinTemp)
+            {
+                BrewData.MashTemperature = MaxTemp;
+            }
         }
 
-        public override void OnKeyPressLong()
+        public override void KeyPressNextLong()
         {
-            RiseStateChangedEvent(new StateSetupMashTempChoose(BrewData));
+            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, 3));
         }
 
-        public override string[] GetNewStateIndication(int secondsLeft)
-        {
-            return null;
-        }
     }
 }

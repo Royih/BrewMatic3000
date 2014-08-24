@@ -1,55 +1,74 @@
+using BrewMatic3000.Extensions;
+
 namespace BrewMatic3000.States.Setup
 {
     public class StateSetupHeat2Effect : State
     {
-
         public StateSetupHeat2Effect(BrewData brewData)
             : base(brewData)
         {
+
         }
 
-        public override void Start()
+        public enum Screens
         {
-            WriteDefaultText();
+            Default,
         }
 
-        private void WriteDefaultText()
+        public override int GetNumberOfScreens()
         {
-            WriteToLcd("Set % Heater 2", "Current: " + BrewData.Heater2.GetCurrentValue() + "%");
+            return (int)Screens.Default;
         }
 
-        public override void OnKeyPressShort()
+        public override Screen GetScreen(int screenNumber)
         {
-            if (BrewData.Heater1.GetCurrentValue() > 0 || BrewData.Heater2.GetCurrentValue() > 0)
+            switch (screenNumber)
             {
-                RiseStateChangedEvent(new StateTurnOffHeat(BrewData));
+                case (int)Screens.Default:
+                    {
+                        return new Screen(screenNumber, new[]
+                        {
+                            "=  Setup  =", 
+                            "Heat effect 2", 
+                            "", 
+                            "Current: " + BrewData.Heater2.GetCurrentValue().DisplayHeat()
+                        }, "Save");
+                    }
+                default:
+                    {
+                        return GetScreenError(screenNumber);
+                    }
+            }
+        }
+
+        public override void KeyPressNextShort()
+        {
+            if (BrewData.Heater2.GetCurrentValue().Equals(100f))
+            {
+                BrewData.Heater2.SetValue(0);
             }
             else
             {
-                RiseStateChangedEvent(new StateDashboard(BrewData));
+                BrewData.Heater2.SetValue(BrewData.Heater2.GetCurrentValue() + 10);
             }
-
-
         }
 
-        public override void OnKeyPressLongWarning()
+        public override void KeyPressPreviousShort()
         {
-            WriteToLcd("..hold to change");
+            if (BrewData.Heater2.GetCurrentValue().Equals(0f))
+            {
+                BrewData.Heater2.SetValue(100);
+            }
+            else
+            {
+                BrewData.Heater2.SetValue(BrewData.Heater2.GetCurrentValue() - 10);
+            }
         }
 
-        public override void OnKeyPressLongCancelled()
+        public override void KeyPressNextLong()
         {
-            WriteDefaultText();
+            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, 1));
         }
 
-        public override void OnKeyPressLong()
-        {
-            RiseStateChangedEvent(new StateSetupHeat2EffectChoose(BrewData));
-        }
-
-        public override string[] GetNewStateIndication(int secondsLeft)
-        {
-            return null;
-        }
     }
 }

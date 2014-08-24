@@ -16,5 +16,10 @@ namespace BrewMatic3000.Extensions
         {
             return input.PadLeft(3) + "%";
         }
+
+        public static string DisplayTemperature(this float input)
+        {
+            return input.ToString("f1").PadLeft(5) + (char)223;
+        }
     }
 }

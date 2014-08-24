@@ -5,44 +5,68 @@ namespace BrewMatic3000.States.Setup
     public class StateSetupSpargeTemp : State
     {
 
+        private const float MinTemp = 70.0f;
+
+        private const float MaxTemp = 90.0f;
+
         public StateSetupSpargeTemp(BrewData brewData)
             : base(brewData)
         {
+
         }
 
-        public override void Start()
+        public enum Screens
         {
-            WriteDefaultText();
+            Default,
         }
 
-        private void WriteDefaultText()
+        public override int GetNumberOfScreens()
         {
-            WriteToLcd("Set Sparge Temp", "Current: " + BrewData.SpargeTemperature.ToString("f1").PadLeft(4) + "*C");
+            return (int)Screens.Default;
         }
 
-        public override void OnKeyPressShort()
+        public override Screen GetScreen(int screenNumber)
         {
-            RiseStateChangedEvent(new StateSetupHeat1Effect(BrewData));
+            switch (screenNumber)
+            {
+                case (int)Screens.Default:
+                    {
+                        return new Screen(screenNumber, new[]
+                        {
+                            "=  Setup  =", 
+                            "Sparge temp", 
+                            "", 
+                            "Current: " + BrewData.SpargeTemperature.DisplayTemperature()
+                        }, "Save");
+                    }
+                default:
+                    {
+                        return GetScreenError(screenNumber);
+                    }
+            }
         }
 
-        public override void OnKeyPressLongWarning()
+        public override void KeyPressNextShort()
         {
-            WriteToLcd("..hold to change");
+            BrewData.SpargeTemperature += 0.1f;
+            if (BrewData.SpargeTemperature > MaxTemp)
+            {
+                BrewData.SpargeTemperature = MinTemp;
+            }
         }
 
-        public override void OnKeyPressLongCancelled()
+        public override void KeyPressPreviousShort()
         {
-            WriteDefaultText();
+            BrewData.SpargeTemperature -= 0.1f;
+            if (BrewData.SpargeTemperature < MinTemp)
+            {
+                BrewData.SpargeTemperature = MaxTemp;
+            }
         }
 
-        public override void OnKeyPressLong()
+        public override void KeyPressNextLong()
         {
-            RiseStateChangedEvent(new StateSetupSpargeTempChoose(BrewData));
-        }
-
-        public override string[] GetNewStateIndication(int secondsLeft)
-        {
-            return null;
+            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, 5));
         }
 
     }

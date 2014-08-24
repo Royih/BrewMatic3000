@@ -8,7 +8,8 @@ namespace BrewMatic3000
     {
         public static void Main()
         {
-            var pushButton = new InterruptPort(Pins.GPIO_PIN_D6, true, ResistorModes.PullDown, Port.InterruptMode.InterruptEdgeBoth);
+            var pushButtonPrev = new InputPort(Pins.GPIO_PIN_D6, true, Port.ResistorMode.PullDown);
+            var pushButtonNext = new InputPort(Pins.GPIO_PIN_D5, true, Port.ResistorMode.PullDown);
 
             var tempInput1 = new SecretLabs.NETMF.Hardware.AnalogInput(Pins.GPIO_PIN_A5);
             var tempInput2 = new SecretLabs.NETMF.Hardware.AnalogInput(Pins.GPIO_PIN_A4);
@@ -18,7 +19,11 @@ namespace BrewMatic3000
 
             var lcd = new LiquidCrystal_I2C(0x27, 20, 4);
             lcd.setBacklight(true);
-            var program = new BrewGuide(pushButton, lcd, new PT100Reader(tempInput1), new PT100Reader(tempInput2), portHeater1, portHeater2);
+
+
+            var navButtons = new NavigateButtons(pushButtonPrev, pushButtonNext);
+
+            var program = new BrewGuide(navButtons, lcd, new PT100Reader(tempInput1), new PT100Reader(tempInput2), portHeater1, portHeater2);
             program.Initialize();
             program.Run();
         }

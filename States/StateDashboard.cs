@@ -1,77 +1,123 @@
-﻿using System.Text;
-using System.Threading;
-using BrewMatic3000.Extensions;
+﻿using BrewMatic3000.Extensions;
+using BrewMatic3000.States.Brew;
+using BrewMatic3000.States.Setup;
 
 namespace BrewMatic3000.States
 {
     public class StateDashboard : State
     {
-        private Thread _worker;
-
-        private bool _abort;
-
-        private bool _mainDisplayVisible = true;
-
-        public StateDashboard(BrewData brewData)
-            : base(brewData)
+        public StateDashboard(BrewData brewData, string[] initialMessage = null, int initialScreen = 0)
+            : base(brewData, initialMessage, initialScreen)
         {
 
         }
 
-        public override void OnKeyPressLongWarning()
+
+        public enum Screens
         {
-            _mainDisplayVisible = false;
-            WriteToLcd("..turn off heat");
+            Default,
+            Heater,
+            StartBrew,
+            TurnOffHeat,
+            BrewLog,
+            Setup
         }
 
-        public override void OnKeyPressLongCancelled()
+        private const string TurnOffHeatWarning = "Turn off heaters?";
+
+        public override int GetNumberOfScreens()
         {
-            _mainDisplayVisible = true;
+            return (int)Screens.Setup;
         }
 
-        public override void OnKeyPressLong()
+        public override Screen GetScreen(int screenNumber)
         {
-            BrewData.Heater1.SetValue(0);
-            BrewData.Heater2.SetValue(0);
-            _mainDisplayVisible = true;
-        }
-
-        public override void OnKeyPressShort()
-        {
-            RiseStateChangedEvent(new State1Initial(BrewData));
-        }
-
-        public override void Start()
-        {
-            _worker = new Thread(
-              DoWork
-              ) { Priority = ThreadPriority.Normal };
-            _worker.Start();
-        }
-
-        public override void Dispose()
-        {
-            _abort = true;
-        }
-
-        private void DoWork()
-        {
-            while (!_abort)
+            switch (screenNumber)
             {
-                if (_mainDisplayVisible)
-                {
-                    var strLine1 = "T1:" + BrewData.TempReader1.GetValue().ToString("f1").PadLeft(4) + " T2:" + BrewData.TempReader2.GetValue().ToString("f1").PadLeft(4);
-                    var strLine2 = "H1:" + BrewData.Heater1.GetCurrentValue().DisplayHeat() + " H2:" + BrewData.Heater2.GetCurrentValue().DisplayHeat();
-                    WriteToLcd(strLine1, strLine2);
-                }
-                Thread.Sleep(1000);
+                case (int)Screens.Default:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "T1:" + BrewData.TempReader1.GetValue().DisplayTemperature().PadRight(8) + "T2:" + BrewData.TempReader2.GetValue().DisplayTemperature();
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 });
+                    }
+                case (int)Screens.Heater:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "H1:" + BrewData.Heater1.GetCurrentValue().DisplayHeat().PadRight(8) + "H2:" + BrewData.Heater2.GetCurrentValue().DisplayHeat();
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, TurnOffHeatWarning);
+                    }
+                case (int)Screens.StartBrew:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "Start new brew";
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                    }
+                case (int)Screens.TurnOffHeat:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "Turn off heat";
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                    }
+                case (int)Screens.BrewLog:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "Show Brew log";
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                    }
+                case (int)Screens.Setup:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "Setup";
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                    }
+                default:
+                    {
+                        return GetScreenError(screenNumber);
+                    }
             }
         }
 
-        public override string[] GetNewStateIndication(int secondsLeft)
+        public override void KeyPressNextLong()
         {
-            return null;
+            if (GetCurrentScreenNumber == (int)Screens.Heater)
+            {
+                BrewData.Heater1.SetValue(0);
+                BrewData.Heater2.SetValue(0);
+            }
+            if (GetCurrentScreenNumber == (int)Screens.StartBrew)
+            {
+                RiseStateChangedEvent(new State1Initial(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.TurnOffHeat)
+            {
+                BrewData.Heater1.SetValue(0);
+                BrewData.Heater2.SetValue(0);
+                SetScreen((int)Screens.Heater);
+            }
+            if (GetCurrentScreenNumber == (int)Screens.Setup)
+            {
+                RiseStateChangedEvent(new StateSetup(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.BrewLog)
+            {
+                RiseStateChangedEvent(new StateShowLog(BrewData));
+            }
+
         }
+
+
 
 
 

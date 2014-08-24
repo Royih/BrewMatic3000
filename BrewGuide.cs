@@ -11,7 +11,7 @@ namespace BrewMatic3000
 
         private LiquidCrystal_I2C Lcd { get; set; }
 
-        private NavigateButton NavButtonManager { get; set; }
+        private NavigateButtons NavButtonsManager { get; set; }
 
         private PT100Reader TempReader1 { get; set; }
 
@@ -27,11 +27,11 @@ namespace BrewMatic3000
 
         private State _currentState;
 
-        public BrewGuide(InterruptPort pushButton, LiquidCrystal_I2C lcd, PT100Reader tempReader1, PT100Reader tempReader2, OutputPort portHeater1, OutputPort portHeater2)
+        public BrewGuide(NavigateButtons navButtons, LiquidCrystal_I2C lcd, PT100Reader tempReader1, PT100Reader tempReader2, OutputPort portHeater1, OutputPort portHeater2)
         {
             Lcd = lcd;
 
-            NavButtonManager = new NavigateButton(pushButton);
+            NavButtonsManager = navButtons;
 
             TempReader1 = tempReader1;
             TempReader2 = tempReader2;
@@ -54,12 +54,36 @@ namespace BrewMatic3000
 
         }
 
+        private void RemoveEvents()
+        {
+            NavButtonsManager.KeyPressPreviousShort -= NavButton_KeyPressPreviousShort;
+            NavButtonsManager.KeyPressPreviousLongWarning -= NavButton_KeyPressPreviousLongWarning;
+            NavButtonsManager.KeyPressPreviousLongWarningCancelled -= NavButton_KeyPressPreviousLongWarningCancelled;
+            NavButtonsManager.KeyPressPreviousLong -= NavButton_KeyPressPreviousLong;
+
+            NavButtonsManager.KeyPressNextShort -= NavButton_KeyPressNextShort;
+            NavButtonsManager.KeyPressNextLongWarning -= NavButton_KeyPressNextLongWarning;
+            NavButtonsManager.KeyPressNextLongWarningCancelled -= NavButton_KeyPressNextLongWarningCancelled;
+            NavButtonsManager.KeyPressNextLong -= NavButton_KeyPressNextLong;
+        }
+
+        private void AddEvents()
+        {
+            NavButtonsManager.KeyPressPreviousShort += NavButton_KeyPressPreviousShort;
+            NavButtonsManager.KeyPressPreviousLongWarning += NavButton_KeyPressPreviousLongWarning;
+            NavButtonsManager.KeyPressPreviousLongWarningCancelled += NavButton_KeyPressPreviousLongWarningCancelled;
+            NavButtonsManager.KeyPressPreviousLong += NavButton_KeyPressPreviousLong;
+
+            NavButtonsManager.KeyPressNextShort += NavButton_KeyPressNextShort;
+            NavButtonsManager.KeyPressNextLongWarning += NavButton_KeyPressNextLongWarning;
+            NavButtonsManager.KeyPressNextLongWarningCancelled += NavButton_KeyPressNextLongWarningCancelled;
+            NavButtonsManager.KeyPressNextLong += NavButton_KeyPressNextLong;
+        }
+
         private void ApplyState(State state)
         {
-            NavButtonManager.KeyPressLong -= NavButton_KeyPressLong;
-            NavButtonManager.KeyPressLongWarning -= NavButton_KeyPressLongWarning;
-            NavButtonManager.KeyPressLongCancelled -= NavButton_KeyPressLongCancelled;
-            NavButtonManager.KeyPressShort -= NavButton_KeyPressShort;
+            RemoveEvents();
+
             if (_currentState != state)
             {
                 //abort/dispose currently running job
@@ -71,15 +95,8 @@ namespace BrewMatic3000
                 _currentState.DisplayContentChanged += _currentState_DisplayContentChanged;
                 _currentState.StateChanged += _currentState_StateChanged;
 
-                //start new job
-                _currentState.Start();
-
-                //DisplayLcdContent(state.DisplayUi);
             }
-            NavButtonManager.KeyPressLong += NavButton_KeyPressLong;
-            NavButtonManager.KeyPressLongWarning += NavButton_KeyPressLongWarning;
-            NavButtonManager.KeyPressLongCancelled += NavButton_KeyPressLongCancelled;
-            NavButtonManager.KeyPressShort += NavButton_KeyPressShort;
+            AddEvents();
 
         }
 
@@ -106,11 +123,6 @@ namespace BrewMatic3000
 
         public void Run()
         {
-            NavButtonManager.KeyPressShort += NavButton_KeyPressShort;
-            NavButtonManager.KeyPressLongWarning += NavButton_KeyPressLongWarning;
-            NavButtonManager.KeyPressLong += NavButton_KeyPressLong;
-            NavButtonManager.KeyPressLongCancelled += NavButton_KeyPressLongCancelled;
-
             var brewData = new BrewData(TempReader1, TempReader2, Heater1, Heater2);
             ApplyState(new StateDashboard(brewData));
 
@@ -122,25 +134,7 @@ namespace BrewMatic3000
         }
         // ReSharper restore FunctionNeverReturns
 
-        void NavButton_KeyPressLongCancelled()
-        {
-            _currentState.OnKeyPressLongCancelled();
-        }
 
-        void NavButton_KeyPressLongWarning()
-        {
-            _currentState.OnKeyPressLongWarning();
-        }
-
-        void NavButton_KeyPressShort()
-        {
-            _currentState.OnKeyPressShort();
-        }
-
-        void NavButton_KeyPressLong()
-        {
-            _currentState.OnKeyPressLong();
-        }
 
         void _currentState_DisplayContentChanged()
         {
@@ -150,6 +144,46 @@ namespace BrewMatic3000
         void _currentState_StateChanged(State newState)
         {
             ApplyState(newState);
+        }
+
+        private void NavButton_KeyPressPreviousShort()
+        {
+            _currentState.KeyPressPreviousShort();
+        }
+
+        private void NavButton_KeyPressPreviousLongWarning()
+        {
+            _currentState.KeyPressPreviousLongWarning();
+        }
+
+        private void NavButton_KeyPressPreviousLongWarningCancelled()
+        {
+            _currentState.KeyPressPreviousLongWarningCancelled();
+        }
+
+        private void NavButton_KeyPressPreviousLong()
+        {
+            _currentState.KeyPressPreviousPrivate();
+        }
+
+        private void NavButton_KeyPressNextShort()
+        {
+            _currentState.KeyPressNextShort();
+        }
+
+        private void NavButton_KeyPressNextLongWarning()
+        {
+            _currentState.KeyPressNextLongWarning();
+        }
+
+        private void NavButton_KeyPressNextLongWarningCancelled()
+        {
+            _currentState.KeyPressNextLongWarningCancelled();
+        }
+
+        private void NavButton_KeyPressNextLong()
+        {
+            _currentState.KeyPressNextLongPrivate();
         }
 
     }

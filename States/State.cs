@@ -1,7 +1,5 @@
-
 using System;
 using System.Threading;
-using BrewMatic3000.States.Setup;
 
 namespace BrewMatic3000.States
 {
@@ -11,19 +9,47 @@ namespace BrewMatic3000.States
 
     public abstract class State : IDisposable
     {
-        protected int SecondsLeftOfNewStateIndication = 4;
+        protected Thread Worker;
+
+        protected bool Abort;
+
+        private int _selectedScreen = 0;
 
         protected BrewData BrewData { get; private set; }
 
-        private string[] _currentLcdContent;
+        protected Screen CurrentScreen;
+
+        protected Screen GetScreenError(int screenNumber)
+        {
+            return new Screen(screenNumber, new[] { "", "Screen [" + screenNumber + "]: Error." });
+        }
+
+        protected int GetCurrentScreenNumber
+        {
+            get
+            {
+                if (CurrentScreen == null)
+                    return -1;
+                return CurrentScreen.Identifier;
+            }
+        }
 
         public event DisplayContentEventHandler DisplayContentChanged;
 
         public event StateChangedEventHandler StateChanged;
 
-        protected State(BrewData brewData)
+        public string[] _initialMessage = null;
+
+        protected State(BrewData brewData, string[] initialMessage = null, int initialScreen = 0)
         {
             BrewData = brewData;
+            _initialMessage = initialMessage;
+            _selectedScreen = initialScreen;
+            Worker = new Thread(
+            DoWork
+            ) { Priority = ThreadPriority.Normal };
+            Worker.Start();
+
         }
 
         protected void RiseStateChangedEvent(State nextState)
@@ -35,82 +61,122 @@ namespace BrewMatic3000.States
         {
             get
             {
-                if (_currentLcdContent == null)
-                    _currentLcdContent = new[] { "", "" };
-                return _currentLcdContent;
+                if (CurrentScreen == null)
+                    return new[] { "", "", "", "" };
+                return CurrentScreen.GetScreenContent;
             }
         }
 
-        protected void WriteToLcd(NavigateAction action)
+        protected virtual void StartExtra()
         {
-            WriteToLcd(action.Line1, action.Line2);
-        }
-        protected void WriteToLcd(string line1, string line2 = "")
-        {
-            _currentLcdContent = new[] { line1, "", line2 };
-            DisplayContentChanged();
+
         }
 
-        private int _selectedActionPointer = -1;
-
-        public NavigateAction ToggleActions(NavigateAction[] actions)
+        private void DoWork()
         {
-            if (++_selectedActionPointer < actions.Length)
+            CurrentScreen = GetScreen(_selectedScreen);
+            if (_initialMessage != null)
+                CurrentScreen.SetInitialMessage(_initialMessage);
+            StartExtra();
+            while (!Abort)
             {
-                return actions[_selectedActionPointer];
-            }
-            _selectedActionPointer = -1;
-            return null;
-        }
-
-        public NavigateAction GetSelectedAction(NavigateAction[] actions)
-        {
-            return _selectedActionPointer > -1 ? actions[_selectedActionPointer] : null;
-        }
-
-        public abstract void Start();
-
-        public abstract string[] GetNewStateIndication(int secondsLeft);
-
-        public virtual void Dispose()
-        {
-
-        }
-
-        public virtual void OnKeyPressShort()
-        {
-
-        }
-
-        public virtual void OnKeyPressLong()
-        {
-
-        }
-
-        public virtual void OnKeyPressLongWarning()
-        {
-
-        }
-
-        public virtual void OnKeyPressLongCancelled()
-        {
-
-        }
-
-        public void ShowStateName()
-        {
-            while (SecondsLeftOfNewStateIndication-- > 1)
-            {
-                var indication = GetNewStateIndication(SecondsLeftOfNewStateIndication);
-                if (indication == null)
+                DoWorkExtra();
+                CurrentScreen.UpdateScreenContent(GetScreen(_selectedScreen));
+                if (DisplayContentChanged != null)
                 {
-                    return;
+                    DisplayContentChanged();
                 }
-                WriteToLcd(indication[0], indication[1]);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
 
+        protected virtual void DoWorkExtra()
+        {
+
+        }
+
+
+
+        public void Dispose()
+        {
+            Abort = true;
+        }
+
+        #region Handle Screens
+
+        public abstract Screen GetScreen(int screenNumber);
+
+        public abstract int GetNumberOfScreens();
+
+        public void SetScreen(int screenNumber)
+        {
+            _selectedScreen = screenNumber;
+        }
+
+        #endregion
+
+        #region Handle KeyPresses
+
+        public virtual void KeyPressPreviousShort()
+        {
+            if (--_selectedScreen < 0)
+            {
+                _selectedScreen = GetNumberOfScreens();
+            }
+        }
+
+        public virtual void KeyPressNextShort()
+        {
+            if (++_selectedScreen > GetNumberOfScreens())
+            {
+                _selectedScreen = 0;
+            }
+        }
+
+        public virtual void KeyPressPreviousLongWarning()
+        {
+            CurrentScreen.SetScreenState(Screen.ScreenState.WarningPrevious);
+        }
+
+        public virtual void KeyPressNextLongWarning()
+        {
+            CurrentScreen.SetScreenState(Screen.ScreenState.WarningNext);
+        }
+
+        public virtual void KeyPressPreviousLongWarningCancelled()
+        {
+            CurrentScreen.SetScreenState(Screen.ScreenState.Default);
+        }
+
+        public virtual void KeyPressNextLongWarningCancelled()
+        {
+            CurrentScreen.SetScreenState(Screen.ScreenState.Default);
+        }
+
+        public void KeyPressPreviousPrivate()
+        {
+            KeyPressPreviousLong();
+            CurrentScreen.SetScreenState(Screen.ScreenState.Default);
+            RiseStateChangedEvent(new StateDashboard(BrewData));
+        }
+
+        public virtual void KeyPressPreviousLong()
+        {
+
+        }
+
+        public void KeyPressNextLongPrivate()
+        {
+            KeyPressNextLong();
+            CurrentScreen.SetScreenState(Screen.ScreenState.Default);
+        }
+
+        public virtual void KeyPressNextLong()
+        {
+
+        }
+
+        #endregion
 
 
 

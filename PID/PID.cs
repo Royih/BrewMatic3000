@@ -27,14 +27,8 @@ namespace BrewMatic3000.PID
         private float _lastTemp;
 
 
-        //Logging of values
-        private LogValue[] _logValues;
-        private TimeSpan _logInterval = new TimeSpan(0, 0, 15);
-        private DateTime _nextLog = DateTime.MinValue;
-
         public PID(float kp, float ki, float kd)
         {
-            _logValues = new LogValue[0];
             _kp = kp;
             _ki = ki;
             _kd = kd;
@@ -93,35 +87,9 @@ namespace BrewMatic3000.PID
             if (outReal < 0)
                 outReal = 0;
 
-            LogValue(outReal, pv, preferredTemperature);
-
             //Write it out to the world
             return outReal;
         }
-
-        public void LogValue(float outReal, float currentTemperature, float preferredTemperature)
-        {
-            //Log this adjustment
-            if (_nextLog == DateTime.MinValue || _nextLog < DateTime.Now)
-            {
-                var nuArray = new LogValue[_logValues.Length + 1];
-                Array.Copy(_logValues, nuArray, _logValues.Length);
-                _logValues = nuArray;
-                _logValues[_logValues.Length - 1] = new LogValue()
-                {
-                    Effect = outReal,
-                    CurrentTemperature = currentTemperature,
-                    PreferredTemperature = preferredTemperature,
-                    TimeStamp = DateTime.Now
-                };
-                _nextLog = DateTime.Now.Add(_logInterval);
-            }
-
-        }
-
-        public LogValue[] GetLogValues()
-        {
-            return _logValues;
-        }
+       
     }
 }

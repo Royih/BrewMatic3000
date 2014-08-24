@@ -1,124 +1,89 @@
 using System;
 using System.Threading;
-using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 
 namespace BrewMatic3000
 {
-    public delegate void MyEventHandler();
+    public enum NavButtonStates
+    {
+        Idle,
+        Pressed,
+        Warned,
+        PressedLong
+    }
 
     public class NavigateButton
     {
-        private enum NavButtonStates
-        {
-            Idle,
-            Pressed,
-            Warned
-        }
 
-        private NavButtonStates _navButtonState = NavButtonStates.Idle;
+        private NavButtonStates _prevButtonState = NavButtonStates.Idle;
+        private DateTime _buttonTimeout = DateTime.MinValue;
 
-        private readonly InterruptPort _navButton;
+        private const int TimeoutDisplayWarning = 1;
 
-        private const int TimeoutDisplayWarning = 1000;
+        private const int TimeoutConfirmed = 1;
 
-        private const int TimeoutConfirmed = 1000;
+        private readonly InputPort _navButton;
 
-        private DateTime _timeButtonPressed = DateTime.MinValue;
 
-        public event MyEventHandler KeyPressShort;
-
-        public event MyEventHandler KeyPressLongWarning;
-
-        public event MyEventHandler KeyPressLongCancelled;
-
-        public event MyEventHandler KeyPressLong;
-
-        private bool _triggerKeyPressShort = false;
-
-        private bool _triggerKeyPressLongCancelled = false;
-
-        public NavigateButton(InterruptPort navButton)
+        public NavigateButton(InputPort navButton)
         {
             _navButton = navButton;
-            _navButton.OnInterrupt += navButton_OnInterrupt;
-            var worker = new Thread(
-            DoWork
-            );
-            worker.Start();
         }
 
+        public bool EventShort { get; private set; }
 
+        public bool EventLongWarning { get; private set; }
 
-        private void navButton_OnInterrupt(uint data1, uint data2, DateTime time)
+        public bool EventLongCancelled { get; private set; }
+
+        public bool EventLong { get; private set; }
+
+        public void Read()
         {
-            Debug.Print("Button pressed. Data2: " + data2);
-            if (data2 > 0 && _navButtonState == NavButtonStates.Idle)
+            EventShort = false;
+            EventLongWarning = false;
+            EventLongCancelled = false;
+            EventLong = false;
+            lock (_navButton)
             {
-                _timeButtonPressed = DateTime.Now;
-                _navButtonState = NavButtonStates.Pressed;
-            }
-            else if (data2 == 0 && _navButtonState == NavButtonStates.Warned)
-            {
-                _triggerKeyPressLongCancelled = true;
-                _navButtonState = NavButtonStates.Idle;
-            }
-            else if (data2 == 0 && _navButtonState == NavButtonStates.Pressed)
-            {
-                _navButtonState = NavButtonStates.Idle;
-                _triggerKeyPressShort = true;
-            }
-        }
-
-        private void DoWork()
-        {
-            while (true)
-            {
-                if (_triggerKeyPressLongCancelled)
+                if (_navButton.Read() && _prevButtonState == NavButtonStates.Idle)
                 {
-                    KeyPressLongCancelled();
-                    Debug.Print("Navigate Button: Keypress Long Cancelled event");
+                    _buttonTimeout = DateTime.Now.AddSeconds(TimeoutDisplayWarning);
+                    _prevButtonState = NavButtonStates.Pressed;
                 }
-                else if (_triggerKeyPressShort)
+                else
                 {
-                    KeyPressShort();
-                    Debug.Print("Navigate Button: Keypress Short event");
-                }
-                else if (_navButtonState != NavButtonStates.Idle)
-                {
-                    var tsPressed = DateTime.Now.Subtract(_timeButtonPressed);
-                    var buttonWasPressedMillis = tsPressed.Milliseconds + (1000 * tsPressed.Seconds) + (1000 * 60 * tsPressed.Minutes);
-                    if (_navButtonState == NavButtonStates.Pressed && buttonWasPressedMillis > TimeoutDisplayWarning)
+                    if (_prevButtonState == NavButtonStates.Pressed && !_navButton.Read())
                     {
-                        if (KeyPressLongWarning != null)
-                        {
-                            _navButtonState = NavButtonStates.Warned;
-                            KeyPressLongWarning();
-                            Debug.Print("Navigate Button: Keypress Long Warning event");
-                        }
+                        _prevButtonState = NavButtonStates.Idle;
+                        EventShort = true;
                     }
-                    else if (_navButtonState == NavButtonStates.Warned && buttonWasPressedMillis > (TimeoutDisplayWarning + TimeoutConfirmed))
+                    else if (_prevButtonState == NavButtonStates.Pressed && _navButton.Read() && _buttonTimeout < DateTime.Now)
                     {
-                        if (KeyPressLong != null)
-                        {
-                            _navButtonState = NavButtonStates.Idle;
-                            KeyPressLong();
-                            Debug.Print("Navigate Button: Keypress Long event");
-                        }
+                        _buttonTimeout = DateTime.Now.AddSeconds(TimeoutConfirmed);
+                        _prevButtonState = NavButtonStates.Warned;
+                        EventLongWarning = true;
+                    }
+                    else if (_prevButtonState == NavButtonStates.Warned && !_navButton.Read())
+                    {
+                        _buttonTimeout = DateTime.MinValue;
+                        _prevButtonState = NavButtonStates.Idle;
+                        EventLongCancelled = true;
+                    }
+                    else if (_prevButtonState == NavButtonStates.Warned && _navButton.Read() && _buttonTimeout < DateTime.Now)
+                    {
+                        _buttonTimeout = DateTime.MinValue;
+                        _prevButtonState = NavButtonStates.PressedLong;
+                        EventLong = true;
+                    }
+                    else if (!_navButton.Read() && _prevButtonState != NavButtonStates.Idle)
+                    {
+                        _buttonTimeout = DateTime.MinValue;
+                        _prevButtonState = NavButtonStates.Idle;
                     }
                 }
-
-                _triggerKeyPressLongCancelled = false;
-                _triggerKeyPressShort = false;
-
-                Thread.Sleep(500);
-
-
+                Thread.Sleep(5);
             }
         }
-
-
     }
-
-
 }
