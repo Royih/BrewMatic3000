@@ -44,7 +44,7 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            if (BrewData.Heater1.GetCurrentValue().Equals(100f))
+            if (BrewData.Heater1.GetCurrentValue() == 100)
             {
                 BrewData.Heater1.SetValue(0);
             }
@@ -56,7 +56,7 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressPreviousShort()
         {
-            if (BrewData.Heater1.GetCurrentValue().Equals(0f))
+            if (BrewData.Heater1.GetCurrentValue() == 0)
             {
                 BrewData.Heater1.SetValue(100);
             }

@@ -18,9 +18,9 @@ namespace BrewMatic3000
         private NavButtonStates _prevButtonState = NavButtonStates.Idle;
         private DateTime _buttonTimeout = DateTime.MinValue;
 
-        private const int TimeoutDisplayWarning = 1;
+        private const int TimeoutDisplayWarning = 500;
 
-        private const int TimeoutConfirmed = 1;
+        private const int TimeoutConfirmed = 500;
 
         private readonly InputPort _navButton;
 
@@ -48,7 +48,7 @@ namespace BrewMatic3000
             {
                 if (_navButton.Read() && _prevButtonState == NavButtonStates.Idle)
                 {
-                    _buttonTimeout = DateTime.Now.AddSeconds(TimeoutDisplayWarning);
+                    _buttonTimeout = DateTime.Now.AddMilliseconds(TimeoutDisplayWarning);
                     _prevButtonState = NavButtonStates.Pressed;
                 }
                 else
@@ -60,7 +60,7 @@ namespace BrewMatic3000
                     }
                     else if (_prevButtonState == NavButtonStates.Pressed && _navButton.Read() && _buttonTimeout < DateTime.Now)
                     {
-                        _buttonTimeout = DateTime.Now.AddSeconds(TimeoutConfirmed);
+                        _buttonTimeout = DateTime.Now.AddMilliseconds(TimeoutConfirmed);
                         _prevButtonState = NavButtonStates.Warned;
                         EventLongWarning = true;
                     }

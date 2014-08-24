@@ -86,7 +86,7 @@ namespace BrewMatic3000.States
                 {
                     DisplayContentChanged();
                 }
-                Thread.Sleep(500);
+                Thread.Sleep(10);
             }
         }
 

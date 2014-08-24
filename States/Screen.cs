@@ -26,7 +26,7 @@ namespace BrewMatic3000.States
 
         private DateTime _initialMessageTimeout;
 
-        private const int InitialMessageSeconds = 3;
+        private const int InitialMessageMilliSeconds = 1000;
 
         public string[] GetScreenContent
         {
@@ -76,7 +76,7 @@ namespace BrewMatic3000.States
         public void SetInitialMessage(string[] initialMessage)
         {
             _initialMessage = initialMessage;
-            _initialMessageTimeout = DateTime.Now.AddSeconds(InitialMessageSeconds);
+            _initialMessageTimeout = DateTime.Now.AddMilliseconds(InitialMessageMilliSeconds);
             _screenState = ScreenState.InitialMessage;
         }
 
