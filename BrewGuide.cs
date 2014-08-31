@@ -124,18 +124,17 @@ namespace BrewMatic3000
         public void Run()
         {
             var brewData = new BrewData(TempReader1, TempReader2, Heater1, Heater2);
+
+
             ApplyState(new StateDashboard(brewData));
 
             while (true)
             {
                 Thread.Sleep(Timeout.Infinite);
             }
-            // ReSharper disable FunctionNeverReturns
+            
         }
-        // ReSharper restore FunctionNeverReturns
-
-
-
+        
         void _currentState_DisplayContentChanged()
         {
             DisplayLcdContent(_currentState.CurrentLcdContent);

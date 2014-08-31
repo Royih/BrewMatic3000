@@ -32,24 +32,13 @@ namespace BrewMatic3000.States.Brew
                 case (int)Screens.Default:
                     {
                         var currentTemp1 = BrewData.TempReader1.GetValue();
-                        var currentTemp2 = BrewData.TempReader2.GetValue();
-
-                        var preferredMashTemp = BrewData.MashTemperature;
-                        var preferredSpargeTemp = BrewData.SpargeTemperature;
-
-
-                        var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
-                        BrewData.Heater1.SetValue(pidOutputMash);
-
-                        var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, preferredSpargeTemp);
-                        BrewData.Heater2.SetValue(pidOutputSparge);
-
+                        
                         var longWarningNext = "Mash complete";
 
                         var strLine1 = "= Brew: Mash =";
                         var strLine2 = "";
                         var strLine3 = "Timer: " + _mashComplete.Subtract(DateTime.Now).Display();
-                        var strLine4 = "Tg:" + preferredMashTemp.ToString("f1").PadLeft(4) + " Ac:" + currentTemp1.ToString("f1").PadLeft(4);
+                        var strLine4 = "Tg:" + BrewData.MashPID.GetPreferredTemperature.ToString("f1").PadLeft(4) + " Ac:" + currentTemp1.ToString("f1").PadLeft(4);
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, longWarningNext);
                     }
                 case (int)Screens.MashComplete:
@@ -96,6 +85,8 @@ namespace BrewMatic3000.States.Brew
         {
             BrewData.BrewMashStart = DateTime.Now;
             _mashComplete = DateTime.Now.AddMinutes(BrewData.MashTime);
+            BrewData.MashPID.Start(BrewData.MashTemperature);
+            BrewData.SpargePID.Start(BrewData.SpargeTemperature);
         }
 
     }

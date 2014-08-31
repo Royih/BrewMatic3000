@@ -34,19 +34,10 @@ namespace BrewMatic3000.States.Brew
                         var currentTemp1 = BrewData.TempReader1.GetValue();
                         var currentTemp2 = BrewData.TempReader2.GetValue();
 
-                        var preferredMashTemp = BrewData.MashTemperature;
-                        var preferredSpargeTemp = BrewData.SpargeTemperature;
-
-                        var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, preferredMashTemp);
-                        BrewData.Heater1.SetValue(pidOutputMash);
-
-                        var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeTemperature);
-                        BrewData.Heater2.SetValue(pidOutputSparge);
-
                         var strLine1 = "= Brew: Add grain  =";
                         var strLine2 = "";
-                        var strLine3 = GetLineString(currentTemp1, preferredMashTemp, BrewData.Heater1.GetCurrentValue(), "Ms");
-                        var strLine4 = GetLineString(currentTemp2, preferredSpargeTemp, BrewData.Heater2.GetCurrentValue(), "Sp");
+                        var strLine3 = GetLineString(currentTemp1, BrewData.MashPID.GetPreferredTemperature, BrewData.Heater1.GetCurrentValue(), "Ms");
+                        var strLine4 = GetLineString(currentTemp2, BrewData.SpargePID.GetPreferredTemperature, BrewData.Heater2.GetCurrentValue(), "Sp");
 
                         var longWarningNext = "Start mashing";
 
@@ -94,6 +85,8 @@ namespace BrewMatic3000.States.Brew
         protected override void StartExtra()
         {
             BrewData.BrewAddGrainStart = DateTime.Now;
+            BrewData.MashPID.Start(BrewData.MashTemperature);
+            BrewData.SpargePID.Start(BrewData.SpargeTemperature);
         }
 
 

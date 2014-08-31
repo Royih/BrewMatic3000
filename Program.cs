@@ -17,6 +17,7 @@ namespace BrewMatic3000
             var portHeater1 = new OutputPort(Pins.GPIO_PIN_D8, false);
             var portHeater2 = new OutputPort(Pins.GPIO_PIN_D9, false);
 
+            
             var lcd = new LiquidCrystal_I2C(0x27, 20, 4);
             lcd.setBacklight(true);
 

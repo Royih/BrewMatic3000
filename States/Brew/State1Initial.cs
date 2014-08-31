@@ -31,8 +31,8 @@ namespace BrewMatic3000.States.Brew
                 case (int)Screens.Default:
                     {
                         var strLine1 = "=  Start new brew  =";
-                        var strLine2 = "";
-                        var strLine3 = "St:" + BrewData.StrikeTemperature.DisplayTemperature() + "  Sp:" + BrewData.SpargeTemperature.DisplayTemperature(); //St:70.5|Sp:12.2
+                        var strLine2 = "St: " + BrewData.MashStartTime.DisplayShort();
+                        var strLine3 = "Str:" + BrewData.StrikeTemperature.DisplayTemperature() + " Sp:" + BrewData.SpargeTemperature.DisplayTemperature(); //St:70.5|Sp:12.2
                         var strLine4 = "Ms:" + BrewData.MashTemperature.DisplayTemperature() + "  Tm:" + BrewData.MashTime + "min"; //Ms:65.1|Tm:60 
 
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, "Begin warmup");

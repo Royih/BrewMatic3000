@@ -1,4 +1,5 @@
 ﻿
+using System;
 using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States.Setup
@@ -19,6 +20,10 @@ namespace BrewMatic3000.States.Setup
             MashTime,
             SpargeTemp,
             StrikeTemp,
+            MashStartTime,
+            EstimatedMashWarmupTime,
+            EstimatedSpargeWarmupTime,
+            Time,
             Return
         }
 
@@ -87,6 +92,38 @@ namespace BrewMatic3000.States.Setup
                         var line4 = "Current: " + BrewData.StrikeTemperature.DisplayTemperature();
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
+                case (int)Screens.MashStartTime:
+                    {
+                        var line1 = "=  Setup  =";
+                        var line2 = "";
+                        var line3 = "Mash start time";
+                        var line4 = BrewData.MashStartTime.ToString("yyyy MMM dd HH:mm:ss");
+                        return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
+                    }
+                case (int)Screens.EstimatedMashWarmupTime:
+                    {
+                        var line1 = "=  Setup  =";
+                        var line2 = "";
+                        var line3 = "Est. Msh. warmup tm";
+                        var line4 = "Current: " + BrewData.EstimatedMashWarmupMinutes;
+                        return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
+                    }
+                case (int)Screens.EstimatedSpargeWarmupTime:
+                    {
+                        var line1 = "=  Setup  =";
+                        var line2 = "";
+                        var line3 = "Est. Spg. warmup tm";
+                        var line4 = "Current: " + BrewData.EstimatedSpargeWarmupMinutes;
+                        return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
+                    }
+                case (int)Screens.Time:
+                    {
+                        var line1 = "=  Setup  =";
+                        var line2 = "";
+                        var line3 = "Time and date";
+                        var line4 = DateTime.Now.ToString("yyyy MMM dd HH:mm:ss");
+                        return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
+                    }
                 case (int)Screens.Return:
                     {
                         var line1 = "=  Setup  =";
@@ -101,6 +138,15 @@ namespace BrewMatic3000.States.Setup
                         return GetScreenError(screenNumber);
                     }
             }
+        }
+
+        protected override void StartExtra()
+        {
+            if (GetCurrentScreenNumber == (int)Screens.Time)
+            {
+                BrewData.TimeChip.SetDateTime(DateTime.Now);
+            }
+
         }
 
         public override void KeyPressNextLong()
@@ -132,6 +178,22 @@ namespace BrewMatic3000.States.Setup
             if (GetCurrentScreenNumber == (int)Screens.StrikeTemp)
             {
                 RiseStateChangedEvent(new StateSetupStrikeTemp(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.MashStartTime)
+            {
+                RiseStateChangedEvent(new StateSetupMashStartTime(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.EstimatedMashWarmupTime)
+            {
+                RiseStateChangedEvent(new StateSetupEstimatedMashWarmupTime(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.EstimatedSpargeWarmupTime)
+            {
+                RiseStateChangedEvent(new StateSetupEstimatedSpargeWarmupTime(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.Time)
+            {
+                RiseStateChangedEvent(new StateSetupTime(BrewData));
             }
             if (GetCurrentScreenNumber == (int)Screens.Return)
             {

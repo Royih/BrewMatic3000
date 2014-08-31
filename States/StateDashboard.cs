@@ -1,4 +1,5 @@
-﻿using BrewMatic3000.Extensions;
+﻿using System;
+using BrewMatic3000.Extensions;
 using BrewMatic3000.States.Brew;
 using BrewMatic3000.States.Setup;
 
@@ -11,7 +12,6 @@ namespace BrewMatic3000.States
         {
 
         }
-
 
         public enum Screens
         {
@@ -39,7 +39,7 @@ namespace BrewMatic3000.States
                         var strLine1 = "=  BrewMatic 3000  =";
                         var strLine2 = "";
                         var strLine3 = "T1:" + BrewData.TempReader1.GetValue().DisplayTemperature().PadRight(8) + "T2:" + BrewData.TempReader2.GetValue().DisplayTemperature();
-                        var strLine4 = "";
+                        var strLine4 = DateTime.Now.Display();
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 });
                     }
                 case (int)Screens.Heater:
@@ -52,11 +52,12 @@ namespace BrewMatic3000.States
                     }
                 case (int)Screens.StartBrew:
                     {
-                        var strLine1 = "=  BrewMatic 3000  =";
-                        var strLine2 = "";
-                        var strLine3 = "Start new brew";
-                        var strLine4 = "";
-                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                        var strLine1 = "=  Start new brew  =";
+                        var strLine2 = "St: " + BrewData.MashStartTime.DisplayShort();
+                        var strLine3 = "Str:" + BrewData.StrikeTemperature.DisplayTemperature() + " Sp:" + BrewData.SpargeTemperature.DisplayTemperature(); //St:70.5|Sp:12.2
+                        var strLine4 = "Ms:" + BrewData.MashTemperature.DisplayTemperature() + "  Tm:" + BrewData.MashTime + "min"; //Ms:65.1|Tm:60 
+
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, "Start new brew");
                     }
                 case (int)Screens.TurnOffHeat:
                     {
@@ -87,6 +88,17 @@ namespace BrewMatic3000.States
                         return GetScreenError(screenNumber);
                     }
             }
+        }
+
+        protected override void DoWorkExtra()
+        {
+
+        }
+
+        protected override void StartExtra()
+        {
+            BrewData.MashPID.Stop();
+            BrewData.SpargePID.Stop();
         }
 
         public override void KeyPressNextLong()

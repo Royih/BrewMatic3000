@@ -1,5 +1,6 @@
 using System;
 using BrewMatic3000.Extensions;
+using BrewMatic3000.States.Setup;
 
 namespace BrewMatic3000.States.Brew
 {
@@ -8,6 +9,9 @@ namespace BrewMatic3000.States.Brew
 
         private float _maxTemp1;
         private float _maxTemp2;
+
+        private DateTime _startPIDMash = DateTime.MinValue;
+        private DateTime _startPIDSparge = DateTime.MinValue;
 
         public State2Warmup(BrewData brewData, string[] initialMessage = null, int initialScreen = 0)
             : base(brewData, initialMessage, initialScreen)
@@ -40,9 +44,27 @@ namespace BrewMatic3000.States.Brew
 
                         var strLine1 = "= Brew: Warmup =";
                         var strLine2 = "";
-                        var strLine3 = GetLineString(currentTemp1, BrewData.StrikeTemperature, BrewData.Heater1.GetCurrentValue(), "Ms");
-                        var strLine4 = GetLineString(currentTemp2, BrewData.SpargeTemperature, BrewData.Heater2.GetCurrentValue(), "Sp");
+                        var strLine3 = "";
+                        var strLine4 = "";
 
+                        if (BrewData.MashPID.Started())
+                        {
+                            strLine3 = GetLineString(currentTemp1, BrewData.StrikeTemperature, BrewData.Heater1.GetCurrentValue(), "Ms");
+                        }
+                        else
+                        {
+                            strLine3 = "Ms: " + _startPIDMash.Subtract(DateTime.Now).Display();
+                        }
+
+                        if (BrewData.SpargePID.Started())
+                        {
+                            strLine4 = GetLineString(currentTemp2, BrewData.SpargeTemperature,
+                                BrewData.Heater2.GetCurrentValue(), "Sp");
+                        }
+                        else
+                        {
+                            strLine4 = "Sp: " + _startPIDSparge.Subtract(DateTime.Now).Display();
+                        }
 
                         var longWarningNext = "Add grain";
 
@@ -60,8 +82,8 @@ namespace BrewMatic3000.States.Brew
                 case (int)Screens.MinMax:
                     {
                         var strLine1 = "= Brew: Warmup =";
-                        var strLine2 = "Min: " + _maxTemp1.DisplayTemperature();
-                        var strLine3 = "Max: " + _maxTemp2.DisplayTemperature();
+                        var strLine2 = "Max 1: " + _maxTemp1.DisplayTemperature();
+                        var strLine3 = "Max 2: " + _maxTemp2.DisplayTemperature();
                         var strLine4 = "";
 
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine2);
@@ -100,28 +122,40 @@ namespace BrewMatic3000.States.Brew
         protected override void StartExtra()
         {
             BrewData.BrewWarmupStart = DateTime.Now;
+            _startPIDMash = BrewData.MashStartTime.AddMinutes((-1) * BrewData.EstimatedMashWarmupMinutes);
+            _startPIDSparge = BrewData.MashStartTime.AddMinutes((-1) * BrewData.EstimatedSpargeWarmupMinutes);
         }
 
         protected override void DoWorkExtra()
         {
-            var currentTemp1 = BrewData.TempReader1.GetValue();
-            var currentTemp2 = BrewData.TempReader2.GetValue();
-
-            //keep the highest temp (for pid tuning purposes)
-            if (_maxTemp1 < currentTemp1)
+            if (!BrewData.MashPID.Started() && DateTime.Now > _startPIDMash)
             {
-                _maxTemp1 = currentTemp1;
+                BrewData.MashPID.Start(BrewData.StrikeTemperature);
             }
-            if (_maxTemp2 < currentTemp2)
+            else if (BrewData.MashPID.Started())
             {
-                _maxTemp2 = currentTemp2;
+                var currentTemp1 = BrewData.TempReader1.GetValue();
+                if (_maxTemp1 < currentTemp1)
+                {
+                    _maxTemp1 = currentTemp1;
+                }
             }
 
-            var pidOutputMash = BrewData.MashPID.GetValue(currentTemp1, BrewData.StrikeTemperature);
-            BrewData.Heater1.SetValue(pidOutputMash);
+            if (!BrewData.SpargePID.Started() && DateTime.Now > _startPIDSparge)
+            {
+                BrewData.SpargePID.Start(BrewData.SpargeTemperature);
+            }
+            else if (BrewData.SpargePID.Started())
+            {
+                var currentTemp2 = BrewData.TempReader2.GetValue();
 
-            var pidOutputSparge = BrewData.SpargePID.GetValue(currentTemp2, BrewData.SpargeTemperature);
-            BrewData.Heater2.SetValue(pidOutputSparge);
+                if (_maxTemp2 < currentTemp2)
+                {
+                    _maxTemp2 = currentTemp2;
+                }
+            }
+
+
         }
 
         private string GetLineString(float currentTemp, float desiredTemp, float watt, string prefix)

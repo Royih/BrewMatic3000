@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using BrewMatic3000.Interfaces;
 
 namespace BrewMatic3000.PID
@@ -18,6 +19,12 @@ namespace BrewMatic3000.PID
         private readonly float _kp;
         private readonly float _ki;
         private readonly float _kd;
+        private float _preferredTemperature;
+
+        private readonly ITempReader _tempReader;
+        private readonly IHeatDevice _heater;
+        private DateTime _dtStart;
+        private TimeSpan _dtTimeToPreferredValue;
 
 
         private float _pTerm;
@@ -26,18 +33,40 @@ namespace BrewMatic3000.PID
         private float _iState;
         private float _lastTemp;
 
+        private bool _abort;
+        protected Thread Worker;
 
-        public PID(float kp, float ki, float kd)
+        public PID(float kp, float ki, float kd, float preferredTemperature, ITempReader tempReader, IHeatDevice heater)
         {
             _kp = kp;
             _ki = ki;
             _kd = kd;
+            _preferredTemperature = preferredTemperature;
+            _tempReader = tempReader;
+            _heater = heater;
+
         }
 
-        public float GetValue(float currentTemperature, float preferredTemperature)
+        public float Value { get; private set; }
+
+        private void DoWork()
+        {
+            while (!_abort)
+            {
+                CalculateValue(_tempReader.GetValue());
+                Thread.Sleep(1500);
+            }
+        }
+
+        private void CalculateValue(float currentTemperature)
         {
             var pv = currentTemperature;
-            var sp = preferredTemperature;
+            var sp = _preferredTemperature;
+
+            if (sp >= pv && _dtTimeToPreferredValue == TimeSpan.MinValue)
+            {
+                _dtTimeToPreferredValue = DateTime.Now.Subtract(_dtStart);
+            }
 
             // these local variables can be factored out if memory is an issue, 
             // but they make it more readable
@@ -88,8 +117,47 @@ namespace BrewMatic3000.PID
                 outReal = 0;
 
             //Write it out to the world
-            return outReal;
+            Value = outReal;
+            _heater.SetValue(outReal);
         }
-       
+
+
+
+        public void Start(float preferredTemperature)
+        {
+            _abort = false;
+
+            _preferredTemperature = preferredTemperature;
+            _dtStart = DateTime.Now;
+            _dtTimeToPreferredValue = TimeSpan.MinValue;
+
+            Worker = new Thread(DoWork)
+            {
+                Priority = ThreadPriority.Normal
+            };
+            Worker.Start();
+        }
+
+
+        public void Stop()
+        {
+            _abort = true;
+            Worker = null;
+        }
+
+        public bool Started()
+        {
+            if (Worker == null)
+                return false;
+            return true;
+        }
+
+
+        public float GetPreferredTemperature
+        {
+            get { return _preferredTemperature; }
+        }
+        
+      
     }
 }

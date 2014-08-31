@@ -66,7 +66,7 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextLong()
         {
-            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, 3));
+            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, (int)StateSetup.Screens.MashTemp));
         }
 
     }

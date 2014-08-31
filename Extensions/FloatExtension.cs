@@ -14,7 +14,7 @@ namespace BrewMatic3000.Extensions
         }
         public static string DisplayHeat(this float input)
         {
-            return input.PadLeft(3) + "%";
+            return ((int)input).ToString().PadLeft(3) + "%";
         }
 
         public static string DisplayTemperature(this float input)

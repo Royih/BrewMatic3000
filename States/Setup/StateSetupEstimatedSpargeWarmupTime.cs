@@ -1,15 +1,14 @@
-using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States.Setup
 {
-    public class StateSetupMashOutTemp : State
+    public class StateSetupEstimatedSpargeWarmupTime : State
     {
 
-        private const float MinTemp = 76.0f;
+        private const int MinTime = 30;
 
-        private const float MaxTemp = 90.0f;
+        private const int MaxTime = 100;
 
-        public StateSetupMashOutTemp(BrewData brewData)
+        public StateSetupEstimatedSpargeWarmupTime(BrewData brewData)
             : base(brewData)
         {
 
@@ -34,9 +33,9 @@ namespace BrewMatic3000.States.Setup
                         return new Screen(screenNumber, new[]
                         {
                             "=  Setup  =", 
-                            "Mesh out temp", 
+                            "Est. Spg. warmup tm", 
                             "", 
-                            "Current: " + BrewData.MashOutTemperature.DisplayTemperature()
+                            "Current: " + BrewData.EstimatedSpargeWarmupMinutes +"min"
                         }, "Save");
                     }
                 default:
@@ -48,25 +47,25 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            BrewData.MashOutTemperature += 0.1f;
-            if (BrewData.MashOutTemperature > MaxTemp)
+            BrewData.EstimatedSpargeWarmupMinutes += 1;
+            if (BrewData.EstimatedSpargeWarmupMinutes > MaxTime)
             {
-                BrewData.MashOutTemperature = MinTemp;
+                BrewData.EstimatedSpargeWarmupMinutes = MinTime;
             }
         }
 
         public override void KeyPressPreviousShort()
         {
-            BrewData.MashOutTemperature -= 0.1f;
-            if (BrewData.MashOutTemperature < MinTemp)
+            BrewData.EstimatedSpargeWarmupMinutes -= 1;
+            if (BrewData.EstimatedSpargeWarmupMinutes < MinTime)
             {
-                BrewData.MashOutTemperature = MaxTemp;
+                BrewData.EstimatedSpargeWarmupMinutes = MaxTime;
             }
         }
 
         public override void KeyPressNextLong()
         {
-            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, (int)StateSetup.Screens.MashOutTemp));
+            RiseStateChangedEvent(new StateSetup(BrewData, new[] { "", "Saved", "", "" }, (int)StateSetup.Screens.EstimatedSpargeWarmupTime));
         }
 
     }

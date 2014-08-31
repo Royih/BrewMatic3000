@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="BrewGuide.cs" />
     <Compile Include="BrewData.cs" />
+    <Compile Include="Extensions\DateTimeExtension.cs" />
     <Compile Include="Extensions\TimeSpanExtension.cs" />
     <Compile Include="NavigateButton.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
@@ -47,9 +48,15 @@
     <Compile Include="Interfaces\IHeatDevice.cs" />
     <Compile Include="PID\IPID.cs" />
     <Compile Include="PID\LogValue.cs" />
+    <Compile Include="RealHW\DS3231.cs" />
     <Compile Include="RealHW\HeatElement3000W.cs" />
     <Compile Include="RealHW\LiquidCrystal_I2C.cs" />
     <Compile Include="RealHW\PT100Reader.cs" />
+    <Compile Include="RealHW\Wire.cs" />
+    <Compile Include="States\Setup\StateSetupEstimatedSpargeWarmupTime.cs" />
+    <Compile Include="States\Setup\StateSetupMashStartTime.cs" />
+    <Compile Include="States\Setup\StateSetupEstimatedMashWarmupTime.cs" />
+    <Compile Include="States\Setup\StateSetupTime.cs" />
     <Compile Include="States\Setup\StateSetup.cs" />
     <Compile Include="States\StateShowLog.cs" />
     <Compile Include="States\Brew\State6Sparge.cs" />

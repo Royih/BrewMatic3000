@@ -82,8 +82,8 @@ namespace BrewMatic3000.States.Brew
         protected override void StartExtra()
         {
             BrewData.BrewSpargeStart = DateTime.Now;
-            BrewData.Heater1.SetValue(0);
-            BrewData.Heater2.SetValue(0);
+            BrewData.MashPID.Stop();
+            BrewData.SpargePID.Stop();
         }
 
     }

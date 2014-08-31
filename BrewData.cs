@@ -1,7 +1,6 @@
 
 using System;
 using BrewMatic3000.RealHW;
-using Microsoft.SPOT.Hardware;
 
 namespace BrewMatic3000
 {
@@ -43,6 +42,12 @@ namespace BrewMatic3000
         public DateTime BrewSpargeStart = DateTime.MinValue;
         public DateTime BrewSpargeEnd = DateTime.MinValue;
 
+        public int EstimatedMashWarmupMinutes = 90;
+        public int EstimatedSpargeWarmupMinutes = 60;
+        public DateTime MashStartTime = DateTime.MinValue;
+
+        public DS3231 TimeChip { get; private set; }
+
         public BrewData(PT100Reader tempReader1, PT100Reader tempReader2, HeatElement3000W heater1, HeatElement3000W heater2)
         {
             StrikeTemperature = 73.6f;
@@ -55,8 +60,19 @@ namespace BrewMatic3000
             Heater1 = heater1;
             Heater2 = heater2;
 
-            MashPID = new PID.PID(MashPIDKp, MashPIDKi, MashPIDKd);
-            SpargePID = new PID.PID(SpargePIDKp, SpargePIDKi, SpargePIDKd);
+            MashPID = new PID.PID(MashPIDKp, MashPIDKi, MashPIDKd, StrikeTemperature, tempReader1, Heater1);
+            SpargePID = new PID.PID(SpargePIDKp, SpargePIDKi, SpargePIDKd, SpargePIDKd, tempReader2, Heater2);
+
+
+            //Load the actual time and date from the time-chip
+            TimeChip = new DS3231();
+
+            var currentTime = TimeChip.GetDateTime();
+
+            var dt = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, currentTime.Second);
+
+            Microsoft.SPOT.Hardware.Utility.SetLocalTime(dt);
+            MashStartTime = DateTime.Now.AddHours(1).AddMinutes(40);
         }
 
     }
