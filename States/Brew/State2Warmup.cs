@@ -49,7 +49,7 @@ namespace BrewMatic3000.States.Brew
 
                         if (BrewData.MashPID.Started())
                         {
-                            strLine3 = GetLineString(currentTemp1, BrewData.StrikeTemperature, BrewData.Heater1.GetCurrentValue(), "Ms");
+                            strLine3 = GetLineString(currentTemp1, BrewData.Config.StrikeTemperature, BrewData.Heater1.GetCurrentValue(), "Ms");
                         }
                         else
                         {
@@ -58,7 +58,7 @@ namespace BrewMatic3000.States.Brew
 
                         if (BrewData.SpargePID.Started())
                         {
-                            strLine4 = GetLineString(currentTemp2, BrewData.SpargeTemperature,
+                            strLine4 = GetLineString(currentTemp2, BrewData.Config.SpargeTemperature,
                                 BrewData.Heater2.GetCurrentValue(), "Sp");
                         }
                         else
@@ -116,21 +116,25 @@ namespace BrewMatic3000.States.Brew
             {
                 RiseStateChangedEvent(new State3MashAddGrain(BrewData));
             }
+            if (GetCurrentScreenNumber == (int)Screens.AbortBrew)
+            {
+                RiseStateChangedEvent(new StateDashboard(BrewData, new[] { "Brew aborted" }));
+            }
         }
 
 
         protected override void StartExtra()
         {
             BrewData.BrewWarmupStart = DateTime.Now;
-            _startPIDMash = BrewData.MashStartTime.AddMinutes((-1) * BrewData.EstimatedMashWarmupMinutes);
-            _startPIDSparge = BrewData.MashStartTime.AddMinutes((-1) * BrewData.EstimatedSpargeWarmupMinutes);
+            _startPIDMash = BrewData.MashStartTime.AddMinutes((-1) * BrewData.Config.EstimatedMashWarmupMinutes);
+            _startPIDSparge = BrewData.MashStartTime.AddMinutes((-1) * BrewData.Config.EstimatedSpargeWarmupMinutes);
         }
 
         protected override void DoWorkExtra()
         {
             if (!BrewData.MashPID.Started() && DateTime.Now > _startPIDMash)
             {
-                BrewData.MashPID.Start(BrewData.StrikeTemperature);
+                BrewData.MashPID.Start(BrewData.Config.StrikeTemperature);
             }
             else if (BrewData.MashPID.Started())
             {
@@ -143,7 +147,7 @@ namespace BrewMatic3000.States.Brew
 
             if (!BrewData.SpargePID.Started() && DateTime.Now > _startPIDSparge)
             {
-                BrewData.SpargePID.Start(BrewData.SpargeTemperature);
+                BrewData.SpargePID.Start(BrewData.Config.SpargeTemperature);
             }
             else if (BrewData.SpargePID.Started())
             {

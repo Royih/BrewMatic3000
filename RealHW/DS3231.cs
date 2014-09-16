@@ -1,6 +1,6 @@
 
 using System;
-using Microsoft.SPOT.Hardware;
+using Microsoft.SPOT;
 
 namespace BrewMatic3000.RealHW
 {
@@ -13,20 +13,28 @@ namespace BrewMatic3000.RealHW
 
         public DateTime GetDateTime()
         {
-            var myBuffer = new Byte[7];
-            ReadFromRegister(0x00, myBuffer);
+            try
+            {
+                var myBuffer = new Byte[7];
+                ReadFromRegister(0x00, myBuffer);
 
-            var second = (int)BinaryCodedDecimal2Decimal(myBuffer[0]);
-            var minute = (int)BinaryCodedDecimal2Decimal(myBuffer[1]);
-            var hour = (int)BinaryCodedDecimal2Decimal(myBuffer[2]);
-            var day = (int)BinaryCodedDecimal2Decimal(myBuffer[4]);
-            var month = (int)BinaryCodedDecimal2Decimal(myBuffer[5] & 127);
-            var century = (myBuffer[5] & 128) == 128;
-            var year = (int)BinaryCodedDecimal2Decimal(myBuffer[6]);
-            var yearFull = century
-                ? 2000 + year
-                : 1900 + year;
-            return new DateTime(yearFull, month, day, hour, minute, second);
+                var second = (int)BinaryCodedDecimal2Decimal(myBuffer[0]);
+                var minute = (int)BinaryCodedDecimal2Decimal(myBuffer[1]);
+                var hour = (int)BinaryCodedDecimal2Decimal(myBuffer[2]);
+                var day = (int)BinaryCodedDecimal2Decimal(myBuffer[4]);
+                var month = (int)BinaryCodedDecimal2Decimal(myBuffer[5] & 127);
+                var century = (myBuffer[5] & 128) == 128;
+                var year = (int)BinaryCodedDecimal2Decimal(myBuffer[6]);
+                var yearFull = century
+                    ? 2000 + year
+                    : 1900 + year;
+                return new DateTime(yearFull, month, day, hour, minute, second);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print("Error reading date from DS3231: " + ex.Message);
+                return DateTime.Now;
+            }
         }
 
         // Convert Binary Coded Decimal (BCD) to Decimal 

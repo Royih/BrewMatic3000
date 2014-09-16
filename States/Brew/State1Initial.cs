@@ -32,8 +32,8 @@ namespace BrewMatic3000.States.Brew
                     {
                         var strLine1 = "=  Start new brew  =";
                         var strLine2 = "St: " + BrewData.MashStartTime.DisplayShort();
-                        var strLine3 = "Str:" + BrewData.StrikeTemperature.DisplayTemperature() + " Sp:" + BrewData.SpargeTemperature.DisplayTemperature(); //St:70.5|Sp:12.2
-                        var strLine4 = "Ms:" + BrewData.MashTemperature.DisplayTemperature() + "  Tm:" + BrewData.MashTime + "min"; //Ms:65.1|Tm:60 
+                        var strLine3 = "Str:" + BrewData.Config.StrikeTemperature.DisplayTemperature() + " Sp:" + BrewData.Config.SpargeTemperature.DisplayTemperature(); //St:70.5|Sp:12.2
+                        var strLine4 = "Ms:" + BrewData.Config.MashTemperature.DisplayTemperature() + "  Tm:" + BrewData.Config.MashTime + "min"; //Ms:65.1|Tm:60 
 
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, "Begin warmup");
                     }
@@ -75,7 +75,7 @@ namespace BrewMatic3000.States.Brew
             }
             if (GetCurrentScreenNumber == (int)Screens.AbortBrew)
             {
-                RiseStateChangedEvent(new StateDashboard(BrewData));
+                RiseStateChangedEvent(new StateDashboard(BrewData, new[] { "Brew aborted" }));
             }
         }
 
@@ -88,6 +88,9 @@ namespace BrewMatic3000.States.Brew
             BrewData.BrewMashOutStart = DateTime.MinValue;
             BrewData.BrewSpargeStart = DateTime.MinValue;
             BrewData.BrewSpargeEnd = DateTime.MinValue;
+
+            BrewData.Heater1.SetValue(0);
+            BrewData.Heater2.SetValue(0);
         }
 
 

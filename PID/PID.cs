@@ -70,7 +70,6 @@ namespace BrewMatic3000.PID
 
             // these local variables can be factored out if memory is an issue, 
             // but they make it more readable
-            double result;
             float error;
             float windupGaurd;
 

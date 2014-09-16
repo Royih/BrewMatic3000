@@ -80,13 +80,17 @@ namespace BrewMatic3000.States.Brew
             {
                 RiseStateChangedEvent(new State4Mash(BrewData));
             }
+            if (GetCurrentScreenNumber == (int)Screens.AbortBrew)
+            {
+                RiseStateChangedEvent(new StateDashboard(BrewData, new[] { "Brew aborted" }));
+            }
         }
 
         protected override void StartExtra()
         {
             BrewData.BrewAddGrainStart = DateTime.Now;
-            BrewData.MashPID.Start(BrewData.MashTemperature);
-            BrewData.SpargePID.Start(BrewData.SpargeTemperature);
+            BrewData.MashPID.Start(BrewData.Config.MashTemperature);
+            BrewData.SpargePID.Start(BrewData.Config.SpargeTemperature);
         }
 
 

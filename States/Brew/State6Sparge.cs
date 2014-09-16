@@ -75,6 +75,10 @@ namespace BrewMatic3000.States.Brew
             {
                 RiseStateChangedEvent(new State7Boil(BrewData));
             }
+            if (GetCurrentScreenNumber == (int)Screens.AbortBrew)
+            {
+                RiseStateChangedEvent(new StateDashboard(BrewData, new[] { "Brew aborted" }));
+            }
         }
 
 

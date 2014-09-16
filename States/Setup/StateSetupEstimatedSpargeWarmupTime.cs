@@ -35,7 +35,7 @@ namespace BrewMatic3000.States.Setup
                             "=  Setup  =", 
                             "Est. Spg. warmup tm", 
                             "", 
-                            "Current: " + BrewData.EstimatedSpargeWarmupMinutes +"min"
+                            "Current: " + BrewData.Config.EstimatedSpargeWarmupMinutes +"min"
                         }, "Save");
                     }
                 default:
@@ -47,19 +47,19 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            BrewData.EstimatedSpargeWarmupMinutes += 1;
-            if (BrewData.EstimatedSpargeWarmupMinutes > MaxTime)
+            BrewData.Config.EstimatedSpargeWarmupMinutes += 1;
+            if (BrewData.Config.EstimatedSpargeWarmupMinutes > MaxTime)
             {
-                BrewData.EstimatedSpargeWarmupMinutes = MinTime;
+                BrewData.Config.EstimatedSpargeWarmupMinutes = MinTime;
             }
         }
 
         public override void KeyPressPreviousShort()
         {
-            BrewData.EstimatedSpargeWarmupMinutes -= 1;
-            if (BrewData.EstimatedSpargeWarmupMinutes < MinTime)
+            BrewData.Config.EstimatedSpargeWarmupMinutes -= 1;
+            if (BrewData.Config.EstimatedSpargeWarmupMinutes < MinTime)
             {
-                BrewData.EstimatedSpargeWarmupMinutes = MaxTime;
+                BrewData.Config.EstimatedSpargeWarmupMinutes = MaxTime;
             }
         }
 

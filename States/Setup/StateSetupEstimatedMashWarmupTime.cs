@@ -1,4 +1,3 @@
-using BrewMatic3000.Extensions;
 
 namespace BrewMatic3000.States.Setup
 {
@@ -36,7 +35,7 @@ namespace BrewMatic3000.States.Setup
                             "=  Setup  =", 
                             "Est. Msh. warmup tm", 
                             "", 
-                            "Current: " + BrewData.EstimatedMashWarmupMinutes +"min"
+                            "Current: " + BrewData.Config.EstimatedMashWarmupMinutes +"min"
                         }, "Save");
                     }
                 default:
@@ -48,19 +47,19 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            BrewData.EstimatedMashWarmupMinutes += 1;
-            if (BrewData.EstimatedMashWarmupMinutes > MaxTime)
+            BrewData.Config.EstimatedMashWarmupMinutes += 1;
+            if (BrewData.Config.EstimatedMashWarmupMinutes > MaxTime)
             {
-                BrewData.EstimatedMashWarmupMinutes = MinTime;
+                BrewData.Config.EstimatedMashWarmupMinutes = MinTime;
             }
         }
 
         public override void KeyPressPreviousShort()
         {
-            BrewData.EstimatedMashWarmupMinutes -= 1;
-            if (BrewData.EstimatedMashWarmupMinutes < MinTime)
+            BrewData.Config.EstimatedMashWarmupMinutes -= 1;
+            if (BrewData.Config.EstimatedMashWarmupMinutes < MinTime)
             {
-                BrewData.EstimatedMashWarmupMinutes = MaxTime;
+                BrewData.Config.EstimatedMashWarmupMinutes = MaxTime;
             }
         }
 

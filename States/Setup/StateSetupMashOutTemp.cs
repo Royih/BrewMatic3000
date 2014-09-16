@@ -36,7 +36,7 @@ namespace BrewMatic3000.States.Setup
                             "=  Setup  =", 
                             "Mesh out temp", 
                             "", 
-                            "Current: " + BrewData.MashOutTemperature.DisplayTemperature()
+                            "Current: " + BrewData.Config.MashOutTemperature.DisplayTemperature()
                         }, "Save");
                     }
                 default:
@@ -48,19 +48,19 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            BrewData.MashOutTemperature += 0.1f;
-            if (BrewData.MashOutTemperature > MaxTemp)
+            BrewData.Config.MashOutTemperature += 0.1f;
+            if (BrewData.Config.MashOutTemperature > MaxTemp)
             {
-                BrewData.MashOutTemperature = MinTemp;
+                BrewData.Config.MashOutTemperature = MinTemp;
             }
         }
 
         public override void KeyPressPreviousShort()
         {
-            BrewData.MashOutTemperature -= 0.1f;
-            if (BrewData.MashOutTemperature < MinTemp)
+            BrewData.Config.MashOutTemperature -= 0.1f;
+            if (BrewData.Config.MashOutTemperature < MinTemp)
             {
-                BrewData.MashOutTemperature = MaxTemp;
+                BrewData.Config.MashOutTemperature = MaxTemp;
             }
         }
 

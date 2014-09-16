@@ -1,8 +1,10 @@
+using System;
+using System.IO;
 using BrewMatic3000.Extensions;
 using BrewMatic3000.RealHW;
 using BrewMatic3000.States;
 using System.Threading;
-using Microsoft.SPOT.Hardware;
+using Microsoft.SPOT.   Hardware;
 
 namespace BrewMatic3000
 {
@@ -50,7 +52,6 @@ namespace BrewMatic3000
 
             Heater2 = new HeatElement3000W(PortHeater2);
             Heater2.Start();
-
 
         }
 
@@ -132,9 +133,9 @@ namespace BrewMatic3000
             {
                 Thread.Sleep(Timeout.Infinite);
             }
-            
+
         }
-        
+
         void _currentState_DisplayContentChanged()
         {
             DisplayLcdContent(_currentState.CurrentLcdContent);

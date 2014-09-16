@@ -36,7 +36,7 @@ namespace BrewMatic3000.States.Setup
                             "=  Setup  =", 
                             "Strike temp", 
                             "", 
-                            "Current: " + BrewData.StrikeTemperature.DisplayTemperature()
+                            "Current: " + BrewData.Config.StrikeTemperature.DisplayTemperature()
                         }, "Save");
                     }
                 default:
@@ -48,19 +48,19 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            BrewData.StrikeTemperature += 0.1f;
-            if (BrewData.StrikeTemperature > MaxTemp)
+            BrewData.Config.StrikeTemperature += 0.1f;
+            if (BrewData.Config.StrikeTemperature > MaxTemp)
             {
-                BrewData.StrikeTemperature = MinTemp;
+                BrewData.Config.StrikeTemperature = MinTemp;
             }
         }
 
         public override void KeyPressPreviousShort()
         {
-            BrewData.StrikeTemperature -= 0.1f;
-            if (BrewData.StrikeTemperature < MinTemp)
+            BrewData.Config.StrikeTemperature -= 0.1f;
+            if (BrewData.Config.StrikeTemperature < MinTemp)
             {
-                BrewData.StrikeTemperature = MaxTemp;
+                BrewData.Config.StrikeTemperature = MaxTemp;
             }
         }
 

@@ -24,6 +24,7 @@ namespace BrewMatic3000.States.Setup
             EstimatedMashWarmupTime,
             EstimatedSpargeWarmupTime,
             Time,
+            SaveConfig,
             Return
         }
 
@@ -57,7 +58,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Mash out temp";
-                        var line4 = "Current: " + BrewData.MashOutTemperature.DisplayTemperature();
+                        var line4 = "Current: " + BrewData.Config.MashOutTemperature.DisplayTemperature();
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.MashTemp:
@@ -65,7 +66,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Mash temp";
-                        var line4 = "Current: " + BrewData.MashTemperature.DisplayTemperature();
+                        var line4 = "Current: " + BrewData.Config.MashTemperature.DisplayTemperature();
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.MashTime:
@@ -73,7 +74,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Mash time";
-                        var line4 = "Current: " + BrewData.MashTime + "min";
+                        var line4 = "Current: " + BrewData.Config.MashTime + "min";
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.SpargeTemp:
@@ -81,7 +82,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Sparge temp";
-                        var line4 = "Current: " + BrewData.SpargeTemperature.DisplayTemperature();
+                        var line4 = "Current: " + BrewData.Config.SpargeTemperature.DisplayTemperature();
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.StrikeTemp:
@@ -89,7 +90,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Strike temp";
-                        var line4 = "Current: " + BrewData.StrikeTemperature.DisplayTemperature();
+                        var line4 = "Current: " + BrewData.Config.StrikeTemperature.DisplayTemperature();
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.MashStartTime:
@@ -105,7 +106,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Est. Msh. warmup tm";
-                        var line4 = "Current: " + BrewData.EstimatedMashWarmupMinutes;
+                        var line4 = "Current: " + BrewData.Config.EstimatedMashWarmupMinutes;
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.EstimatedSpargeWarmupTime:
@@ -113,7 +114,7 @@ namespace BrewMatic3000.States.Setup
                         var line1 = "=  Setup  =";
                         var line2 = "";
                         var line3 = "Est. Spg. warmup tm";
-                        var line4 = "Current: " + BrewData.EstimatedSpargeWarmupMinutes;
+                        var line4 = "Current: " + BrewData.Config.EstimatedSpargeWarmupMinutes;
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.Time:
@@ -122,6 +123,14 @@ namespace BrewMatic3000.States.Setup
                         var line2 = "";
                         var line3 = "Time and date";
                         var line4 = DateTime.Now.ToString("yyyy MMM dd HH:mm:ss");
+                        return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
+                    }
+                case (int)Screens.SaveConfig:
+                    {
+                        var line1 = "=  Setup  =";
+                        var line2 = "";
+                        var line3 = "Save config";
+                        var line4 = "";
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
                 case (int)Screens.Return:
@@ -195,10 +204,16 @@ namespace BrewMatic3000.States.Setup
             {
                 RiseStateChangedEvent(new StateSetupTime(BrewData));
             }
+            if (GetCurrentScreenNumber == (int)Screens.SaveConfig)
+            {
+                BrewData.Config.SaveConfig();
+                RiseStateChangedEvent(new StateDashboard(BrewData));
+            }
             if (GetCurrentScreenNumber == (int)Screens.Return)
             {
                 RiseStateChangedEvent(new StateDashboard(BrewData));
             }
+
         }
 
     }

@@ -1,5 +1,3 @@
-using BrewMatic3000.Extensions;
-
 namespace BrewMatic3000.States.Setup
 {
     public class StateSetupMashTime : State
@@ -36,7 +34,7 @@ namespace BrewMatic3000.States.Setup
                             "=  Setup  =", 
                             "Mash time", 
                             "", 
-                            "Current: " + BrewData.MashTime +"min"
+                            "Current: " + BrewData.Config.MashTime +"min"
                         }, "Save");
                     }
                 default:
@@ -48,19 +46,19 @@ namespace BrewMatic3000.States.Setup
 
         public override void KeyPressNextShort()
         {
-            BrewData.MashTime += 1;
-            if (BrewData.MashTime > MaxTemp)
+            BrewData.Config.MashTime += 1;
+            if (BrewData.Config.MashTime > MaxTemp)
             {
-                BrewData.MashTime = MinTemp;
+                BrewData.Config.MashTime = MinTemp;
             }
         }
 
         public override void KeyPressPreviousShort()
         {
-            BrewData.MashTime -= 1;
-            if (BrewData.MashTime < MinTemp)
+            BrewData.Config.MashTime -= 1;
+            if (BrewData.Config.MashTime < MinTemp)
             {
-                BrewData.MashTime = MaxTemp;
+                BrewData.Config.MashTime = MaxTemp;
             }
         }
 

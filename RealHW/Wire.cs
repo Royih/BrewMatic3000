@@ -1,6 +1,4 @@
 using System;
-using Microsoft.SPOT;
-using Microsoft.SPOT.Hardware;
 using Toolbox.NETMF.Hardware;
 
 namespace BrewMatic3000.RealHW
@@ -15,9 +13,7 @@ namespace BrewMatic3000.RealHW
     {
 
         private const int DefaultClockRate = 400;
-        private const int TransactionTimeout = 1000;
 
-        private I2CDevice.Configuration i2cConfig;
         private MultiI2C i2cDevice;
 
         public Wire(byte address, int clockRateKhz)
