@@ -23,6 +23,7 @@ namespace BrewMatic3000.States.Setup
             MashStartTime,
             EstimatedMashWarmupTime,
             EstimatedSpargeWarmupTime,
+            TempLoggerLogEveryNSeconds,
             Time,
             SaveConfig,
             Return
@@ -117,6 +118,14 @@ namespace BrewMatic3000.States.Setup
                         var line4 = "Current: " + BrewData.Config.EstimatedSpargeWarmupMinutes;
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
+                case (int)Screens.TempLoggerLogEveryNSeconds:
+                    {
+                        var line1 = "=  Setup  =";
+                        var line2 = "";
+                        var line3 = "TempLogger interval";
+                        var line4 = "Current: " + BrewData.Config.TempLoggerLogEveryNSeconds + " sec";
+                        return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
+                    }
                 case (int)Screens.Time:
                     {
                         var line1 = "=  Setup  =";
@@ -199,6 +208,10 @@ namespace BrewMatic3000.States.Setup
             if (GetCurrentScreenNumber == (int)Screens.EstimatedSpargeWarmupTime)
             {
                 RiseStateChangedEvent(new StateSetupEstimatedSpargeWarmupTime(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.TempLoggerLogEveryNSeconds)
+            {
+                RiseStateChangedEvent(new StateSetupTempLoggerInterval(BrewData));
             }
             if (GetCurrentScreenNumber == (int)Screens.Time)
             {

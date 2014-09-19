@@ -33,6 +33,8 @@ namespace BrewMatic3000
 
         public int EstimatedSpargeWarmupMinutes = 60;
 
+        public int TempLoggerLogEveryNSeconds = 10;
+
         private const string ConfigfileName = "config.txt";
 
         private string ConfigFile
@@ -114,6 +116,7 @@ namespace BrewMatic3000
                     file.WriteLine("SpargePIDKd:" + SpargePIDKd);
                     file.WriteLine("EstimatedMashWarmupMinutes:" + EstimatedMashWarmupMinutes);
                     file.WriteLine("EstimatedSpargeWarmupMinutes:" + EstimatedSpargeWarmupMinutes);
+                    file.WriteLine("TempLoggerLogEveryNSeconds:" + TempLoggerLogEveryNSeconds);
                     file.Close();
                 }
             }
@@ -190,6 +193,11 @@ namespace BrewMatic3000
                 case "EstimatedSpargeWarmupMinutes":
                     {
                         EstimatedSpargeWarmupMinutes = ApplyInt(valueAsString, EstimatedSpargeWarmupMinutes);
+                        break;
+                    }
+                case "TempLoggerLogEveryNSeconds":
+                    {
+                        TempLoggerLogEveryNSeconds = ApplyInt(valueAsString, TempLoggerLogEveryNSeconds);
                         break;
                     }
             }

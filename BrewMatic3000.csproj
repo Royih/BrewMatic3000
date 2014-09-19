@@ -55,6 +55,7 @@
     <Compile Include="RealHW\LiquidCrystal_I2C.cs" />
     <Compile Include="RealHW\PT100Reader.cs" />
     <Compile Include="RealHW\Wire.cs" />
+    <Compile Include="States\Setup\StateSetupTempLoggerInterval.cs" />
     <Compile Include="States\Setup\StateSetupEstimatedSpargeWarmupTime.cs" />
     <Compile Include="States\Setup\StateSetupMashStartTime.cs" />
     <Compile Include="States\Setup\StateSetupEstimatedMashWarmupTime.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="FakeHW\FakeTempReader.cs" />
     <Compile Include="Interfaces\ITempReader.cs" />
     <Compile Include="PID\PID.cs" />
+    <Compile Include="States\TempLogger\TempLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Hardware" />

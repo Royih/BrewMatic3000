@@ -21,5 +21,6 @@ namespace BrewMatic3000.Extensions
         {
             return input.ToString("f1").PadLeft(5) + (char)223;
         }
+
     }
 }

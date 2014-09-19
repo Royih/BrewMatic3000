@@ -19,6 +19,7 @@ namespace BrewMatic3000.States
             Heater,
             StartBrew,
             TurnOffHeat,
+            TempLogger,
             BrewLog,
             Setup
         }
@@ -64,6 +65,14 @@ namespace BrewMatic3000.States
                         var strLine1 = "=  BrewMatic 3000  =";
                         var strLine2 = "";
                         var strLine3 = "Turn off heat";
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                    }
+                case (int)Screens.TempLogger:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "Temp logger";
                         var strLine4 = "";
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
                     }
@@ -117,6 +126,10 @@ namespace BrewMatic3000.States
                 BrewData.Heater1.SetValue(0);
                 BrewData.Heater2.SetValue(0);
                 SetScreen((int)Screens.Heater);
+            }
+            if (GetCurrentScreenNumber == (int)Screens.TempLogger)
+            {
+                RiseStateChangedEvent(new TempLogger.TempLogger(BrewData));
             }
             if (GetCurrentScreenNumber == (int)Screens.Setup)
             {
