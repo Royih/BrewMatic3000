@@ -146,7 +146,7 @@ namespace BrewMatic3000.States.TempLogger
         {
             if (GetCurrentScreenNumber == (int)Screens.StopLogging)
             {
-                RiseStateChangedEvent(new StateDashboard(BrewData, new[] { "Brew aborted" }));
+                RiseStateChangedEvent(new StateDashboard(BrewData, new[] { "Temp logging stopped" }));
             }
         }
 
