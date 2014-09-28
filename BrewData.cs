@@ -1,7 +1,10 @@
 
 using System;
+using System.IO;
+using BrewMatic3000.Extensions;
 using BrewMatic3000.Interfaces;
 using BrewMatic3000.RealHW;
+using Microsoft.SPOT;
 
 namespace BrewMatic3000
 {
@@ -26,8 +29,60 @@ namespace BrewMatic3000
         public DateTime BrewMashOutStart = DateTime.MinValue;
         public DateTime BrewSpargeStart = DateTime.MinValue;
         public DateTime BrewSpargeEnd = DateTime.MinValue;
-
         public DateTime MashStartTime = DateTime.MinValue;
+
+        private DirectoryInfo _logDirectory;
+        private FileInfo _logFile;
+
+        private DirectoryInfo LogDirectory
+        {
+            get
+            {
+                if (_logDirectory == null)
+                {
+                    _logDirectory = new DirectoryInfo("\\sd\\BrewMatic3000\\Brew\\");
+                }
+                return _logDirectory;
+            }
+        }
+        public FileInfo LogFile
+        {
+            get
+            {
+                if (!LogDirectory.Exists)
+                {
+                    LogDirectory.Create();
+                }
+                if (_logFile == null)
+                {
+                    _logFile = new FileInfo(Path.Combine(LogDirectory.FullName, "brew_" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm") + ".txt"));
+                }
+                return _logFile;
+            }
+        }
+
+        public void ResetBrewLog()
+        {
+            _logFile = null;
+        }
+
+        public void LogBrewEventToFile(string eventToLog)
+        {
+            try
+            {
+                using (var wr = new StreamWriter(LogFile.FullName, true))
+                {
+                    wr.WriteLine(DateTime.Now.Display() + ":\t" + eventToLog);
+                    wr.Close();
+                }
+            }
+            catch (Exception)
+            {
+                Debug.Print("Error logging value to file.");
+            }
+        }
+
+
 
         public DS3231 TimeChip { get; private set; }
 

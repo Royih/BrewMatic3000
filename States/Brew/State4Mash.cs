@@ -91,6 +91,7 @@ namespace BrewMatic3000.States.Brew
             _mashComplete = DateTime.Now.AddMinutes(BrewData.Config.MashTime);
             BrewData.MashPID.Start(BrewData.Config.MashTemperature);
             BrewData.SpargePID.Start(BrewData.Config.SpargeTemperature);
+            BrewData.LogBrewEventToFile("Begin mashing");
         }
 
     }

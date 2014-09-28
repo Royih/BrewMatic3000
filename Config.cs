@@ -41,7 +41,7 @@ namespace BrewMatic3000
         {
             get
             {
-                return Path.Combine("\\sd", ConfigfileName);
+                return Path.Combine("\\sd\\BrewMatic3000", ConfigfileName);
             }
         }
 

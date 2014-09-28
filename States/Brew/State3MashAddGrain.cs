@@ -89,6 +89,7 @@ namespace BrewMatic3000.States.Brew
         protected override void StartExtra()
         {
             BrewData.BrewAddGrainStart = DateTime.Now;
+            BrewData.LogBrewEventToFile("Adding grain");
             BrewData.MashPID.Start(BrewData.Config.MashTemperature);
             BrewData.SpargePID.Start(BrewData.Config.SpargeTemperature);
         }

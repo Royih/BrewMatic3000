@@ -88,6 +88,9 @@ namespace BrewMatic3000.States.Brew
             BrewData.BrewSpargeStart = DateTime.Now;
             BrewData.MashPID.Stop();
             BrewData.SpargePID.Stop();
+            BrewData.Heater1.SetValue(0);
+            BrewData.Heater2.SetValue(0);
+            BrewData.LogBrewEventToFile("Begin sparge");
         }
 
     }

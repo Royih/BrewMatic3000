@@ -138,7 +138,7 @@ namespace BrewMatic3000.States.Setup
                     {
                         var line1 = "=  Setup  =";
                         var line2 = "";
-                        var line3 = "Save config";
+                        var line3 = "Save & retrn to dash";
                         var line4 = "";
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, line3);
                     }
@@ -146,7 +146,7 @@ namespace BrewMatic3000.States.Setup
                     {
                         var line1 = "=  Setup  =";
                         var line2 = "";
-                        var line3 = "Return to dashboard";
+                        var line3 = "Retrn without saving";
                         var line4 = "";
                         return new Screen(screenNumber, new[] { line1, line2, line3, line4 }, "");
                     }

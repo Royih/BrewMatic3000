@@ -91,6 +91,7 @@ namespace BrewMatic3000.States.Brew
             BrewData.BrewMashOutStart = DateTime.Now;
             BrewData.MashPID.Start(BrewData.Config.MashOutTemperature);
             BrewData.SpargePID.Start(BrewData.Config.SpargeTemperature);
+            BrewData.LogBrewEventToFile("Begin mash out");
         }
 
 

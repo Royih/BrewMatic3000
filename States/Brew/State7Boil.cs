@@ -76,6 +76,7 @@ namespace BrewMatic3000.States.Brew
             BrewData.BrewSpargeEnd = DateTime.Now;
             BrewData.MashPID.Stop();
             BrewData.SpargePID.Stop();
+            BrewData.LogBrewEventToFile("Ready for boil");
         }
 
     }

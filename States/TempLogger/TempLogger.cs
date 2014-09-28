@@ -27,7 +27,7 @@ namespace BrewMatic3000.States.TempLogger
             {
                 if (_logDirectory == null)
                 {
-                    _logDirectory = new DirectoryInfo("\\sd\\TempLogger\\");
+                    _logDirectory = new DirectoryInfo("\\sd\\BrewMatic3000\\TempLogger\\");
                 }
                 return _logDirectory;
             }

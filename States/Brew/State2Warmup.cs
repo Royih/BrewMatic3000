@@ -1,6 +1,5 @@
 using System;
 using BrewMatic3000.Extensions;
-using BrewMatic3000.States.Setup;
 
 namespace BrewMatic3000.States.Brew
 {
@@ -12,6 +11,9 @@ namespace BrewMatic3000.States.Brew
 
         private DateTime _startPIDMash = DateTime.MinValue;
         private DateTime _startPIDSparge = DateTime.MinValue;
+
+        private bool _strikeTempReached = false;
+        private bool _spargeTempReached = false;
 
         public State2Warmup(BrewData brewData, string[] initialMessage = null, int initialScreen = 0)
             : base(brewData, initialMessage, initialScreen)
@@ -66,7 +68,11 @@ namespace BrewMatic3000.States.Brew
                             strLine4 = "Sp: " + _startPIDSparge.Subtract(DateTime.Now).Display();
                         }
 
-                        var longWarningNext = "Add grain";
+                        string longWarningNext = null;
+                        if (!BrewData.MashPID.Started() || !BrewData.SpargePID.Started())
+                        {
+                            longWarningNext = "Start warmup now";
+                        }
 
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, longWarningNext);
                     }
@@ -110,7 +116,11 @@ namespace BrewMatic3000.States.Brew
         {
             if (GetCurrentScreenNumber == (int)Screens.Default)
             {
-                RiseStateChangedEvent(new State3MashAddGrain(BrewData));
+                if (!BrewData.MashPID.Started() || !BrewData.SpargePID.Started())
+                {
+                    _startPIDMash = DateTime.Now;
+                    _startPIDSparge = DateTime.Now;
+                }
             }
             if (GetCurrentScreenNumber == (int)Screens.AddGrain)
             {
@@ -125,9 +135,11 @@ namespace BrewMatic3000.States.Brew
 
         protected override void StartExtra()
         {
+            BrewData.ResetBrewLog();
             BrewData.BrewWarmupStart = DateTime.Now;
             _startPIDMash = BrewData.MashStartTime.AddMinutes((-1) * BrewData.Config.EstimatedMashWarmupMinutes);
             _startPIDSparge = BrewData.MashStartTime.AddMinutes((-1) * BrewData.Config.EstimatedSpargeWarmupMinutes);
+            BrewData.LogBrewEventToFile("Entering warmup state. Mash warmup will begin: " + _startPIDMash.Display() + ". Sparge warmup will begin: " + _startPIDSparge.Display());
         }
 
         protected override void DoWorkExtra()
@@ -135,6 +147,7 @@ namespace BrewMatic3000.States.Brew
             if (!BrewData.MashPID.Started() && DateTime.Now > _startPIDMash)
             {
                 BrewData.MashPID.Start(BrewData.Config.StrikeTemperature);
+                BrewData.LogBrewEventToFile("Begin strike temp warmup");
             }
             else if (BrewData.MashPID.Started())
             {
@@ -143,11 +156,17 @@ namespace BrewMatic3000.States.Brew
                 {
                     _maxTemp1 = currentTemp1;
                 }
+                if (currentTemp1 >= BrewData.Config.StrikeTemperature && !_strikeTempReached)
+                {
+                    _strikeTempReached = true;
+                    BrewData.LogBrewEventToFile("Strike temperature reached");
+                }
             }
 
             if (!BrewData.SpargePID.Started() && DateTime.Now > _startPIDSparge)
             {
                 BrewData.SpargePID.Start(BrewData.Config.SpargeTemperature);
+                BrewData.LogBrewEventToFile("Begin sparge water warmup");
             }
             else if (BrewData.SpargePID.Started())
             {
@@ -157,6 +176,13 @@ namespace BrewMatic3000.States.Brew
                 {
                     _maxTemp2 = currentTemp2;
                 }
+
+                if (currentTemp2 >= BrewData.Config.SpargeTemperature && !_spargeTempReached)
+                {
+                    _spargeTempReached = true;
+                    BrewData.LogBrewEventToFile("Sparge temperature reached");
+                }
+
             }
 
 
