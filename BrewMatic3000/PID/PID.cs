@@ -156,7 +156,16 @@ namespace BrewMatic3000.PID
         {
             get { return _preferredTemperature; }
         }
-        
-      
+
+        public void IncreasePreferredTemperatureByOneDegree()
+        {
+            _preferredTemperature += 1;
+        }
+        public void DecreasePreferredTemperatureByOneDegree()
+        {
+            _preferredTemperature -= 1;
+        }
+
+
     }
 }

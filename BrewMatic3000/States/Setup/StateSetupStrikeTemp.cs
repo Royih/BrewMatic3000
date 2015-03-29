@@ -5,7 +5,7 @@ namespace BrewMatic3000.States.Setup
     public class StateSetupStrikeTemp : State
     {
 
-        private const float MinTemp = 70.0f;
+        private const float MinTemp = 50.0f;
 
         private const float MaxTemp = 85.0f;
 

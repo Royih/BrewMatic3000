@@ -5,7 +5,7 @@ namespace BrewMatic3000.States.Setup
     public class StateSetupMashTemp : State
     {
 
-        private const float MinTemp = 60.0f;
+        private const float MinTemp = 45.0f;
 
         private const float MaxTemp = 75.0f;
 

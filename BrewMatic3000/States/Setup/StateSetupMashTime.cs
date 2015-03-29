@@ -3,7 +3,7 @@ namespace BrewMatic3000.States.Setup
     public class StateSetupMashTime : State
     {
 
-        private const int MinTime = 50;
+        private const int MinTime = 15;
 
         private const int MaxTime = 95;
 

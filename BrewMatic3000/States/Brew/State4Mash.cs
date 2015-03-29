@@ -17,6 +17,9 @@ namespace BrewMatic3000.States.Brew
         {
             Default,
             MashComplete,
+            IncreaseMashTemp,
+            DecreaseMashTemp,
+            ResetTimer,
             AbortBrew
         }
 
@@ -32,7 +35,7 @@ namespace BrewMatic3000.States.Brew
                 case (int)Screens.Default:
                     {
                         var currentTemp1 = BrewData.TempReader1.GetValue();
-                        
+
                         var longWarningNext = "Mash complete";
 
                         var strLine1 = "= Brew: Mash =";
@@ -47,6 +50,33 @@ namespace BrewMatic3000.States.Brew
                         var strLine2 = "Mash complete";
                         var strLine3 = "";
                         var strLine4 = "";
+
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine2);
+                    }
+                case (int)Screens.IncreaseMashTemp:
+                    {
+                        var strLine1 = "= Brew: Inc Ms tmp =";
+                        var strLine2 = "";
+                        var strLine3 = "";
+                        var strLine4 = "Tg:" + BrewData.MashPID.GetPreferredTemperature.ToString("f1").PadLeft(4);
+
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine2);
+                    }
+                case (int)Screens.DecreaseMashTemp:
+                    {
+                        var strLine1 = "= Brew: Dec Ms tmp =";
+                        var strLine2 = "";
+                        var strLine3 = "";
+                        var strLine4 = "Tg:" + BrewData.MashPID.GetPreferredTemperature.ToString("f1").PadLeft(4);
+
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine2);
+                    }
+                case (int)Screens.ResetTimer:
+                    {
+                        var strLine1 = "= Brew: Reset timer=";
+                        var strLine2 = " Reset mash timer";
+                        var strLine3 = "";
+                        var strLine4 = "Timer: " + _mashComplete.Subtract(DateTime.Now).Display();
 
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine2);
                     }
@@ -67,7 +97,6 @@ namespace BrewMatic3000.States.Brew
         }
 
 
-
         public override void KeyPressNextLong()
         {
             if (GetCurrentScreenNumber == (int)Screens.Default)
@@ -77,6 +106,20 @@ namespace BrewMatic3000.States.Brew
             if (GetCurrentScreenNumber == (int)Screens.MashComplete)
             {
                 RiseStateChangedEvent(new State5Mashout(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.IncreaseMashTemp)
+            {
+                BrewData.MashPID.IncreasePreferredTemperatureByOneDegree();
+            }
+            if (GetCurrentScreenNumber == (int)Screens.DecreaseMashTemp)
+            {
+                BrewData.MashPID.DecreasePreferredTemperatureByOneDegree();
+            }
+            if (GetCurrentScreenNumber == (int)Screens.ResetTimer)
+            {
+                BrewData.BrewMashStart = DateTime.Now;
+                _mashComplete = DateTime.Now.AddMinutes(BrewData.Config.MashTime);
+                BrewData.LogBrewEventToFile("Begin mashing");
             }
             if (GetCurrentScreenNumber == (int)Screens.AbortBrew)
             {
