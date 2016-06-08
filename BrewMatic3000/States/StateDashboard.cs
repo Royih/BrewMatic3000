@@ -21,6 +21,7 @@ namespace BrewMatic3000.States
             TurnOffHeat,
             TempLogger,
             BrewLog,
+            SlaveMode,
             Setup
         }
 
@@ -84,6 +85,14 @@ namespace BrewMatic3000.States
                         var strLine4 = "";
                         return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
                     }
+                case (int)Screens.SlaveMode:
+                    {
+                        var strLine1 = "=  BrewMatic 3000  =";
+                        var strLine2 = "";
+                        var strLine3 = "Slave mode";
+                        var strLine4 = "";
+                        return new Screen(screenNumber, new[] { strLine1, strLine2, strLine3, strLine4 }, strLine3);
+                    }
                 case (int)Screens.Setup:
                     {
                         var strLine1 = "=  BrewMatic 3000  =";
@@ -138,6 +147,10 @@ namespace BrewMatic3000.States
             if (GetCurrentScreenNumber == (int)Screens.BrewLog)
             {
                 RiseStateChangedEvent(new StateShowLog(BrewData));
+            }
+            if (GetCurrentScreenNumber == (int)Screens.SlaveMode)
+            {
+                RiseStateChangedEvent(new SlaveMode.SlaveMode(BrewData));
             }
 
         }

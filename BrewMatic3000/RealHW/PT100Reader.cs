@@ -21,7 +21,7 @@ namespace BrewMatic3000.RealHW
         //F1: Variables used to return an average value based on the last N measurements
         private const int NumberOfMeasurementsToKeep = 5; //The number of measurments to keep. An average of these measurments will be returned
         private readonly float[] _measurements = new float[NumberOfMeasurementsToKeep]; //An array of the last measurements. 
-        
+
         //F2: Variables used to ignore measurments out
         private float _lastMeasure; // Holds the last valid measurement
         private const float IgnoreThreshold = 0.8f; //The maximum allowed diff to be allowed compared to the last measurement
@@ -49,6 +49,7 @@ namespace BrewMatic3000.RealHW
             var myVoltage = (float)_analogInput.Read() / MaximumValue * AnalogReference;
             var myCurrent = (myVoltage / ReistorOhms);
             var myTemp = (myCurrent - MinimumCurrentValue) * 6250;
+            //var myTemp = myCurrent * 6250;
             return myTemp;
         }
 

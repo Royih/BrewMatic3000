@@ -17,7 +17,7 @@ namespace BrewMatic3000
             var portHeater1 = new OutputPort(Pins.GPIO_PIN_D8, false);
             var portHeater2 = new OutputPort(Pins.GPIO_PIN_D9, false);
 
-            
+
             var lcd = new LiquidCrystal_I2C(0x27, 20, 4);
             lcd.setBacklight(true);
 
@@ -27,9 +27,8 @@ namespace BrewMatic3000
             var program = new BrewGuide(navButtons, lcd, new PT100Reader(tempInput1), new PT100Reader(tempInput2), portHeater1, portHeater2);
             program.Initialize();
             program.Run();
+
         }
-
-
 
     }
 }
