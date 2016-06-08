@@ -13,7 +13,7 @@ namespace BrewMatic3000.States.SlaveMode
         private int _ok;
         private int _error;
 
-        private const string _url = "http://hansecwebapp.azurewebsites.net/api/communicate";
+        private const string _url = "http://brewmaticwebapp.azurewebsites.net/api/communicate";
 
         private string[] _screen = new[] { "", "", "", "" };
 
