@@ -6,6 +6,7 @@ var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+var mainBowerFiles = require('main-bower-files');
 
 // Lint Task
 gulp.task('lint', function() {
@@ -53,11 +54,10 @@ gulp.task('boostrap', function(){
   .pipe(gulp.dest('wwwroot/bootstrap'));
 });
 
-var mainBowerFiles = require('main-bower-files');
  
 gulp.task('bower-files', function() {
     return gulp.src(mainBowerFiles())
-        .pipe(gulp.dest("wwwroot/assets"))
+        .pipe(gulp.dest("wwwroot/assets"));
 });
 
 // Default Task

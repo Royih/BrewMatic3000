@@ -15,9 +15,13 @@ namespace WebApp.Model
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=./blog.db");
+            optionsBuilder.UseSqlite("Filename=./brew.db");
+
         }
     }
+
+
+
     public class BrewStatusLog
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

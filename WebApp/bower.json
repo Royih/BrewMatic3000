@@ -3,13 +3,13 @@
   "homepage": "https://github.com/Royih/BrewMatic3000",
   "description": "Brew sw",
   "dependencies": {
-               "bootstrap": "3.3.6",   
-               "loading-bar": "latest",
-               "angular-loading-bar": "latest",
-               "underscore": "latest",
-               "angular-ui-router": "latest", 
-               "angular-i18n": "latest"          
-              },
+    "bootstrap": "3.3.6",
+    "loading-bar": "*",
+    "angular-loading-bar": "*",
+    "underscore": "*",
+    "angular-ui-router": "0.3.1",
+    "angular-i18n": "*"
+  },
   "main": "bower.json",
   "authors": [
     "Roy Ingar Hansen"

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using WebApp.Model;
 
 namespace WebApp
 {
@@ -42,9 +44,22 @@ namespace WebApp
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            Seed();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc();
+        }
+
+        private void Seed()
+        {
+            using (var db = new BrewMaticContext())
+            {
+                db.Database.EnsureCreated();
+                //db.Database.Migrate();
+                
+                // Seed code
+                db.SaveChanges();
+            }
         }
     }
 }

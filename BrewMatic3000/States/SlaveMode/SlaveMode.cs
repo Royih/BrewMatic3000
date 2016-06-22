@@ -105,10 +105,13 @@ namespace BrewMatic3000.States.SlaveMode
                                 var hashTable = JsonSerializer.DeserializeString(responseValue) as Hashtable;
                                 if (hashTable != null)
                                 {
-                                    var screenContent = hashTable["ScreenContent"] as ArrayList;
+                                    var screenContent = hashTable["screenContent"] as ArrayList;
                                     _screen = ParseScreenContent(screenContent);
+                                    var targetTemp1 = (double)hashTable["targetTemp1"];
+                                    var targetTemp2 = (double)hashTable["targetTemp2"];
+                                    ConsiderNewTemp(BrewData.MashPID, targetTemp1);
+                                    ConsiderNewTemp(BrewData.SpargePID, targetTemp2);
                                 }
-
                             }
                         }
                     }
@@ -122,6 +125,19 @@ namespace BrewMatic3000.States.SlaveMode
             catch (Exception ex)
             {
                 _error++;
+            }
+        }
+
+        private void ConsiderNewTemp(PID.PID pid, double newTargetTemp)
+        {
+            var diff = Math.Abs(BrewData.MashPID.GetPreferredTemperature - newTargetTemp);
+            if (diff > 0.1)
+            {
+                if (pid.Started())
+                {
+                    pid.Stop();
+                }
+                pid.Start((float)newTargetTemp);
             }
         }
 

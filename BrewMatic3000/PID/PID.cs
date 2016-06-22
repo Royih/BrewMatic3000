@@ -120,7 +120,7 @@ namespace BrewMatic3000.PID
             _heater.SetValue(outReal);
         }
 
-
+        
 
         public void Start(float preferredTemperature)
         {

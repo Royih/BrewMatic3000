@@ -16,22 +16,34 @@ namespace WebApp.Controllers
         [Route("get50Latest")]
         public async Task<IEnumerable<BrewStatusLog>> Get50Latest()
         {
-            //todo! Return async data!!
-            var logs = new List<BrewStatusLog>();
             using (var db = new BrewMaticContext())
             {
-                return await db.Logs.OrderByDescending(x=>x.Id).Take(50).ToListAsync();
+                return await db.Logs.OrderByDescending(x => x.Id).Take(50).ToListAsync();
             }
         }
 
-    
+
         [HttpGet]
-        public Task<BrewStatusLog> GetLatest()
+        public async Task<BrewStatusLog> GetLatest()
         {
-            //todo! Return async data!!
             using (var db = new BrewMaticContext())
             {
-                return db.Logs.OrderByDescending(x=>x.Id).FirstOrDefaultAsync();
+                var l = await db.Logs.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+                if (l != null)
+                {
+                    return l;
+                }
+                var newLog = new BrewStatusLog
+                {
+                    Temp1 = 0,
+                    Temp2 = 0,
+                    Heater1Percentage = 0,
+                    Heater2Percentage = 0,
+                    TimeStamp = DateTime.Now
+                };
+                db.Logs.Add(newLog);
+                await db.SaveChangesAsync();
+                return newLog;
             }
         }
 
