@@ -3,17 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApp.Model;
 
 namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class BrewStatusLogController : Controller
     {
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        [Route("get50Latest")]
+        public async Task<IEnumerable<BrewStatusLog>> Get50Latest()
         {
-            return new string[] { "value1", "value2" };
+            //todo! Return async data!!
+            var logs = new List<BrewStatusLog>();
+            using (var db = new BrewMaticContext())
+            {
+                return await db.Logs.OrderByDescending(x=>x.Id).Take(50).ToListAsync();
+            }
+        }
+
+    
+        [HttpGet]
+        public Task<BrewStatusLog> GetLatest()
+        {
+            //todo! Return async data!!
+            using (var db = new BrewMaticContext())
+            {
+                return db.Logs.OrderByDescending(x=>x.Id).FirstOrDefaultAsync();
+            }
         }
 
         // GET api/values/5

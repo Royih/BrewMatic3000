@@ -1,0 +1,34 @@
+<div class="jumbotron text-center">
+    <h1>Temp log</h1>
+    <table class="table table-striped">
+        <tr>
+            <th>
+                Time stamp
+            </th>
+            <th>
+                Temp 1
+            </th>
+            <th>Temp 2</th>
+            <th>
+                Heater % 1</th>
+            <th>Heater % 2</th>
+        </tr>
+        <tr ng-repeat="log in brewLogs">
+            <td>
+                {{log.timeStamp | date: 'medium'}}
+            </td>
+            <td>
+                {{log.temp1}} ºC
+            </td>
+             <td>
+                {{log.temp2}} ºC
+            </td>
+            <td>
+                {{log.heater1Percentage}} %
+            </td>
+            <td>
+                {{log.heater2Percentage}} %
+            </td>
+        </tr>
+    </table>
+</div>

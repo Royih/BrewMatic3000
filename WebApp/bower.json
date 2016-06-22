@@ -1,0 +1,25 @@
+{
+  "name": "BrewMatic",
+  "homepage": "https://github.com/Royih/BrewMatic3000",
+  "description": "Brew sw",
+  "dependencies": {
+               "bootstrap": "3.3.6",   
+               "loading-bar": "latest",
+               "angular-loading-bar": "latest",
+               "underscore": "latest",
+               "angular-ui-router": "latest", 
+               "angular-i18n": "latest"          
+              },
+  "main": "bower.json",
+  "authors": [
+    "Roy Ingar Hansen"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

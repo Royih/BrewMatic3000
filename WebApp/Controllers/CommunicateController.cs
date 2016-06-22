@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using WebApp.Model;
 
 namespace WebApp.Controllers
 {
@@ -34,20 +37,37 @@ namespace WebApp.Controllers
 
 
         [HttpPost]
-        public BrewMaticNewSettings Post([FromBody]BrewMaticStatus value)
+        public async Task<BrewMaticNewSettings> Post([FromBody]BrewMaticStatus value)
         {
             _logger.LogDebug($"{DateTime.Now}: Temp1: {value.Temp1}. Temp2: {value.Temp2}. Heater1: {value.Heater1Percentage}%. Heater2: {value.Heater2Percentage}%");
 
+            BrewTargetTemperature t;
+
+            using (var db = new BrewMaticContext())
+            {
+                t = db.TargetTemp.FirstOrDefault();
+                if(t==null)
+                {
+                    t = new BrewTargetTemperature();
+                    t.Target1 = 20;
+                    t.Target2 = 20;
+                    db.TargetTemp.Add(t);
+                }
+                db.Logs.Add(new BrewStatusLog { Temp1 = value.Temp1, Temp2 = value.Temp2, Heater1Percentage = value.Heater1Percentage, Heater2Percentage = value.Heater2Percentage, TimeStamp = DateTime.Now });
+                var count = await db.SaveChangesAsync();
+                _logger.LogDebug("{0} records saved to database", count);
+            }
+
             return new BrewMaticNewSettings
             {
-                TargetTemp1 = 0,
-                TargetTemp2 = 0,
+                TargetTemp1 = t.Target1,
+                TargetTemp2 = t.Target2,
                 ScreenContent = new[]
                 {
                     "Hello! " + DateTime.UtcNow.AddHours(2).ToString("HH:mm:ss"),
                     "",
-                    GetLineString("1", value.Temp1, 0, value.Heater1Percentage),
-                    GetLineString("2", value.Temp2, 0, value.Heater2Percentage)
+                    GetLineString("1", value.Temp1, t.Target1, value.Heater1Percentage),
+                    GetLineString("2", value.Temp2, t.Target2, value.Heater2Percentage)
                 }
             };
         }

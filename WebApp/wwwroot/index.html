@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test</title>
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="assets/loading-bar.css" rel="stylesheet" />
+    <script src="assets/angular.js"></script>
+    <script src="assets/angular-ui-router.js"></script>
+    <script src="assets/angular-locale_nb-no.js"></script>
+    <script src="assets/all.min.js"></script>
+    
+</head>
+
+<body ng-app="BrewMatic">
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" ui-sref="home">Brew Matic 3000</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a ui-sref="home">Home</a></li>
+            <li><a ui-sref="tempLog">Temp log <i class="glyphicon glyphicon-scale"></i></a></li>
+            <li><a ui-sref="about">About</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div ui-view></div>
+    </div>
+    <script src="assets/jquery.js"></script>
+    <script src="assets/underscore.js"></script>
+    <script src="assets/loading-bar.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
+
+</body>
+
+</html>

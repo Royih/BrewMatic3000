@@ -1,0 +1,56 @@
+<div class="jumbotron text-center">
+    <h1><i class="glyphicon glyphicon-glass"></i> Brew Matic 3000 <i class="glyphicon glyphicon-glass"></i></h1>
+    <p>Automating brewing tasks with <span class="text-danger">precision</span> since 2016.</p>
+    <div class="row">
+        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+            <p style="white-space: nowrap">
+                <label>Temp 1: </strong>
+                <span class="text-danger">{{lastLog.temp1}}</span> ºC
+            </p>
+            <p style="white-space: nowrap">
+                    <label>Target:</label> <input ng-model="targetTemperature.target1" type="text" class="" style="width: 60px" class="form-control"
+                    /> ºC
+                </p>
+        </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+           <p style="white-space: nowrap">
+                <label>Temp 2: </strong>
+                <span class="text-danger">{{lastLog.temp2}}</span> ºC
+            </p>
+            <p style="white-space: nowrap">
+                    <label>Target:</label> <input ng-model="targetTemperature.target2" type="text" class="" style="width: 60px" class="form-control"
+                    /> ºC
+                </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+            <h3>
+                <strong>Heater 1</strong>
+                <br><br>
+                <span class="text-danger">{{lastLog.heater1Percentage}}</span> %
+                <br>
+                <br>
+                
+            </h3>
+        </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+            <h3>
+                <strong>Heater 2</strong>
+                <br><br>
+                <span class="text-danger">{{lastLog.heater2Percentage}}</span> %
+                  <br>
+                <br>
+                
+            </h3>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="text-muted">{{lastLog.timeStamp | date: 'medium'}}</p>
+    </div>
+</footer>
