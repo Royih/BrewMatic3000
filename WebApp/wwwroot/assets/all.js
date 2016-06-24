@@ -71,54 +71,35 @@ angular.module('BrewMatic').controller('aboutController', ['$scope', '$window', 
     self.loadData();
 
 }]);
-
-angular.module('BrewMatic').controller('tempLogController', ['$scope', '$window', 'tempLogService', function ($scope, $window, tempLogService) {
+angular.module("BrewMatic").service('pageHelperService', ['$http', '$q', '$rootScope', 'ngAuthSettings', function ($http, $q, $rootScope, ngAuthSettings) {
     'use strict';
-
     var self = this;
-
-    self.loadData = function () {
-        tempLogService.getBrewLogs().then(function (result) {
-            $scope.brewLogs = result;
-        });
-    };
-
-    self.loadData();
-
-}]);
-
-angular.module('BrewMatic').service('tempLogService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
-    'use strict';
-
-    var self = this;
-
+    var textResources;
+    var textResourcesLoaded = false;
     var serviceBase = ngAuthSettings.apiServiceBaseUri;
-    
-    self.getBrewLogs = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewStatusLog/get50latest').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
+
+    self.handleError = function (data, response) {
+        if (data) {
+            if (response === 404) {
+                $rootScope.errors = $rootScope.errors || [];
+                var errorMessage = "404: Url not found. ";
+                throw { Message: errorMessage, ExceptionMessage: "" };
+            } else {
+                throw data;
+            }
+        }
+
     };
 
-    /*self.saveSomething = function (something) {
-        return $q(function (resolve, reject) {
-            $http.post(serviceBase + 'api/something/save', something).success(function (result) {
-                resolve(result);
-                pageHelperService.pushOkMessage("Something was saved successfully");
-            }).error(pageHelperService.handleError);
-        });
+    self.pushOkMessage = function (message) {
+        $rootScope.messages = $rootScope.messages || [];
+        $rootScope.messages.push(message);
+        setTimeout(function () {
+            var messageIndex = $rootScope.messages.indexOf(message);
+            $rootScope.messages.splice(messageIndex, 1);
+            $rootScope.$apply();
+        }, 3000);
     };
-
-    self.listSomething = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'api/something/list').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-    */
 
 }]);
 
@@ -183,17 +164,6 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
     };
     poll();
 
-    Number.prototype.round = function (p) {
-        p = p || 10;
-        return parseFloat(this.toFixed(p));
-    };
-
-    $scope.changeTarget = function (target, value) {
-        if (target === 1) {
-            $scope.targetTemperature.target1 = parseFloat($scope.targetTemperature.target1).round(1) + value;
-        }
-    };
-
 }]);
 
 angular.module('BrewMatic').service('homeControllerService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
@@ -246,35 +216,54 @@ angular.module('BrewMatic').service('homeControllerService', ['$http', '$q', 'ng
     */
 
 }]);
-angular.module("BrewMatic").service('pageHelperService', ['$http', '$q', '$rootScope', 'ngAuthSettings', function ($http, $q, $rootScope, ngAuthSettings) {
+
+angular.module('BrewMatic').controller('tempLogController', ['$scope', '$window', 'tempLogService', function ($scope, $window, tempLogService) {
     'use strict';
+
     var self = this;
-    var textResources;
-    var textResourcesLoaded = false;
+
+    self.loadData = function () {
+        tempLogService.getBrewLogs().then(function (result) {
+            $scope.brewLogs = result;
+        });
+    };
+
+    self.loadData();
+
+}]);
+
+angular.module('BrewMatic').service('tempLogService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
+    'use strict';
+
+    var self = this;
+
     var serviceBase = ngAuthSettings.apiServiceBaseUri;
-
-    self.handleError = function (data, response) {
-        if (data) {
-            if (response === 404) {
-                $rootScope.errors = $rootScope.errors || [];
-                var errorMessage = "404: Url not found. ";
-                throw { Message: errorMessage, ExceptionMessage: "" };
-            } else {
-                throw data;
-            }
-        }
-
+    
+    self.getBrewLogs = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewStatusLog/get50latest').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
     };
 
-    self.pushOkMessage = function (message) {
-        $rootScope.messages = $rootScope.messages || [];
-        $rootScope.messages.push(message);
-        setTimeout(function () {
-            var messageIndex = $rootScope.messages.indexOf(message);
-            $rootScope.messages.splice(messageIndex, 1);
-            $rootScope.$apply();
-        }, 3000);
+    /*self.saveSomething = function (something) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'api/something/save', something).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Something was saved successfully");
+            }).error(pageHelperService.handleError);
+        });
     };
+
+    self.listSomething = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'api/something/list').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+    */
 
 }]);
 angular.module("BrewMatic").directive('decimalChanger', function () {

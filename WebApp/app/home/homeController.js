@@ -60,15 +60,4 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
     };
     poll();
 
-    Number.prototype.round = function (p) {
-        p = p || 10;
-        return parseFloat(this.toFixed(p));
-    };
-
-    $scope.changeTarget = function (target, value) {
-        if (target === 1) {
-            $scope.targetTemperature.target1 = parseFloat($scope.targetTemperature.target1).round(1) + value;
-        }
-    };
-
 }]);
