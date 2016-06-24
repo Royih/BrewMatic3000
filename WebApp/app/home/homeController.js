@@ -3,15 +3,14 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
     'use strict';
 
     var self = this;
+    var changeTimeout;
 
     self.loadLastLog = function () {
         service.getLastLog().then(function (result) {
             $scope.lastLog = result;
         });
     };
-
-
-
+    
     self.updateIfNotChangedAfterNSeconds = function (newValue1, newValue2, seconds) {
         if (changeTimeout) $timeout.cancel(changeTimeout);
         changeTimeout = $timeout(function () {
@@ -20,8 +19,7 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
             });
         }, seconds * 1000); // delay n seconds
     };
-
-    var changeTimeout;
+    
 
     self.loadData = function () {
         self.loadLastLog();

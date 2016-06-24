@@ -120,8 +120,8 @@ angular.module('cfp.loadingBarInterceptor', ['cfp.loadingBar'])
 
           if (!response.config.ignoreLoadingBar && !isCached(response.config)) {
             reqsCompleted++;
-            $rootScope.$broadcast('cfpLoadingBar:loaded', {url: response.config.url, result: response});
             if (reqsCompleted >= reqsTotal) {
+              $rootScope.$broadcast('cfpLoadingBar:loaded', {url: response.config.url, result: response});
               setComplete();
             } else {
               cfpLoadingBar.set(reqsCompleted / reqsTotal);
@@ -138,8 +138,8 @@ angular.module('cfp.loadingBarInterceptor', ['cfp.loadingBar'])
 
           if (!rejection.config.ignoreLoadingBar && !isCached(rejection.config)) {
             reqsCompleted++;
-            $rootScope.$broadcast('cfpLoadingBar:loaded', {url: rejection.config.url, result: rejection});
             if (reqsCompleted >= reqsTotal) {
+              $rootScope.$broadcast('cfpLoadingBar:loaded', {url: rejection.config.url, result: rejection});
               setComplete();
             } else {
               cfpLoadingBar.set(reqsCompleted / reqsTotal);
@@ -307,9 +307,7 @@ angular.module('cfp.loadingBar', [])
           $animate = $injector.get('$animate');
         }
 
-        $rootScope.$broadcast('cfpLoadingBar:completed');
         _set(1);
-
         $timeout.cancel(completeTimeout);
 
         // Attempt to aggregate any start/complete calls within 500ms:
@@ -319,6 +317,7 @@ angular.module('cfp.loadingBar', [])
             promise.then(_completeAnimation);
           }
           $animate.leave(spinner);
+          $rootScope.$broadcast('cfpLoadingBar:completed');
         }, 500);
       }
 

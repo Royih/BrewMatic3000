@@ -150,7 +150,7 @@ namespace BrewMatic3000.States
             }
             if (GetCurrentScreenNumber == (int)Screens.SlaveMode)
             {
-                RiseStateChangedEvent(new SlaveMode.SlaveMode(BrewData));
+                RiseStateChangedEvent(new SlaveMode.StateSlaveMode(BrewData));
             }
 
         }

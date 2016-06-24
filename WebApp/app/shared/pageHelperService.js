@@ -6,6 +6,7 @@ angular.module("BrewMatic").service('pageHelperService', ['$http', '$q', '$rootS
     var serviceBase = ngAuthSettings.apiServiceBaseUri;
 
     self.handleError = function (data, response) {
+        console.log(data);
         if (data) {
             if (response === 404) {
                 $rootScope.errors = $rootScope.errors || [];

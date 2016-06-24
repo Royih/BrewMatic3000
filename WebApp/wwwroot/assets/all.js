@@ -41,8 +41,8 @@ angular.module('BrewMatic', ['ui.router', 'angular-loading-bar'])
     ]);
 
 //var serviceBase = 'http://localhost:26264/';
-//var serviceBase = 'http://brewmaticwebapp.azurewebsites.net/api/';
-var serviceBase = 'http://localhost:5000/api/';
+var serviceBase = 'http://brewmaticwebapp.azurewebsites.net/api/';
+//var serviceBase = 'http://localhost:5000/api/';
 angular.module('BrewMatic').constant('ngAuthSettings', {
     apiServiceBaseUri: serviceBase,
     clientId: 'ngAuthApp'
@@ -71,51 +71,19 @@ angular.module('BrewMatic').controller('aboutController', ['$scope', '$window', 
     self.loadData();
 
 }]);
-angular.module("BrewMatic").service('pageHelperService', ['$http', '$q', '$rootScope', 'ngAuthSettings', function ($http, $q, $rootScope, ngAuthSettings) {
-    'use strict';
-    var self = this;
-    var textResources;
-    var textResourcesLoaded = false;
-    var serviceBase = ngAuthSettings.apiServiceBaseUri;
-
-    self.handleError = function (data, response) {
-        if (data) {
-            if (response === 404) {
-                $rootScope.errors = $rootScope.errors || [];
-                var errorMessage = "404: Url not found. ";
-                throw { Message: errorMessage, ExceptionMessage: "" };
-            } else {
-                throw data;
-            }
-        }
-
-    };
-
-    self.pushOkMessage = function (message) {
-        $rootScope.messages = $rootScope.messages || [];
-        $rootScope.messages.push(message);
-        setTimeout(function () {
-            var messageIndex = $rootScope.messages.indexOf(message);
-            $rootScope.messages.splice(messageIndex, 1);
-            $rootScope.$apply();
-        }, 3000);
-    };
-
-}]);
 
 angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '$timeout', 'homeControllerService', function ($scope, $window, $timeout, service) {
     'use strict';
 
     var self = this;
+    var changeTimeout;
 
     self.loadLastLog = function () {
         service.getLastLog().then(function (result) {
             $scope.lastLog = result;
         });
     };
-
-
-
+    
     self.updateIfNotChangedAfterNSeconds = function (newValue1, newValue2, seconds) {
         if (changeTimeout) $timeout.cancel(changeTimeout);
         changeTimeout = $timeout(function () {
@@ -124,8 +92,7 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
             });
         }, seconds * 1000); // delay n seconds
     };
-
-    var changeTimeout;
+    
 
     self.loadData = function () {
         self.loadLastLog();
@@ -264,6 +231,38 @@ angular.module('BrewMatic').service('tempLogService', ['$http', '$q', 'ngAuthSet
         });
     };
     */
+
+}]);
+angular.module("BrewMatic").service('pageHelperService', ['$http', '$q', '$rootScope', 'ngAuthSettings', function ($http, $q, $rootScope, ngAuthSettings) {
+    'use strict';
+    var self = this;
+    var textResources;
+    var textResourcesLoaded = false;
+    var serviceBase = ngAuthSettings.apiServiceBaseUri;
+
+    self.handleError = function (data, response) {
+        console.log(data);
+        if (data) {
+            if (response === 404) {
+                $rootScope.errors = $rootScope.errors || [];
+                var errorMessage = "404: Url not found. ";
+                throw { Message: errorMessage, ExceptionMessage: "" };
+            } else {
+                throw data;
+            }
+        }
+
+    };
+
+    self.pushOkMessage = function (message) {
+        $rootScope.messages = $rootScope.messages || [];
+        $rootScope.messages.push(message);
+        setTimeout(function () {
+            var messageIndex = $rootScope.messages.indexOf(message);
+            $rootScope.messages.splice(messageIndex, 1);
+            $rootScope.$apply();
+        }, 3000);
+    };
 
 }]);
 angular.module("BrewMatic").directive('decimalChanger', function () {

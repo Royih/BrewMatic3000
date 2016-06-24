@@ -8,7 +8,7 @@ using Json.NETMF;
 
 namespace BrewMatic3000.States.SlaveMode
 {
-    public class SlaveMode : State
+    public class StateSlaveMode : State
     {
         private int _ok;
         private int _error;
@@ -18,7 +18,7 @@ namespace BrewMatic3000.States.SlaveMode
         private string[] _screen = new[] { "", "", "", "" };
 
 
-        public SlaveMode(BrewData brewData, string[] initialMessage = null, int initialScreen = 0)
+        public StateSlaveMode(BrewData brewData, string[] initialMessage = null, int initialScreen = 0)
             : base(brewData, initialMessage, initialScreen)
         {
 
@@ -79,7 +79,7 @@ namespace BrewMatic3000.States.SlaveMode
                 request.ReadWriteTimeout = 60000;
                 //request.KeepAlive = false;
 
-                Stream postStream = request.GetRequestStream();
+                var postStream = request.GetRequestStream();
 
                 postStream.Write(byteArray, 0, byteArray.Length);
                 postStream.Close();
@@ -112,11 +112,11 @@ namespace BrewMatic3000.States.SlaveMode
                                     ConsiderNewTemp(BrewData.MashPID, targetTemp1);
                                     ConsiderNewTemp(BrewData.SpargePID, targetTemp2);
                                 }
+                                responseStream.Close();
                             }
                         }
                     }
-
-
+                    response.Close();
                 }
 
                 _ok++;
@@ -128,9 +128,9 @@ namespace BrewMatic3000.States.SlaveMode
             }
         }
 
-        private void ConsiderNewTemp(PID.PID pid, double newTargetTemp)
+        private static void ConsiderNewTemp(PID.PID pid, double newTargetTemp)
         {
-            var diff = Math.Abs(BrewData.MashPID.GetPreferredTemperature - newTargetTemp);
+            var diff = Math.Abs(pid.GetPreferredTemperature - newTargetTemp);
             if (diff > 0.1)
             {
                 if (pid.Started())
@@ -155,7 +155,7 @@ namespace BrewMatic3000.States.SlaveMode
             }
         }
 
-        private string[] ParseScreenContent(ArrayList screenContent)
+        private static string[] ParseScreenContent(ArrayList screenContent)
         {
             if (screenContent != null && screenContent.Count >= 4)
             {
