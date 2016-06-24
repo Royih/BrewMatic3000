@@ -41,7 +41,8 @@ angular.module('BrewMatic', ['ui.router', 'angular-loading-bar'])
     ]);
 
 //var serviceBase = 'http://localhost:26264/';
-var serviceBase = 'http://brewmaticwebapp.azurewebsites.net/api/';
+//var serviceBase = 'http://brewmaticwebapp.azurewebsites.net/api/';
+var serviceBase = 'http://localhost:5000/api/';
 angular.module('BrewMatic').constant('ngAuthSettings', {
     apiServiceBaseUri: serviceBase,
     clientId: 'ngAuthApp'

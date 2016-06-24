@@ -1,49 +1,43 @@
 <div class="jumbotron text-center">
-    <h1><i class="glyphicon glyphicon-glass"></i> Brew Matic 3000 <i class="glyphicon glyphicon-glass"></i></h1>
+    <h1>Brew Matic 3000</h1>
     <p>Automating brewing tasks with <span class="text-danger">precision</span> since 2016.</p>
     <div class="row">
-        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+        <div class="col-md-5 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+            <h2>Mash</h2>
             <p style="white-space: nowrap">
-                <label>Temp 1: </strong>
-                <span class="text-danger">{{lastLog.temp1}}</span> ºC
+                <label>Temp: </label>
+                <span class="text-danger">{{lastLog.temp1 | number:2}}</span> ºC
             </p>
             <p style="white-space: nowrap">
-                    <label>Target:</label> <input ng-model="targetTemperature.target1" type="text" class="" style="width: 60px" class="form-control"
-                    /> ºC
-                </p>
-        </div>
-        <div class="col-md-4"></div>
-        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
-           <p style="white-space: nowrap">
-                <label>Temp 2: </strong>
-                <span class="text-danger">{{lastLog.temp2}}</span> ºC
+                <label>Target:</label> <input type="number" step="0.1" ng-model="targetTemperature.target1" min="0" max="100"
+                    style="width: 60px" /> ºC
             </p>
-            <p style="white-space: nowrap">
-                    <label>Target:</label> <input ng-model="targetTemperature.target2" type="text" class="" style="width: 60px" class="form-control"
-                    /> ºC
-                </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+
+            <div decimal-changer ng-model="targetTemperature.target1" min="0" max="100"></div>
+
             <h3>
-                <strong>Heater 1</strong>
-                <br><br>
-                <span class="text-danger">{{lastLog.heater1Percentage}}</span> %
-                <br>
-                <br>
-                
+                <label>Heater:</label>
+                <span class="label label-danger">
+                    {{lastLog.heater1Percentage | number:0}}  %</span>
             </h3>
+
         </div>
-        <div class="col-md-4"></div>
-        <div class="col-md-4 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+        <div class="col-md-2"></div>
+        <div class="col-md-5 jumbotron text-center" style="background:#fff !important; border: 1px solid #aaa;">
+            <h2>Sparge</h2>
+            <p style="white-space: nowrap">
+                <label>Temp: </label>
+                <span class="text-danger">{{lastLog.temp2  | number:2}}</span> ºC
+            </p>
+            <p style="white-space: nowrap">
+                <label>Target:</label> <input type="number" step="0.1" ng-model="targetTemperature.target2" min="0" max="100" 
+                style="width: 60px" /> ºC
+            </p>
+            <div decimal-changer ng-model="targetTemperature.target2" min="0" max="100"></div>
             <h3>
-                <strong>Heater 2</strong>
-                <br><br>
-                <span class="text-danger">{{lastLog.heater2Percentage}}</span> %
-                  <br>
-                <br>
-                
+                <label>Heater:</label>
+                <span class="label label-danger">
+                    {{lastLog.heater2Percentage | number:0}}  %</span>
             </h3>
         </div>
     </div>
