@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Test</title>
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="brewmatic.css" rel="stylesheet" />
     <link href="assets/loading-bar.css" rel="stylesheet" />
     <script src="assets/angular.js"></script>
     <script src="assets/angular-ui-router.js"></script>
@@ -27,6 +28,8 @@
             </button>
         </div>
         <ul id="navbar" class="nav navbar-nav navbar-collapse collapse">
+             <li><a ui-sref="new">New <i class="glyphicon glyphicon-play"></i></a></li>
+             <li><a ui-sref="current">Resume <i class="glyphicon glyphicon-repeat"></i></a></li>
             <li><a ui-sref="tempLog">Temp log <i class="glyphicon glyphicon-scale"></i></a></li>
             <li><a ui-sref="about">About</a></li>
         </ul>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using WebApp.BusinessLogic;
 using WebApp.Model;
 
 namespace WebApp.Controllers
@@ -45,14 +46,8 @@ namespace WebApp.Controllers
 
             using (var db = new BrewMaticContext())
             {
-                t = db.TargetTemp.FirstOrDefault();
-                if(t==null)
-                {
-                    t = new BrewTargetTemperature();
-                    t.Target1 = 20;
-                    t.Target2 = 20;
-                    db.TargetTemp.Add(t);
-                }
+                var repo = new BrewLogRepository(db);
+                t = repo.GetTargetTemp();
                 db.Logs.Add(new BrewStatusLog { Temp1 = value.Temp1, Temp2 = value.Temp2, Heater1Percentage = value.Heater1Percentage, Heater2Percentage = value.Heater2Percentage, TimeStamp = DateTime.Now });
                 var count = await db.SaveChangesAsync();
                 _logger.LogDebug("{0} records saved to database", count);

@@ -1,0 +1,39 @@
+<h1>Brew "{{brew.setup.name}}"</h1>
+<div class="row">
+    <div class="col-md-3">
+        <fieldset>
+            <legend>Temperatures</legend>
+            <p>Mash temp: {{brew.setup.mashTemp}}ºC</p>
+            <p>Strike temp: {{brew.setup.strikeTemp}}ºC</p>
+            <p>Sparge temp: {{brew.setup.spargeTemp}}ºC</p>
+            <p>Mash out temp: {{brew.setup.mashOutTemp}}ºC</p>
+        </fieldset>
+    </div>
+    <div class="col-md-3">
+        <fieldset>
+            <legend>Times</legend>
+            <p>Mash time: {{brew.setup.mashTimeInMinutes}}min</p>
+            <p>Boil time: {{brew.setup.boilTimeInMinutes}}min</p>
+        </fieldset>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <fieldset>
+            <legend>Current step "{{brew.currentStep.name}}"</legend>
+            <div>Start time: <span class="label label-info">{{brew.currentStep.startTime | date: 'medium'}}</span></div>
+            <div>Target Mash temp: <span class="label label-warning">{{brew.currentStep.getTargetMashTemp | number: 2}}</span></div>
+            <div>Target Sparge temp: <span class="label label-warning">{{brew.currentStep.getTargetSpargeTemp | number: 2}}</span></div>
+        </fieldset>
+    </div>
+    <div class="col-md-3">
+        <fieldset>
+            <legend>Actions</legend>
+            <div class="btn-group">
+                <button class="btn btn-danger" ng-if="brew.currentStep.order>1" ng-click="goBackOneStep()">Abort this step</button>
+                <button class="btn btn-primary" ng-if="brew.currentStep.completeButtonText" ng-click="goToNextStep()">{{brew.currentStep.completeButtonText}}</button>
+            </div>
+
+        </fieldset>
+    </div>
+</div>

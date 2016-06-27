@@ -8,9 +8,10 @@ using WebApp.Model;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(BrewMaticContext))]
-    partial class BrewMaticContextModelSnapshot : ModelSnapshot
+    [Migration("20160626163747_Add brew-step2")]
+    partial class Addbrewstep2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rc2-20896");
@@ -39,34 +40,6 @@ namespace WebApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Brews");
-                });
-
-            modelBuilder.Entity("WebApp.Model.BrewLogStep", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("BrewId");
-
-                    b.Property<string>("CompleteButtonText");
-
-                    b.Property<float>("GetTargetMashTemp");
-
-                    b.Property<float>("GetTargetSpargeTemp");
-
-                    b.Property<string>("Name");
-
-                    b.Property<int>("Order");
-
-                    b.Property<bool>("ShowTimer");
-
-                    b.Property<DateTime>("StartTime");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BrewId");
-
-                    b.ToTable("BrewLogSteps");
                 });
 
             modelBuilder.Entity("WebApp.Model.BrewStatusLog", b =>
@@ -101,14 +74,6 @@ namespace WebApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TargetTemp");
-                });
-
-            modelBuilder.Entity("WebApp.Model.BrewLogStep", b =>
-                {
-                    b.HasOne("WebApp.Model.BrewLog")
-                        .WithMany()
-                        .HasForeignKey("BrewId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }

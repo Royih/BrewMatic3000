@@ -13,8 +13,7 @@
                 <span class="text-danger">{{lastLog.temp1 | number:2}}</span> ºC
             </p>
             <p style="white-space: nowrap">
-                <label>Target:</label> <input type="number" step="0.1" ng-model="targetTemperature.target1" min="0" max="100"
-                                              style="width: 60px"/> ºC
+                <label>Target:</label> <input type="number" step="0.1" ng-model="targetTemperature.target1" min="0" max="100" class="temp" /> ºC
             </p>
 
             <div decimal-changer ng-model="targetTemperature.target1" min="0" max="100"></div>
@@ -36,7 +35,7 @@
             </p>
             <p style="white-space: nowrap">
                 <label>Target:</label> <input type="number" step="0.1" ng-model="targetTemperature.target2" min="0" max="100"
-                                              style="width: 60px"/> ºC
+                                              class="temp" /> ºC
             </p>
             <div decimal-changer ng-model="targetTemperature.target2" min="0" max="100"></div>
             <h3>

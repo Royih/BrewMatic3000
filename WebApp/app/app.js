@@ -8,6 +8,21 @@ angular.module('BrewMatic', ['ui.router', 'angular-loading-bar'])
                     templateUrl: "/html/home/index.html",
                     controller: "homeController"
                 })
+                .state('new', {
+                    url: "/new",
+                    templateUrl: "/html/brewGuide/new/index.html",
+                    controller: "newController"
+                })
+                .state('current', {
+                    url: "/current",
+                    templateUrl: "/html/brewGuide/current/index.html",
+                    controller: "currentController"
+                })
+                .state('displayBrew', {
+                    url: "/brew/:brewId",
+                    templateUrl: "/html/brewGuide/display/index.html",
+                    controller: "displayController"
+                })
                 .state('tempLog', {
                     url: "/tempLog",
                     templateUrl: "/html/tempLog/index.html",
@@ -41,8 +56,8 @@ angular.module('BrewMatic', ['ui.router', 'angular-loading-bar'])
     ]);
 
 //var serviceBase = 'http://localhost:26264/';
-var serviceBase = 'http://brewmaticwebapp.azurewebsites.net/api/';
-//var serviceBase = 'http://localhost:5000/api/';
+//var serviceBase = 'http://brewmaticwebapp.azurewebsites.net/api/';
+var serviceBase = 'http://localhost:5000/api/';
 angular.module('BrewMatic').constant('ngAuthSettings', {
     apiServiceBaseUri: serviceBase,
     clientId: 'ngAuthApp'
