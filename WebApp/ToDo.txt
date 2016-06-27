@@ -1,0 +1,8 @@
+﻿=>Forbedre Instructions (Bryt opp i linjer som vises som bullet-points)
+=>Detaljer på History (Hover over/Click/eller noe)
+=>Luft!
+=>Datafangst! (Antall liter før warmup, OG før og etter kok. Antall liter før/etter kok)
+=>Notatfelter for Bryggelogg og Innkjøpsliste (til neste brygg)
+=>Mulighet for å redigere instruksjoner direkte i løsningen. 
+=>Forbedre utseende på "New" -> Wizarden
+=>Sikkerhet (Innlogging/autentisering)
