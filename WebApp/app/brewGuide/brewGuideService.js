@@ -22,6 +22,14 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
         });
     };
 
+    self.getBrewHistory = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewGuide/getBrewHistory/' + brewId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
     self.getCurrentBrew = function(){
          return $q(function (resolve, reject) {
             $http.get(serviceBase + 'brewGuide/getLatest').success(function (result) {

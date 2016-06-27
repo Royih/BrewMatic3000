@@ -14,9 +14,9 @@
     "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
     "Microsoft.Extensions.Logging.Debug": "1.0.0-rc2-final", 
-    "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0-rc2-*",
+    "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0-rc2-final",
     "Microsoft.EntityFrameworkCore.Tools": {
-      "version": "1.0.0-preview1-*",
+      "version": "1.0.0-preview1-final",
       "type": "build"
     }
     

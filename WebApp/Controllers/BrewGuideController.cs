@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,17 @@ namespace WebApp.Controllers
             {
                 var repo = new BrewLogRepository(db);
                 return await repo.GetBrewDto(brewId);
+            }
+        }
+
+        [HttpGet]
+        [Route("getBrewHistory/{brewId:int}")]
+        public async Task<IEnumerable<BrewLogHistoryDto>> GetBrewHistory(int brewId)
+        {
+            using (var db = new BrewMaticContext())
+            {
+                var repo = new BrewLogRepository(db);
+                return await repo.GetBrewHistory(brewId);
             }
         }
 
@@ -52,7 +64,7 @@ namespace WebApp.Controllers
         {
             using (var db = new BrewMaticContext())
             {
-                return await db.Brews.OrderByDescending(x => x.Id).Select(x => x.Id).FirstOrDefaultAsync();
+                return await db.BrewLogs.OrderByDescending(x => x.Id).Select(x => x.Id).FirstOrDefaultAsync();
             }
         }
 

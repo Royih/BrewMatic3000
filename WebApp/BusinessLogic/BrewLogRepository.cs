@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +18,6 @@ namespace WebApp.BusinessLogic
         {
             _db = db;
         }
-
 
         public BrewTargetTemperature GetTargetTemp()
         {
@@ -54,12 +55,35 @@ namespace WebApp.BusinessLogic
                     Order = t.Order,
                     Name = t.Name,
                     StartTime = t.StartTime,
-                    ShowTimer = t.ShowTimer,
+                    CompleteTime = t.CompleteTime,
                     GetTargetMashTemp = t.GetTargetMashTemp,
                     GetTargetSpargeTemp = t.GetTargetSpargeTemp,
-                    CompleteButtonText = t.CompleteButtonText
+                    CompleteButtonText = t.CompleteButtonText,
+                    Instructions = t.Instructions
                 }
             };
+        }
+
+        public async Task<IEnumerable<BrewLogHistoryDto>> GetBrewHistory(int brewId)
+        {
+            var t = await _db.BrewLogSteps.Where(x => x.BrewId == brewId).OrderBy(x => x.Order).ToArrayAsync();
+            var list = new List<BrewLogHistoryDto>();
+            for (var i = 0; i < t.Length; i++)
+            {
+                var thisLog = t[i];
+                BrewLogStep next = null;
+                if (i+1 < t.Length)
+                    next = t[i + 1];
+
+                list.Add(
+                    new BrewLogHistoryDto
+                    {
+                        Name = thisLog.Name,
+                        Started = thisLog.StartTime,
+                        Completed = next?.StartTime
+                    });
+            }
+            return list.AsEnumerable();
         }
 
         public async Task<BrewLogStep> GetBrew(int brewId)
@@ -82,7 +106,7 @@ namespace WebApp.BusinessLogic
             };
             _db.Add(l);
 
-            var firstStep = Steps.GetAllSteps(value.StrikeTemp, value.SpargeTemp, value.MashTemp, value.MashOutTemp).OrderBy(x => x.Order).FirstOrDefault();
+            var firstStep = Steps.GetAllSteps(value.StrikeTemp, value.SpargeTemp, value.MashTemp, value.MashOutTemp, value.MashTimeInMinutes, value.BoilTimeInMinutes).OrderBy(x => x.Order).FirstOrDefault();
 
             var brewStep = AddStep(l, firstStep);
 
@@ -97,10 +121,11 @@ namespace WebApp.BusinessLogic
                 Order = step.Order,
                 Name = step.Name,
                 StartTime = DateTime.Now,
-                ShowTimer = step.ShowTimer,
+                CompleteTime = step.CompleteTime,
                 GetTargetMashTemp = step.GetTargetMashTemp,
                 GetTargetSpargeTemp = step.GetTargetSpargeTemp,
-                CompleteButtonText = step.CompleteButtonText
+                CompleteButtonText = step.CompleteButtonText,
+                Instructions = step.Instructions
             };
             _db.Add(brewStep);
 
@@ -121,7 +146,7 @@ namespace WebApp.BusinessLogic
             var brewResult = GetBrew(brewId);
             Task.WhenAll(brewResult);
             var brew = brewResult.Result;
-            var nextStep = Steps.GetAllSteps(brew.BrewLog.StrikeTemp, brew.BrewLog.SpargeTemp, brew.BrewLog.MashTemp, brew.BrewLog.MashOutTemp).OrderBy(x => x.Order).Where(x => x.Order > brew.Order).FirstOrDefault();
+            var nextStep = Steps.GetAllSteps(brew.BrewLog.StrikeTemp, brew.BrewLog.SpargeTemp, brew.BrewLog.MashTemp, brew.BrewLog.MashOutTemp, brew.BrewLog.MashTimeInMinutes, brew.BrewLog.BoilTimeInMinutes).OrderBy(x => x.Order).FirstOrDefault(x => x.Order > brew.Order);
             if (nextStep != null)
             {
                 AddStep(brew.BrewLog, nextStep);

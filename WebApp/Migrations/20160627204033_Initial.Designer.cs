@@ -8,13 +8,13 @@ using WebApp.Model;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(BrewMaticContext))]
-    [Migration("20160626163947_Add brew-step3")]
-    partial class Addbrewstep3
+    [Migration("20160627204033_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rc2-20896");
+                .HasAnnotation("ProductVersion", "1.0.0-rc2-20901");
 
             modelBuilder.Entity("WebApp.Model.BrewLog", b =>
                 {
@@ -39,7 +39,7 @@ namespace WebApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brews");
+                    b.ToTable("BrewLogs");
                 });
 
             modelBuilder.Entity("WebApp.Model.BrewLogStep", b =>
@@ -51,15 +51,17 @@ namespace WebApp.Migrations
 
                     b.Property<string>("CompleteButtonText");
 
+                    b.Property<DateTime?>("CompleteTime");
+
                     b.Property<float>("GetTargetMashTemp");
 
                     b.Property<float>("GetTargetSpargeTemp");
 
+                    b.Property<string>("Instructions");
+
                     b.Property<string>("Name");
 
                     b.Property<int>("Order");
-
-                    b.Property<bool>("ShowTimer");
 
                     b.Property<DateTime>("StartTime");
 
@@ -70,7 +72,21 @@ namespace WebApp.Migrations
                     b.ToTable("BrewLogSteps");
                 });
 
-            modelBuilder.Entity("WebApp.Model.BrewStatusLog", b =>
+            modelBuilder.Entity("WebApp.Model.BrewTargetTemperature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<float>("Target1");
+
+                    b.Property<float>("Target2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TargetTemp");
+                });
+
+            modelBuilder.Entity("WebApp.Model.BrewTempLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -87,21 +103,7 @@ namespace WebApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Logs");
-                });
-
-            modelBuilder.Entity("WebApp.Model.BrewTargetTemperature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<float>("Target1");
-
-                    b.Property<float>("Target2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TargetTemp");
+                    b.ToTable("TempLogs");
                 });
 
             modelBuilder.Entity("WebApp.Model.BrewLogStep", b =>

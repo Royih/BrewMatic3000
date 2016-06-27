@@ -14,26 +14,26 @@ namespace WebApp.Controllers
         // GET api/values
         [HttpGet]
         [Route("get50Latest")]
-        public async Task<IEnumerable<BrewStatusLog>> Get50Latest()
+        public async Task<IEnumerable<BrewTempLog>> Get50Latest()
         {
             using (var db = new BrewMaticContext())
             {
-                return await db.Logs.OrderByDescending(x => x.Id).Take(50).ToListAsync();
+                return await db.TempLogs.OrderByDescending(x => x.Id).Take(50).ToListAsync();
             }
         }
 
 
         [HttpGet]
-        public async Task<BrewStatusLog> GetLatest()
+        public async Task<BrewTempLog> GetLatest()
         {
             using (var db = new BrewMaticContext())
             {
-                var l = await db.Logs.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+                var l = await db.TempLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
                 if (l != null)
                 {
                     return l;
                 }
-                var newLog = new BrewStatusLog
+                var newLog = new BrewTempLog
                 {
                     Temp1 = 0,
                     Temp2 = 0,
@@ -41,7 +41,7 @@ namespace WebApp.Controllers
                     Heater2Percentage = 0,
                     TimeStamp = DateTime.Now
                 };
-                db.Logs.Add(newLog);
+                db.TempLogs.Add(newLog);
                 await db.SaveChangesAsync();
                 return newLog;
             }

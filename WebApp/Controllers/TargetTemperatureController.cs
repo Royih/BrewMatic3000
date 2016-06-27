@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +14,7 @@ namespace WebApp.Controllers
         public async Task<BrewTargetTemperature> Get()
         {
             //todo! Return async data!!
-            var logs = new List<BrewStatusLog>();
+            var logs = new List<BrewTempLog>();
             using (var db = new BrewMaticContext())
             {
                 var t = await db.TargetTemp.FirstOrDefaultAsync();

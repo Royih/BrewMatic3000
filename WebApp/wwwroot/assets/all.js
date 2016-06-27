@@ -110,6 +110,14 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
         });
     };
 
+    self.getBrewHistory = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewGuide/getBrewHistory/' + brewId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
     self.getCurrentBrew = function(){
          return $q(function (resolve, reject) {
             $http.get(serviceBase + 'brewGuide/getLatest').success(function (result) {
@@ -366,7 +374,7 @@ angular.module('BrewMatic').controller('currentController', ['$scope', '$window'
 
 }]);
 
-angular.module('BrewMatic').controller('displayController', ['$scope', '$window', 'BrewGuideService', '$stateParams', '$state', function ($scope, $window, service, $stateParams, $state) {
+angular.module('BrewMatic').controller('displayController', ['$scope', '$window', 'BrewGuideService', '$stateParams', '$state', '$timeout', function ($scope, $window, service, $stateParams, $state, $timeout) {
     'use strict';
 
     var self = this;
@@ -376,7 +384,32 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
     self.loadData = function () {
         service.getBrew(brewId).then(function (result) {
             $scope.brew = result;
+            $scope.startTime = result.currentStep.startTime;
+            self.updateStepTime();
+            if (result.currentStep.completeTime) {
+                $scope.completeTime = result.currentStep.completeTime;
+                self.updateCountdown();
+            }
         });
+        service.getBrewHistory(brewId).then(function(result) {
+            $scope.brewHistory = result;
+        });
+    };
+
+    self.updateStepTime = function () {
+        $timeout(function () {
+            var startTime = moment($scope.startTime);
+            $scope.stepTime = moment.utc(moment().diff(startTime)).format("HH:mm:ss");
+            self.updateStepTime();
+        }, 1000);
+    };
+
+    self.updateCountdown = function () {
+        $timeout(function () {
+            var endTime = moment($scope.completeTime);
+            $scope.countDown = moment.utc(endTime.diff(moment())).format("HH:mm:ss");
+            self.updateCountdown();
+        }, 1000);
     };
 
     self.loadData();
@@ -394,6 +427,29 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
             });
         }
 
+    };
+
+}]);
+
+angular.module('BrewMatic').controller('newController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
+    'use strict';
+
+    var self = this;
+
+    self.loadData = function () {
+        service.getDefaultSetup().then(function (result) {
+            $scope.setup = result;
+            console.log("test");
+        });
+    };
+
+    self.loadData();
+
+    $scope.startNewBrew = function () {
+        service.startNewBrew($scope.setup).then(function (newId) {
+            $state.go("displayBrew", { brewId: newId });
+            console.log({ "test": newId });
+        });
     };
 
 }]);
@@ -421,26 +477,3 @@ angular.module("BrewMatic").directive('decimalChanger', function () {
     templateUrl: 'html/shared/decimalChangerlDirective/index.html'
   };
 })
-
-angular.module('BrewMatic').controller('newController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
-    'use strict';
-
-    var self = this;
-
-    self.loadData = function () {
-        service.getDefaultSetup().then(function (result) {
-            $scope.setup = result;
-            console.log("test");
-        });
-    };
-
-    self.loadData();
-
-    $scope.startNewBrew = function () {
-        service.startNewBrew($scope.setup).then(function (newId) {
-            $state.go("displayBrew", { brewId: newId });
-            console.log({ "test": newId });
-        });
-    };
-
-}]);

@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -9,8 +7,8 @@ namespace WebApp.Model
 {
     public class BrewMaticContext : DbContext
     {
-        public DbSet<BrewStatusLog> Logs { get; set; }
-        public DbSet<BrewLog> Brews { get; set; }
+        public DbSet<BrewTempLog> TempLogs { get; set; }
+        public DbSet<BrewLog> BrewLogs { get; set; }
         public DbSet<BrewLogStep> BrewLogSteps { get; set; }
         public DbSet<BrewTargetTemperature> TargetTemp { get; set; }
 
@@ -22,7 +20,7 @@ namespace WebApp.Model
 
 
 
-    public class BrewStatusLog
+    public class BrewTempLog
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -59,10 +57,11 @@ namespace WebApp.Model
         public int Order { get; set; }
         public string Name { get; set; }
         public DateTime StartTime { get; set; }
-        public bool ShowTimer { get; set; }
+        public DateTime? CompleteTime { get; set; }
         public float GetTargetMashTemp { get; set; }
         public float GetTargetSpargeTemp { get; set; }
         public string CompleteButtonText { get; set; }
+        public string Instructions { get; set; }
 
     }
 

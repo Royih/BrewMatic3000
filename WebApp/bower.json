@@ -8,7 +8,8 @@
     "angular-loading-bar": "*",
     "underscore": "*",
     "angular-ui-router": "0.3.1",
-    "angular-i18n": "*"
+    "angular-i18n": "*", 
+    "moment": "2.13.0"
   },
   "main": "bower.json",
   "authors": [
