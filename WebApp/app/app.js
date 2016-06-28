@@ -13,10 +13,10 @@ angular.module('BrewMatic', ['ui.router', 'angular-loading-bar'])
                     templateUrl: "/html/brewGuide/new/index.html",
                     controller: "newController"
                 })
-                .state('current', {
-                    url: "/current",
-                    templateUrl: "/html/brewGuide/current/index.html",
-                    controller: "currentController"
+                .state('resume', {
+                    url: "/resume",
+                    templateUrl: "/html/brewGuide/resume/index.html",
+                    controller: "resumeController"
                 })
                 .state('displayBrew', {
                     url: "/brew/:brewId",

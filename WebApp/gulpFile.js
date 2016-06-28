@@ -9,14 +9,14 @@ var rename = require('gulp-rename');
 var mainBowerFiles = require('main-bower-files');
 
 // Lint Task
-gulp.task('lint', function() {
+gulp.task('lint', function () {
     return gulp.src('js/*.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
 
 // Compile Our Sass
-gulp.task('sass', function() {
+gulp.task('sass', function () {
     return gulp.src('scss/*.scss')
         .pipe(sass())
         .pipe(gulp.dest('dist/css'));
@@ -24,7 +24,7 @@ gulp.task('sass', function() {
 
 
 // Concatenate & Minify JS
-gulp.task('scripts', function() {
+gulp.task('scripts', function () {
     return gulp.src('app/**/*.js')
         .pipe(concat('all.js'))
         .pipe(gulp.dest('wwwroot/assets'))
@@ -34,31 +34,37 @@ gulp.task('scripts', function() {
 });
 
 // Watch Files For Changes
-gulp.task('watch', function() {
+gulp.task('watch', function () {
     gulp.watch('app/**/*.js', ['lint', 'scripts']);
-    gulp.watch('app/**/*.html', ['html']);
+    gulp.watch(['app/**/*.html','app/brew.css'], ['html', 'spaPage']);
     gulp.watch('scss/*.scss', ['sass']);
 });
 
-gulp.task('html', function(){
-  // the base option sets the relative root for the set of files,
-  // preserving the folder structure
-  gulp.src(['app/**/*.html'], { base: './app/' })
-  .pipe(gulp.dest('wwwroot/html'));
+gulp.task('html', function () {
+    // the base option sets the relative root for the set of files,
+    // preserving the folder structure
+    gulp.src(['app/**/*.html', '!app/index.html'], { base: './app/' })
+        .pipe(gulp.dest('wwwroot/html'));
+
 });
 
-gulp.task('boostrap', function(){
-  // the base option sets the relative root for the set of files,
-  // preserving the folder structure
-  gulp.src(['bower_components/bootstrap/dist/*/*.*'], { base: 'bower_components/bootstrap/dist/' })
-  .pipe(gulp.dest('wwwroot/bootstrap'));
+gulp.task('spaPage', function () {
+    gulp.src(['app/index.html', 'app/brew.css'])
+        .pipe(gulp.dest('wwwroot'));
 });
 
- 
-gulp.task('bower-files', function() {
+gulp.task('boostrap', function () {
+    // the base option sets the relative root for the set of files,
+    // preserving the folder structure
+    gulp.src(['bower_components/bootstrap/dist/*/*.*'], { base: 'bower_components/bootstrap/dist/' })
+        .pipe(gulp.dest('wwwroot/bootstrap'));
+});
+
+
+gulp.task('bower-files', function () {
     return gulp.src(mainBowerFiles())
         .pipe(gulp.dest("wwwroot/assets"));
 });
 
 // Default Task
-gulp.task('default', ['lint', 'sass', 'bower-files','scripts','html','boostrap', 'watch']);
+gulp.task('default', ['lint', 'sass', 'bower-files', 'scripts', 'html', 'spaPage', 'boostrap', 'watch']);

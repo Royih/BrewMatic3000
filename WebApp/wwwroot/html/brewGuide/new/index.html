@@ -1,38 +1,66 @@
 <h1>Start new brew</h1>
-<p><label for="name">Brew Name</label>
-    <input type="text" ng-model="setup.name" class="form-control" />
-</p>
-<fieldset>
-    <legend>
-        Setup
-    </legend>
-    <div>
-        <label for="mashTemp">Mash temp</label>
-        <input id="mashTemp" type="number" step="0.1" min="0" max="100" ng-model="setup.mashTemp" class="form-control temp">ºC
+
+<form class="form-horizontal" name="form" novalidate>
+    <div class="form-group">
+        <label for="mashTemp" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-4">
+            <input type="text" ng-model="setup.name" class="form-control" required />
+        </div>
     </div>
-    <p>
-        <label for="strikeTemp">Strike temp</label>
-        <input id="strikeTemp" type="number" step="0.1" min="0" max="100" ng-model="setup.strikeTemp" class="form-control temp">ºC
-    </p>
-    <p>
-        <label for="spargeTemp">Sparge temp</label>
-        <input id="spargeTemp" type="number" step="0.1" min="0" max="100" ng-model="setup.spargeTemp" class="form-control temp">ºC
-    </p>
-    <p>
-        <label for="mashOutTemp">Mash out temp</label>
-        <input id="mashOutTemp" type="number" step="0.1" min="0" max="100" ng-model="setup.mashOutTemp" class="form-control temp">ºC
-    </p>
-    <p>
-        <label for="mashTimeInMinutes">Mash time</label>
-        <input id="mashTimeInMinutes" type="number" step="1" min="0" max="120" ng-model="setup.mashTimeInMinutes" class="form-control minutes">        min
-    </p>
-    <p>
-        <label for="boilTimeInMinutes">Boil time</label>
-        <input id="boilTimeInMinutes" type="number" step="1" min="0" max="200" ng-model="setup.boilTimeInMinutes" class="form-control minutes">        min
-    </p>
-
-</fieldset>
-
-<p>
-    <button class="btn btn-primary" ng-click="startNewBrew()">Start brew</button>
-</p>
+    <div class="form-group">
+        <label for="mashTemp" class="col-sm-2 control-label">Mash temp</label>
+        <div class="col-sm-1">
+            <input id="mashTemp" name="mashTemp" type="number" step="0.1" min="50" max="100" ng-model="setup.mashTemp" class="form-control temp" required />
+        </div>
+        <span class="col-sm-1 control-label">ºC</span>
+        <span class="alert alert-warning" ng-show="form.mashTemp.$error.min || form.mashTemp.$error.max">The value must be in range 50 to 100!</span>
+    </div>
+    <div class="form-group">
+        <label for="strikeTemp" class="col-sm-2 control-label">Strike temp</label>
+        <div class="col-sm-1">
+            <input id="strikeTemp" name="strikeTemp" type="number" step="0.1" min="50" max="100" ng-model="setup.strikeTemp" class="form-control temp" required />
+        </div>
+        <span class="col-sm-1 control-label">ºC</span>
+        <span class="alert alert-warning" ng-show="form.strikeTemp.$error.min || form.strikeTemp.$error.max">The value must be in range 50 to 100!</span>
+    </div>
+    <div class="form-group">
+        <label for="spargeTemp" class="col-sm-2 control-label">Sparge temp</label>
+        <div class="col-sm-1">
+            <input id="spargeTemp" name="spargeTemp" type="number" step="0.1" min="50" max="100" ng-model="setup.spargeTemp" class="form-control temp" required />
+        </div>
+        <span class="col-sm-1 control-label">ºC</span>
+        <span class="alert alert-warning" ng-show="form.spargeTemp.$error.min || form.spargeTemp.$error.max">The value must be in range 50 to 100!</span>
+    </div>
+    <div class="form-group">
+        <label for="mashOutTemp" class="col-sm-2 control-label">Mash out temp</label>
+        <div class="col-sm-1">
+            <input id="mashOutTemp" name="mashOutTemp" type="number" step="0.1" min="50" max="100" ng-model="setup.mashOutTemp" class="form-control temp"
+                required />
+        </div>
+        <span class="col-sm-1 control-label">ºC</span>
+        <span class="alert alert-warning" ng-show="form.mashOutTemp.$error.min || form.mashOutTemp.$error.max">The value must be in range 50 to 100!</span>
+    </div>
+    <div class="form-group">
+        <label for="mashTimeInMinutes" class="col-sm-2 control-label">Mash time</label>
+        <div class="col-sm-1">
+            <input id="mashTimeInMinutes" name="mashTimeInMinutes" type="number" step="1" min="30" max="120" ng-model="setup.mashTimeInMinutes" class="form-control minutes"
+                required />
+        </div>
+        <span class="col-sm-1 control-label">min</span>
+        <span class="alert alert-warning" ng-show="form.mashTimeInMinutes.$error.min || form.mashTimeInMinutes.$error.max">The value must be in range 30 to 120!</span>
+    </div>
+    <div class="form-group">
+        <label for="boilTimeInMinutes" class="col-sm-2 control-label">Boil time</label>
+        <div class="col-sm-1">
+            <input id="boilTimeInMinutes" name="boilTimeInMinutes"" type="number" step="1" min="30" max="200" ng-model="setup.boilTimeInMinutes" class="form-control minutes"
+                required />
+        </div>
+        <span class="col-sm-1 control-label">min</span>
+        <span class="alert alert-warning" ng-show="form.boilTimeInMinutes.$error.min || form.boilTimeInMinutes.$error.max">The value must be in range 30 to 200!</span>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button class="btn btn-primary" ng-click="startNewBrew()" ng-disabled="!form.$valid">Start brew</button>
+        </div>
+    </div>
+</form>
