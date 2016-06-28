@@ -28,22 +28,7 @@ namespace WebApp.Controllers
         {
             using (var db = new BrewMaticContext())
             {
-                var l = await db.TempLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-                if (l != null)
-                {
-                    return l;
-                }
-                var newLog = new BrewTempLog
-                {
-                    Temp1 = 0,
-                    Temp2 = 0,
-                    Heater1Percentage = 0,
-                    Heater2Percentage = 0,
-                    TimeStamp = DateTime.Now
-                };
-                db.TempLogs.Add(newLog);
-                await db.SaveChangesAsync();
-                return newLog;
+                return await db.TempLogs.OrderByDescending(x => x.Id).FirstAsync();
             }
         }
 

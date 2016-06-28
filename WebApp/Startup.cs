@@ -44,22 +44,12 @@ namespace WebApp
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            Seed();
+            BrewMaticContext.Seed();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc();
         }
 
-        private void Seed()
-        {
-            using (var db = new BrewMaticContext())
-            {
-                db.Database.EnsureCreated();
-                //db.Database.Migrate();
-                
-                // Seed code
-                db.SaveChanges();
-            }
-        }
+
     }
 }

@@ -19,7 +19,7 @@
                 </fieldset>
             </div>
             <div class="col-md-4">
-                <fieldset ng-if="brew.currentStep.completeButtonText">
+                <fieldset ng-if="brew.currentStep.completeButtonText && brew.currentStep.order>1">
                     <legend>Step time</legend>
                     <h1>{{stepTime | date: 'HH:mm.ss'}}</h1>
                 </fieldset>
@@ -29,9 +29,9 @@
             <div class="col-md-6">
                 <fieldset>
                     <legend>Current step "{{brew.currentStep.name}}"</legend>
-                    <p><label class="col-sm-6 control-label">Start time: </label><span class="label label-info">{{brew.currentStep.startTime | date: 'medium'}}</span></p>
-                    <p><label class="col-sm-6 control-label">Target Mash temp:</label><span class="label label-warning">{{brew.currentStep.getTargetMashTemp | number: 2}}</span></p>
-                    <p><label class="col-sm-6 control-label">Target Sparge temp:</label><span class="label label-warning">{{brew.currentStep.getTargetSpargeTemp | number: 2}}</span></p>
+                    <p><label class="col-sm-6 control-label">Start time: </label><span class="label label-default">{{brew.currentStep.startTime | date: 'medium'}}</span></p>
+                    <p><label class="col-sm-6 control-label">Target Mash temp:</label><span class="label label-default">{{brew.currentStep.targetMashTemp | number: 2}}</span></p>
+                    <p><label class="col-sm-6 control-label">Target Sparge temp:</label><span class="label label-default">{{brew.currentStep.targetSpargeTemp | number: 2}}</span></p>
                 </fieldset>
             </div>
             <div class="col-md-2">

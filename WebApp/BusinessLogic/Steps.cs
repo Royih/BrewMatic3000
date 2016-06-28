@@ -5,7 +5,7 @@ using WebApp.Model.BrewGuide;
 
 namespace WebApp.BusinessLogic
 {
-    public static class Steps
+    /*public static class Steps2
     {
         public static IEnumerable<StepDto> GetAllSteps(float strikeTemp, float spargeTemp, float mashTemp, float mashOutTemp, int? mashTimeInMinutes, int? boilTimeInMinutes)
         {
@@ -34,7 +34,7 @@ namespace WebApp.BusinessLogic
                 GetTargetMashTemp = mashTemp,
                 GetTargetSpargeTemp = spargeTemp,
                 CompleteButtonText = "Start Mash-timer",
-                Instructions = "Add grain to water in the mash kettle, "
+                Instructions = "Add grain to water in the mash kettle."
             };
             yield return new StepDto()
             {
@@ -53,7 +53,7 @@ namespace WebApp.BusinessLogic
                 GetTargetMashTemp = mashOutTemp,
                 GetTargetSpargeTemp = spargeTemp,
                 CompleteButtonText = "Start sparge",
-                Instructions = "Wait for the temperature to reach the critical 75.6ºC. "
+                Instructions = "Wait for the temperature to reach the critical 75.6ï¿½C. "
             };
             yield return new StepDto()
             {
@@ -90,7 +90,7 @@ namespace WebApp.BusinessLogic
                 GetTargetMashTemp = 0,
                 GetTargetSpargeTemp = 0,
                 CompleteButtonText = "Brew complete",
-                Instructions = "Cool the wort to 18-20ºC. Use whirlpool to gather remains of hop and grain. Clean the yiest tank now. "
+                Instructions = "Cool the wort to 18-20ï¿½C. Use whirlpool to gather remains of hop and grain. Clean the yiest tank now. "
             };
             yield return new StepDto()
             {
@@ -101,5 +101,5 @@ namespace WebApp.BusinessLogic
                 Instructions = "Transfer to yiest tank(bucket). Sample the OG. Note the volume of wort. Add o2. Pitch yiest. Be happy. "
             };
         }
-    }
+    }*/
 }

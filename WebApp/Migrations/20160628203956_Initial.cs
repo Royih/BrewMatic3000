@@ -29,6 +29,24 @@ namespace WebApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BrewStepTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Autoincrement", true),
+                    CompleteButtonText = table.Column<string>(nullable: true),
+                    CompleteTimeAdd = table.Column<string>(nullable: true),
+                    Instructions = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Target1TempFrom = table.Column<string>(nullable: true),
+                    Target2TempFrom = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BrewStepTemplates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TargetTemp",
                 columns: table => new
                 {
@@ -68,12 +86,12 @@ namespace WebApp.Migrations
                     BrewId = table.Column<int>(nullable: false),
                     CompleteButtonText = table.Column<string>(nullable: true),
                     CompleteTime = table.Column<DateTime>(nullable: true),
-                    GetTargetMashTemp = table.Column<float>(nullable: false),
-                    GetTargetSpargeTemp = table.Column<float>(nullable: false),
                     Instructions = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Order = table.Column<int>(nullable: false),
-                    StartTime = table.Column<DateTime>(nullable: false)
+                    StartTime = table.Column<DateTime>(nullable: false),
+                    TargetMashTemp = table.Column<float>(nullable: false),
+                    TargetSpargeTemp = table.Column<float>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,6 +114,9 @@ namespace WebApp.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BrewLogSteps");
+
+            migrationBuilder.DropTable(
+                name: "BrewStepTemplates");
 
             migrationBuilder.DropTable(
                 name: "TargetTemp");

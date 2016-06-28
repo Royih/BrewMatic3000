@@ -11,14 +11,106 @@ namespace WebApp.Model
         public DbSet<BrewLog> BrewLogs { get; set; }
         public DbSet<BrewLogStep> BrewLogSteps { get; set; }
         public DbSet<BrewTargetTemperature> TargetTemp { get; set; }
+        public DbSet<BrewStepTemplate> BrewStepTemplates { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Filename=./brew.db");
         }
+        public static void Seed()
+        {
+            using (var db = new BrewMaticContext())
+            {
+                if (!db.Database.EnsureCreated())
+                {
+                    var newLog = new BrewTempLog
+                    {
+                        Temp1 = 0,
+                        Temp2 = 0,
+                        Heater1Percentage = 0,
+                        Heater2Percentage = 0,
+                        TimeStamp = DateTime.Now
+                    };
+                    db.TempLogs.Add(newLog);
+
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Initial",
+                        CompleteButtonText = "Start Warmup",
+                        Instructions = "Get ready for brewing"
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Warmup",
+                        CompleteButtonText = "Start adding grain",
+                        Instructions = "Wait and relax",
+                        Target1TempFrom = "strikeTemp",
+                        Target2TempFrom = "spargeTemp"
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Add grain",
+                        CompleteButtonText = "Start Mash-timer",
+                        Instructions = "Add grain to water in the mash kettle",
+                        Target1TempFrom = "mashTemp",
+                        Target2TempFrom = "spargeTemp"
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Mash",
+                        CompleteButtonText = "Start mash-out",
+                        Instructions = "Wait for the timer to reach zero. Stir the mash a few times. Pay attention to the temperature.",
+                        CompleteTimeAdd = "mashTimeInMinutes",
+                        Target1TempFrom = "mashTemp",
+                        Target2TempFrom = "spargeTemp"
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Mash out",
+                        CompleteButtonText = "Start sparge",
+                        Instructions = "Wait for the temperature to reach the critical 75.6�C. ",
+                        Target1TempFrom = "mashOutTemp",
+                        Target2TempFrom = "spargeTemp"
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Sparge",
+                        CompleteButtonText = "Sparge complete",
+                        Instructions = "Add water to the top of the mash kettle.  Transfer wort from the bottom of the mash kettle to the boil kettle."
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Boil warmup",
+                        CompleteButtonText = "Start Boil-timer",
+                        Instructions = "Wait for the wort to boil. Sample OG (before boil). Note the volume of wort before boil. Take the Yiest out of the fridge now."
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Boil",
+                        CompleteButtonText = "Start Cool-down",
+                        Instructions = "Let the wort boil until timer reaches zero. Add hops according to the hop bill. Add yiest nutrition. Add Whirl-flock (15 minutes before end). ",
+                        CompleteTimeAdd = "boilTimeInMinutes"
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Cooldown",
+                        CompleteButtonText = "Brew complete",
+                        Instructions = "Cool the wort to 18-20�C. Use whirlpool to gather remains of hop and grain. Clean the yiest tank now. "
+                    });
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Complete",
+                        Instructions = "Transfer to yiest tank(bucket). Sample the OG. Note the volume of wort. Add o2. Pitch yiest. Be happy. "
+                    });
+                }
+                //db.Database.Migrate();
+
+                // Seed code
+                db.SaveChanges();
+            }
+        }
+
     }
-
-
 
     public class BrewTempLog
     {
@@ -58,11 +150,22 @@ namespace WebApp.Model
         public string Name { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? CompleteTime { get; set; }
-        public float GetTargetMashTemp { get; set; }
-        public float GetTargetSpargeTemp { get; set; }
+        public float TargetMashTemp { get; set; }
+        public float TargetSpargeTemp { get; set; }
         public string CompleteButtonText { get; set; }
         public string Instructions { get; set; }
+    }
 
+    public class BrewStepTemplate
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string CompleteButtonText { get; set; }
+        public string Instructions { get; set; }
+        public string Target1TempFrom { get; set; }
+        public string Target2TempFrom { get; set; }
+        public string CompleteTimeAdd { get; set; }
     }
 
     public class BrewTargetTemperature

@@ -8,13 +8,13 @@ using WebApp.Model;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(BrewMaticContext))]
-    [Migration("20160627204033_Initial")]
+    [Migration("20160628203956_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rc2-20901");
+                .HasAnnotation("ProductVersion", "1.0.0-rc2-20896");
 
             modelBuilder.Entity("WebApp.Model.BrewLog", b =>
                 {
@@ -53,10 +53,6 @@ namespace WebApp.Migrations
 
                     b.Property<DateTime?>("CompleteTime");
 
-                    b.Property<float>("GetTargetMashTemp");
-
-                    b.Property<float>("GetTargetSpargeTemp");
-
                     b.Property<string>("Instructions");
 
                     b.Property<string>("Name");
@@ -65,11 +61,37 @@ namespace WebApp.Migrations
 
                     b.Property<DateTime>("StartTime");
 
+                    b.Property<float>("TargetMashTemp");
+
+                    b.Property<float>("TargetSpargeTemp");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BrewId");
 
                     b.ToTable("BrewLogSteps");
+                });
+
+            modelBuilder.Entity("WebApp.Model.BrewStepTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CompleteButtonText");
+
+                    b.Property<string>("CompleteTimeAdd");
+
+                    b.Property<string>("Instructions");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Target1TempFrom");
+
+                    b.Property<string>("Target2TempFrom");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BrewStepTemplates");
                 });
 
             modelBuilder.Entity("WebApp.Model.BrewTargetTemperature", b =>

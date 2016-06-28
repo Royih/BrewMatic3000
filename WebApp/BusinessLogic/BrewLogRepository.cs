@@ -56,8 +56,8 @@ namespace WebApp.BusinessLogic
                     Name = t.Name,
                     StartTime = t.StartTime,
                     CompleteTime = t.CompleteTime,
-                    GetTargetMashTemp = t.GetTargetMashTemp,
-                    GetTargetSpargeTemp = t.GetTargetSpargeTemp,
+                    TargetMashTemp = t.TargetMashTemp,
+                    TargetSpargeTemp = t.TargetSpargeTemp,
                     CompleteButtonText = t.CompleteButtonText,
                     Instructions = t.Instructions
                 }
@@ -72,7 +72,7 @@ namespace WebApp.BusinessLogic
             {
                 var thisLog = t[i];
                 BrewLogStep next = null;
-                if (i+1 < t.Length)
+                if (i + 1 < t.Length)
                     next = t[i + 1];
 
                 list.Add(
@@ -91,6 +91,64 @@ namespace WebApp.BusinessLogic
             return await _db.BrewLogSteps.Include(x => x.BrewLog).OrderByDescending(x => x.Order).FirstOrDefaultAsync(x => x.BrewId == brewId);
         }
 
+        private StepDto GetFirstStep(BrewLog brewLog)
+        {
+            return GetStepDto(_db.BrewStepTemplates.OrderBy(x => x.Id).First(), brewLog);
+        }
+        private StepDto GetNextStep(BrewLogStep brewLogStep)
+        {
+            return GetStepDto(_db.BrewStepTemplates.Where(x => x.Id > brewLogStep.Order).First(), brewLogStep.BrewLog);
+        }
+
+        private StepDto GetStepDto(BrewStepTemplate template, BrewLog brewLog)
+        {
+            return new StepDto
+            {
+                Order = template.Id,
+                Name = template.Name,
+                StartTime = DateTime.Now,
+                CompleteButtonText = template.CompleteButtonText,
+                Instructions = template.Instructions,
+                CompleteTime = ResolveCompleteTime(brewLog, template.CompleteTimeAdd),
+                TargetMashTemp = ResolveTemp(brewLog, template.Target1TempFrom),
+                TargetSpargeTemp = ResolveTemp(brewLog, template.Target2TempFrom)
+            };
+
+        }
+
+        private DateTime? ResolveCompleteTime(BrewLog brewLog, string placeHolder)
+        {
+            if (placeHolder == "mashTimeInMinutes")
+            {
+                return DateTime.Now.AddMinutes(brewLog.MashTimeInMinutes);
+            }
+            if (placeHolder == "boilTimeInMinutes")
+            {
+                return DateTime.Now.AddMinutes(brewLog.BoilTimeInMinutes);
+            }
+            return null;
+        }
+        private float ResolveTemp(BrewLog brewLog, string placeHolder)
+        {
+            if (placeHolder == "strikeTemp")
+            {
+                return brewLog.StrikeTemp;
+            }
+            if (placeHolder == "spargeTemp")
+            {
+                return brewLog.SpargeTemp;
+            }
+            if (placeHolder == "mashTemp")
+            {
+                return brewLog.MashTemp;
+            }
+            if (placeHolder == "mashOutTemp")
+            {
+                return brewLog.MashOutTemp;
+            }
+            return 0;
+        }
+
         public BrewLogStep InitializeNewBrew(SetupDto value)
         {
             var l = new BrewLog
@@ -106,7 +164,7 @@ namespace WebApp.BusinessLogic
             };
             _db.Add(l);
 
-            var firstStep = Steps.GetAllSteps(value.StrikeTemp, value.SpargeTemp, value.MashTemp, value.MashOutTemp, value.MashTimeInMinutes, value.BoilTimeInMinutes).OrderBy(x => x.Order).FirstOrDefault();
+            var firstStep = GetFirstStep(l);
 
             var brewStep = AddStep(l, firstStep);
 
@@ -122,8 +180,8 @@ namespace WebApp.BusinessLogic
                 Name = step.Name,
                 StartTime = DateTime.Now,
                 CompleteTime = step.CompleteTime,
-                GetTargetMashTemp = step.GetTargetMashTemp,
-                GetTargetSpargeTemp = step.GetTargetSpargeTemp,
+                TargetMashTemp = step.TargetMashTemp,
+                TargetSpargeTemp = step.TargetSpargeTemp,
                 CompleteButtonText = step.CompleteButtonText,
                 Instructions = step.Instructions
             };
@@ -137,19 +195,21 @@ namespace WebApp.BusinessLogic
         private void ApplyStepTemperature(BrewLogStep brewStep)
         {
             var targetTemp = GetTargetTemp();
-            targetTemp.Target1 = brewStep.GetTargetMashTemp;
-            targetTemp.Target2 = brewStep.GetTargetSpargeTemp;
+            targetTemp.Target1 = brewStep.TargetMashTemp;
+            targetTemp.Target2 = brewStep.TargetSpargeTemp;
         }
 
         public void GoToNextStep(int brewId)
         {
             var brewResult = GetBrew(brewId);
             Task.WhenAll(brewResult);
-            var brew = brewResult.Result;
-            var nextStep = Steps.GetAllSteps(brew.BrewLog.StrikeTemp, brew.BrewLog.SpargeTemp, brew.BrewLog.MashTemp, brew.BrewLog.MashOutTemp, brew.BrewLog.MashTimeInMinutes, brew.BrewLog.BoilTimeInMinutes).OrderBy(x => x.Order).FirstOrDefault(x => x.Order > brew.Order);
+            var brewLogStep = brewResult.Result;
+
+            var nextStep = GetNextStep(brewLogStep);
+
             if (nextStep != null)
             {
-                AddStep(brew.BrewLog, nextStep);
+                AddStep(brewLogStep.BrewLog, nextStep);
             }
         }
         public void GoBackOneStep(int brewId)
