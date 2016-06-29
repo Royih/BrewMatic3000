@@ -140,7 +140,7 @@ namespace WebApp.Model
                     });
                     db.Add(new DataCaptureDefinition
                     {
-                        BrewStepTemplate = cooldownStep,
+                        BrewStepTemplate = boilWarmupStep,
                         Label = "Wort before boil",
                         ValueType = "float",
                         Optional = false,
@@ -158,6 +158,14 @@ namespace WebApp.Model
                     {
                         BrewStepTemplate = completeStep,
                         Label = "Wort after boil",
+                        ValueType = "float",
+                        Optional = false,
+                        Units = "l"
+                    });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = completeStep,
+                        Label = "Wort to yiest tank",
                         ValueType = "float",
                         Optional = false,
                         Units = "l"

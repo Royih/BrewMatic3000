@@ -15,7 +15,7 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
                 $scope.completeTime = result.currentStep.completeTime;
                 self.updateCountdown();
             }
-            service.getDataCapture(result.currentStep.order).then(function (dataCaptureValues) {
+            service.getDataCapture(result.currentStep.id).then(function (dataCaptureValues) {
                 $scope.dataCaptureValues = dataCaptureValues;
             });
 

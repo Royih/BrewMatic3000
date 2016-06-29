@@ -52,6 +52,7 @@ namespace WebApp.BusinessLogic
                 },
                 CurrentStep = new StepDto
                 {
+                    Id = t.Id,
                     Order = t.Order,
                     Name = t.Name,
                     StartTime = t.StartTime,

@@ -87,6 +87,118 @@ angular.module('BrewMatic').controller('aboutController', ['$scope', '$window', 
 
 }]);
 
+angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '$timeout', 'homeControllerService', function ($scope, $window, $timeout, service) {
+    'use strict';
+
+    var self = this;
+    var changeTimeout;
+
+    self.loadLastLog = function () {
+        service.getLastLog().then(function (result) {
+            $scope.lastLog = result;
+        });
+    };
+    
+    self.updateIfNotChangedAfterNSeconds = function (newValue1, newValue2, seconds) {
+        if (changeTimeout) $timeout.cancel(changeTimeout);
+        changeTimeout = $timeout(function () {
+            service.saveTargetTemperature(newValue1, newValue2).then(function (result) {
+                console.log("Changes was saved");
+            });
+        }, seconds * 1000); // delay n seconds
+    };
+    
+
+    self.loadData = function () {
+        self.loadLastLog();
+        service.getTargetTemperature().then(function (result) {
+            $scope.targetTemperature = result;
+
+            $scope.$watchGroup(['targetTemperature.target1', 'targetTemperature.target2'], function (newValues, oldValues, scope) {
+                var newTemp1 = newValues[0];
+                var newTemp2 = newValues[1];
+                var oldTemp1 = oldValues[0];
+                var oldTemp2 = oldValues[1];
+
+                console.log({ newTemp1: newTemp1, oldTemp1: oldTemp1, newTemp2: newTemp2, oldTemp2: oldTemp2 })
+                if (newTemp1 !== oldTemp1 || newTemp2 !== oldTemp2) {
+                    console.log("Changes found");
+                    if (newTemp1 && newTemp1 !== "" && newTemp2 && newTemp2 !== "") {
+                        console.log("Input found");
+                        console.log(angular.isNumber(parseFloat(newTemp1)));
+                        if (angular.isNumber(parseFloat(newTemp1)) && angular.isNumber(parseFloat(newTemp2))) {
+                            console.log("Numeric input found");
+                            self.updateIfNotChangedAfterNSeconds(newTemp1, newTemp2, 3);
+                        }
+                    }
+                }
+            });
+        });
+    };
+
+    self.loadData();
+
+    var poll = function () {
+        $timeout(function () {
+            self.loadLastLog();
+            poll();
+        }, 1000);
+    };
+    poll();
+
+}]);
+
+angular.module('BrewMatic').service('homeControllerService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
+    'use strict';
+
+    var self = this;
+
+    var serviceBase = ngAuthSettings.apiServiceBaseUri;
+
+    self.getLastLog = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewStatusLog').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.getTargetTemperature = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'targetTemperature').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.saveTargetTemperature = function (target1, target2) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'targetTemperature', { target1: target1, target2: target2 }).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    /*self.saveSomething = function (something) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'api/something/save', something).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Something was saved successfully");
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.listSomething = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'api/something/list').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+    */
+
+}]);
+
 angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
     'use strict';
 
@@ -219,118 +331,6 @@ angular.module('BrewMatic')
     };
   }]);
 
-angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '$timeout', 'homeControllerService', function ($scope, $window, $timeout, service) {
-    'use strict';
-
-    var self = this;
-    var changeTimeout;
-
-    self.loadLastLog = function () {
-        service.getLastLog().then(function (result) {
-            $scope.lastLog = result;
-        });
-    };
-    
-    self.updateIfNotChangedAfterNSeconds = function (newValue1, newValue2, seconds) {
-        if (changeTimeout) $timeout.cancel(changeTimeout);
-        changeTimeout = $timeout(function () {
-            service.saveTargetTemperature(newValue1, newValue2).then(function (result) {
-                console.log("Changes was saved");
-            });
-        }, seconds * 1000); // delay n seconds
-    };
-    
-
-    self.loadData = function () {
-        self.loadLastLog();
-        service.getTargetTemperature().then(function (result) {
-            $scope.targetTemperature = result;
-
-            $scope.$watchGroup(['targetTemperature.target1', 'targetTemperature.target2'], function (newValues, oldValues, scope) {
-                var newTemp1 = newValues[0];
-                var newTemp2 = newValues[1];
-                var oldTemp1 = oldValues[0];
-                var oldTemp2 = oldValues[1];
-
-                console.log({ newTemp1: newTemp1, oldTemp1: oldTemp1, newTemp2: newTemp2, oldTemp2: oldTemp2 })
-                if (newTemp1 !== oldTemp1 || newTemp2 !== oldTemp2) {
-                    console.log("Changes found");
-                    if (newTemp1 && newTemp1 !== "" && newTemp2 && newTemp2 !== "") {
-                        console.log("Input found");
-                        console.log(angular.isNumber(parseFloat(newTemp1)));
-                        if (angular.isNumber(parseFloat(newTemp1)) && angular.isNumber(parseFloat(newTemp2))) {
-                            console.log("Numeric input found");
-                            self.updateIfNotChangedAfterNSeconds(newTemp1, newTemp2, 3);
-                        }
-                    }
-                }
-            });
-        });
-    };
-
-    self.loadData();
-
-    var poll = function () {
-        $timeout(function () {
-            self.loadLastLog();
-            poll();
-        }, 1000);
-    };
-    poll();
-
-}]);
-
-angular.module('BrewMatic').service('homeControllerService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
-    'use strict';
-
-    var self = this;
-
-    var serviceBase = ngAuthSettings.apiServiceBaseUri;
-
-    self.getLastLog = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewStatusLog').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.getTargetTemperature = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'targetTemperature').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.saveTargetTemperature = function (target1, target2) {
-        return $q(function (resolve, reject) {
-            $http.post(serviceBase + 'targetTemperature', { target1: target1, target2: target2 }).success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    /*self.saveSomething = function (something) {
-        return $q(function (resolve, reject) {
-            $http.post(serviceBase + 'api/something/save', something).success(function (result) {
-                resolve(result);
-                pageHelperService.pushOkMessage("Something was saved successfully");
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.listSomething = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'api/something/list').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-    */
-
-}]);
-
 angular.module('BrewMatic').controller('tempLogController', ['$scope', '$window', 'tempLogService', function ($scope, $window, tempLogService) {
     'use strict';
 
@@ -381,49 +381,6 @@ angular.module('BrewMatic').service('tempLogService', ['$http', '$q', 'ngAuthSet
 
 }]);
 
-angular.module('BrewMatic').controller('resumeController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
-    'use strict';
-
-    var self = this;
-
-    self.loadData = function () {
-        service.getCurrentBrew().then(function (brewId) {
-            if (brewId > 0) {
-                $state.go("displayBrew", { brewId: brewId });
-            }
-            else {
-                $scope.nothingToResume = true;
-            }
-        });
-    };
-
-    self.loadData();
-
-}]);
-
-angular.module('BrewMatic').controller('newController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
-    'use strict';
-
-    var self = this;
-
-    self.loadData = function () {
-        service.getDefaultSetup().then(function (result) {
-            $scope.setup = result;
-            console.log("test");
-        });
-    };
-
-    self.loadData();
-
-    $scope.startNewBrew = function () {
-        service.startNewBrew($scope.setup).then(function (newId) {
-            $state.go("displayBrew", { brewId: newId });
-            console.log({ "test": newId });
-        });
-    };
-
-}]);
-
 angular.module('BrewMatic').controller('displayController', ['$scope', '$window', 'BrewGuideService', '$stateParams', '$state', '$timeout', function ($scope, $window, service, $stateParams, $state, $timeout) {
     'use strict';
 
@@ -440,7 +397,7 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
                 $scope.completeTime = result.currentStep.completeTime;
                 self.updateCountdown();
             }
-            service.getDataCapture(result.currentStep.order).then(function (dataCaptureValues) {
+            service.getDataCapture(result.currentStep.id).then(function (dataCaptureValues) {
                 $scope.dataCaptureValues = dataCaptureValues;
             });
 
@@ -481,6 +438,49 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
             });
         }
 
+    };
+
+}]);
+
+angular.module('BrewMatic').controller('resumeController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
+    'use strict';
+
+    var self = this;
+
+    self.loadData = function () {
+        service.getCurrentBrew().then(function (brewId) {
+            if (brewId > 0) {
+                $state.go("displayBrew", { brewId: brewId });
+            }
+            else {
+                $scope.nothingToResume = true;
+            }
+        });
+    };
+
+    self.loadData();
+
+}]);
+
+angular.module('BrewMatic').controller('newController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
+    'use strict';
+
+    var self = this;
+
+    self.loadData = function () {
+        service.getDefaultSetup().then(function (result) {
+            $scope.setup = result;
+            console.log("test");
+        });
+    };
+
+    self.loadData();
+
+    $scope.startNewBrew = function () {
+        service.startNewBrew($scope.setup).then(function (newId) {
+            $state.go("displayBrew", { brewId: newId });
+            console.log({ "test": newId });
+        });
     };
 
 }]);

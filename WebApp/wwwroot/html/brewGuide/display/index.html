@@ -81,7 +81,7 @@
         </fieldset>
         <fieldset ng-if="dataCaptureValues && dataCaptureValues.length>0">
             <legend>Data capture</legend>
-            <p ng-repeat="value in dataCaptureValues">
+            <p ng-repeat="value in dataCaptureValues" style="clear: both">
                 <label class="col-sm-6 control-label">{{value.label}}:</label><input type="text" ng-model="value.valueAsString"
                     class="temp"> {{value.units}}
             </p>
