@@ -189,8 +189,45 @@ namespace WebApp.BusinessLogic
 
             ApplyStepTemperature(brewStep);
 
+            //Add DataCapture values
+            var dataCaptureValues = _db.DataCaptureDefinitions.Where(x => x.BrewStepTemplateId == step.Order);
+            foreach (var v in dataCaptureValues)
+            {
+                if (v.ValueType == "float")
+                {
+                    _db.Add(new DataCaptureFloatValue
+                    {
+                        BrewLogStep = brewStep, 
+                        Label = v.Label, 
+                        Optional = v.Optional,
+                        Units = v.Units
+                    });
+                }
+                else if (v.ValueType == "int")
+                {
+                    _db.Add(new DataCaptureIntValue
+                    {
+                        BrewLogStep = brewStep, 
+                        Label = v.Label, 
+                        Optional = v.Optional,
+                        Units = v.Units
+                    });
+                }
+                else if (v.ValueType == "string")
+                {
+                    _db.Add(new DataCaptureStringValue
+                    {
+                        BrewLogStep = brewStep, 
+                        Label = v.Label, 
+                        Optional = v.Optional,
+                        Units = v.Units
+                    });
+                }
+            }
+
             return brewStep;
         }
+
 
         private void ApplyStepTemperature(BrewLogStep brewStep)
         {
@@ -220,6 +257,46 @@ namespace WebApp.BusinessLogic
                 _db.Remove(logs.First());
             }
             ApplyStepTemperature(logs.ToList()[1]);
+        }
+
+        public async Task<IEnumerable<DataCaptureValueDto>> GetDataCaptureValues(int brewStepId)
+        {
+            var floatValues = _db.DataCaptureFloatValues.Where(x => x.BrewLogStepId == brewStepId).Select(x => new DataCaptureValueDto
+            {
+                Id = x.Id,
+                BrewStepId = brewStepId,
+                Label = x.Label,
+                ValueAsString = x.Value.ToString(),
+                ValueType = "float",
+                Units = x.Units,
+                Optional = x.Optional
+            });
+            var intValues = _db.DataCaptureIntValues.Where(x => x.BrewLogStepId == brewStepId).Select(x => new DataCaptureValueDto
+            {
+                Id = x.Id,
+                BrewStepId = brewStepId,
+                Label = x.Label,
+                ValueAsString = x.Value.ToString(),
+                ValueType = "int",
+                Units = x.Units,
+                Optional = x.Optional
+            });
+            var stringValues = _db.DataCaptureStringValues.Where(x => x.BrewLogStepId == brewStepId).Select(x => new DataCaptureValueDto
+            {
+                Id = x.Id,
+                BrewStepId = brewStepId,
+                Label = x.Label,
+                ValueAsString = x.Value,
+                ValueType = "string",
+                Units = x.Units,
+                Optional = x.Optional
+            });
+            return await floatValues.Union(intValues).Union(stringValues).OrderBy(x => x.Label).ToListAsync();
+        }
+
+        public void SaveDataCaptureValues(DataCaptureValueDto[] values)
+        {
+            throw new NotImplementedException();
         }
 
     }

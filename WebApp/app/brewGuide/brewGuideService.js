@@ -16,7 +16,7 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
 
     self.getBrew = function (brewId) {
         return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewGuide/'+brewId).success(function (result) {
+            $http.get(serviceBase + 'brewGuide/' + brewId).success(function (result) {
                 resolve(result);
             }).error(pageHelperService.handleError);
         });
@@ -30,9 +30,17 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
         });
     };
 
-    self.getCurrentBrew = function(){
-         return $q(function (resolve, reject) {
+    self.getCurrentBrew = function () {
+        return $q(function (resolve, reject) {
             $http.get(serviceBase + 'brewGuide/getLatest').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    }
+
+    self.getDataCapture = function (brewStepId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'datacapture/'+brewStepId).success(function (result) {
                 resolve(result);
             }).error(pageHelperService.handleError);
         });
@@ -56,7 +64,7 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
         });
     };
 
-     self.goBackOneStep = function (brewId) {
+    self.goBackOneStep = function (brewId) {
         return $q(function (resolve, reject) {
             $http.post(serviceBase + 'brewGuide/goBackOneStep', brewId).success(function (result) {
                 resolve(result);

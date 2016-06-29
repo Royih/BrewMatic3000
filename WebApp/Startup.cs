@@ -24,6 +24,7 @@ namespace WebApp
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+            BrewMaticContext.Seed();
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -44,7 +45,6 @@ namespace WebApp
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            BrewMaticContext.Seed();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc();

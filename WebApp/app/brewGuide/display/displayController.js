@@ -15,8 +15,12 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
                 $scope.completeTime = result.currentStep.completeTime;
                 self.updateCountdown();
             }
+            service.getDataCapture(result.currentStep.order).then(function (dataCaptureValues) {
+                $scope.dataCaptureValues = dataCaptureValues;
+            });
+
         });
-        service.getBrewHistory(brewId).then(function(result) {
+        service.getBrewHistory(brewId).then(function (result) {
             $scope.brewHistory = result;
         });
     };

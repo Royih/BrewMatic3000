@@ -55,7 +55,7 @@
                 <fieldset>
                     <legend>Instructions for "{{brew.currentStep.name}}"</legend>
                     <div class="alert alert-info">
-<span ng-bind-html="brew.currentStep.instructions | splitInLines" />
+                        <span ng-bind-html="brew.currentStep.instructions | splitInLines" />
                     </div>
                 </fieldset>
             </div>
@@ -78,6 +78,13 @@
                     </td>
                 </tr>
             </table>
+        </fieldset>
+        <fieldset ng-if="dataCaptureValues && dataCaptureValues.length>0">
+            <legend>Data capture</legend>
+            <p ng-repeat="value in dataCaptureValues">
+                <label class="col-sm-6 control-label">{{value.label}}:</label><input type="text" ng-model="value.valueAsString"
+                    class="temp"> {{value.units}}
+            </p>
         </fieldset>
     </div>
 </div>

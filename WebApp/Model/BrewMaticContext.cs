@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 
 namespace WebApp.Model
 {
@@ -12,6 +13,11 @@ namespace WebApp.Model
         public DbSet<BrewLogStep> BrewLogSteps { get; set; }
         public DbSet<BrewTargetTemperature> TargetTemp { get; set; }
         public DbSet<BrewStepTemplate> BrewStepTemplates { get; set; }
+        public DbSet<DataCaptureDefinition> DataCaptureDefinitions { get; set; }
+        public DbSet<DataCaptureFloatValue> DataCaptureFloatValues { get; set; }
+        public DbSet<DataCaptureStringValue> DataCaptureStringValues { get; set; }
+        public DbSet<DataCaptureIntValue> DataCaptureIntValues { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -21,7 +27,8 @@ namespace WebApp.Model
         {
             using (var db = new BrewMaticContext())
             {
-                if (!db.Database.EnsureCreated())
+                db.Database.EnsureCreated();
+                if (db.TempLogs.Count() == 0)
                 {
                     var newLog = new BrewTempLog
                     {
@@ -33,12 +40,13 @@ namespace WebApp.Model
                     };
                     db.TempLogs.Add(newLog);
 
-                    db.Add(new BrewStepTemplate
+                    var initialStep = new BrewStepTemplate
                     {
                         Name = "Initial",
                         CompleteButtonText = "Start Warmup",
                         Instructions = "Get ready for brewing"
-                    });
+                    };
+                    db.Add(initialStep);
                     db.Add(new BrewStepTemplate
                     {
                         Name = "Warmup",
@@ -78,12 +86,13 @@ namespace WebApp.Model
                         CompleteButtonText = "Sparge complete",
                         Instructions = "Add water to the top of the mash kettle.  Transfer wort from the bottom of the mash kettle to the boil kettle."
                     });
-                    db.Add(new BrewStepTemplate
+                    var boilWarmupStep = new BrewStepTemplate
                     {
                         Name = "Boil warmup",
                         CompleteButtonText = "Start Boil-timer",
                         Instructions = "Wait for the wort to boil. Sample OG (before boil). Note the volume of wort before boil. Take the Yiest out of the fridge now."
-                    });
+                    };
+                    db.Add(boilWarmupStep);
                     db.Add(new BrewStepTemplate
                     {
                         Name = "Boil",
@@ -91,17 +100,77 @@ namespace WebApp.Model
                         Instructions = "Let the wort boil until timer reaches zero. Add hops according to the hop bill. Add yiest nutrition. Add Whirl-flock (15 minutes before end). ",
                         CompleteTimeAdd = "boilTimeInMinutes"
                     });
-                    db.Add(new BrewStepTemplate
+                    var cooldownStep = new BrewStepTemplate
                     {
                         Name = "Cooldown",
                         CompleteButtonText = "Brew complete",
                         Instructions = "Cool the wort to 18-20�C. Use whirlpool to gather remains of hop and grain. Clean the yiest tank now. "
-                    });
-                    db.Add(new BrewStepTemplate
+                    };
+                    db.Add(cooldownStep);
+                    var completeStep = new BrewStepTemplate
                     {
                         Name = "Complete",
                         Instructions = "Transfer to yiest tank(bucket). Sample the OG. Note the volume of wort. Add o2. Pitch yiest. Be happy. "
+                    };
+                    db.Add(completeStep);
+
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = initialStep,
+                        Label = "Water in Mash kettle",
+                        ValueType = "float",
+                        Optional = false,
+                        Units = "l"
                     });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = initialStep,
+                        Label = "Water in Sparge kettle",
+                        ValueType = "float",
+                        Optional = false,
+                        Units = "l"
+                    });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = boilWarmupStep,
+                        Label = "OG before boil",
+                        ValueType = "int",
+                        Optional = false,
+                        Units = "SG"
+                    });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = cooldownStep,
+                        Label = "Wort before boil",
+                        ValueType = "float",
+                        Optional = false,
+                        Units = "l"
+                    });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = cooldownStep,
+                        Label = "OG after boil",
+                        ValueType = "int",
+                        Optional = false,
+                        Units = "SG"
+                    });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = completeStep,
+                        Label = "Wort after boil",
+                        ValueType = "float",
+                        Optional = false,
+                        Units = "l"
+                    });
+                    db.Add(new DataCaptureDefinition
+                    {
+                        BrewStepTemplate = completeStep,
+                        Label = "FG",
+                        ValueType = "int",
+                        Optional = false,
+                        Units = "SG"
+                    });
+
                 }
                 //db.Database.Migrate();
 
@@ -176,5 +245,58 @@ namespace WebApp.Model
         public float Target1 { get; set; }
         public float Target2 { get; set; }
     }
+
+    public class DataCaptureDefinition
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        [ForeignKey("BrewStepTemplate")]
+        public int BrewStepTemplateId { get; set; }
+        public virtual BrewStepTemplate BrewStepTemplate { get; set; }
+        public string Label { get; set; }
+        public string ValueType { get; set; }
+        public bool Optional { get; set; }
+        public string Units {get; set;}
+    }
+
+    public class DataCaptureFloatValue
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        [ForeignKey("BrewLogStep")]
+        public int BrewLogStepId { get; set; }
+        public virtual BrewLogStep BrewLogStep { get; set; }
+        public string Label { get; set; }
+        public bool Optional { get; set; }
+        public float? Value { get; set; }
+        public string Units {get; set;}
+    }
+
+    public class DataCaptureStringValue
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        [ForeignKey("BrewLogStep")]
+        public int BrewLogStepId { get; set; }
+        public virtual BrewLogStep BrewLogStep { get; set; }
+        public string Label { get; set; }
+        public bool Optional { get; set; }
+        public string Value { get; set; }
+        public string Units {get; set;}
+    }
+
+    public class DataCaptureIntValue
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        [ForeignKey("BrewLogStep")]
+        public int BrewLogStepId { get; set; }
+        public virtual BrewLogStep BrewLogStep { get; set; }
+        public string Label { get; set; }
+        public bool Optional { get; set; }
+        public int? Value { get; set; }
+        public string Units {get; set;}
+    }
+
 }
 

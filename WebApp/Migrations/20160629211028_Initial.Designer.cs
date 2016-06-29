@@ -8,9 +8,10 @@ using WebApp.Model;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(BrewMaticContext))]
-    partial class BrewMaticContextModelSnapshot : ModelSnapshot
+    [Migration("20160629211028_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");
