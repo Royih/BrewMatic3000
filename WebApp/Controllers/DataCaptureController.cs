@@ -24,13 +24,24 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        public void GoToNextStep([FromBody]DataCaptureValueDto[] values)
+        public void Save([FromBody]DataCaptureValueDto[] values)
         {
             using (var db = new BrewMaticContext())
             {
                 var repo = new BrewLogRepository(db);
                 repo.SaveDataCaptureValues(values);
                 db.SaveChanges();
+            }
+        }
+
+        [HttpGet]
+        [Route("getDefinedValues/{brewId:int}")]
+        public async Task<IEnumerable<DataCaptureValueDto>> GetDefinedDataCaptureValues(int brewId)
+        {
+            using (var db = new BrewMaticContext())
+            {
+                var repo = new BrewLogRepository(db);
+                return await repo.GetDefinedDataCaptureValues(brewId);
             }
         }
     }

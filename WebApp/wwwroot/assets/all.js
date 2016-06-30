@@ -98,7 +98,7 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
             $scope.lastLog = result;
         });
     };
-    
+
     self.updateIfNotChangedAfterNSeconds = function (newValue1, newValue2, seconds) {
         if (changeTimeout) $timeout.cancel(changeTimeout);
         changeTimeout = $timeout(function () {
@@ -107,7 +107,7 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
             });
         }, seconds * 1000); // delay n seconds
     };
-    
+
 
     self.loadData = function () {
         self.loadLastLog();
@@ -119,15 +119,10 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
                 var newTemp2 = newValues[1];
                 var oldTemp1 = oldValues[0];
                 var oldTemp2 = oldValues[1];
-
-                console.log({ newTemp1: newTemp1, oldTemp1: oldTemp1, newTemp2: newTemp2, oldTemp2: oldTemp2 })
                 if (newTemp1 !== oldTemp1 || newTemp2 !== oldTemp2) {
-                    console.log("Changes found");
                     if (newTemp1 && newTemp1 !== "" && newTemp2 && newTemp2 !== "") {
-                        console.log("Input found");
                         console.log(angular.isNumber(parseFloat(newTemp1)));
                         if (angular.isNumber(parseFloat(newTemp1)) && angular.isNumber(parseFloat(newTemp2))) {
-                            console.log("Numeric input found");
                             self.updateIfNotChangedAfterNSeconds(newTemp1, newTemp2, 3);
                         }
                     }
@@ -198,92 +193,6 @@ angular.module('BrewMatic').service('homeControllerService', ['$http', '$q', 'ng
     */
 
 }]);
-
-angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
-    'use strict';
-
-    var self = this;
-
-    var serviceBase = ngAuthSettings.apiServiceBaseUri;
-
-    self.getDefaultSetup = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewGuide/GetDefaultSetup').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.getBrew = function (brewId) {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewGuide/' + brewId).success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.getBrewHistory = function (brewId) {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewGuide/getBrewHistory/' + brewId).success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.getCurrentBrew = function () {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'brewGuide/getLatest').success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    }
-
-    self.getDataCapture = function (brewStepId) {
-        return $q(function (resolve, reject) {
-            $http.get(serviceBase + 'datacapture/'+brewStepId).success(function (result) {
-                resolve(result);
-            }).error(pageHelperService.handleError);
-        });
-    }
-
-    self.startNewBrew = function (setup) {
-        return $q(function (resolve, reject) {
-            $http.post(serviceBase + 'brewGuide/StartNewBrew', setup).success(function (result) {
-                resolve(result);
-                pageHelperService.pushOkMessage("Brew was started successfully");
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.goToNextStep = function (brewId) {
-        return $q(function (resolve, reject) {
-            $http.post(serviceBase + 'brewGuide/goToNextStep', brewId).success(function (result) {
-                resolve(result);
-                pageHelperService.pushOkMessage("Successfully moved to next step");
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    self.goBackOneStep = function (brewId) {
-        return $q(function (resolve, reject) {
-            $http.post(serviceBase + 'brewGuide/goBackOneStep', brewId).success(function (result) {
-                resolve(result);
-                pageHelperService.pushOkMessage("Successfully moved to previous step");
-            }).error(pageHelperService.handleError);
-        });
-    };
-
-    /*
-        self.listSomething = function () {
-            return $q(function (resolve, reject) {
-                $http.get(serviceBase + 'api/something/list').success(function (result) {
-                    resolve(result);
-                }).error(pageHelperService.handleError);
-            });
-        };
-        */
-
-}]);
 angular.module("BrewMatic").service('pageHelperService', ['$http', '$q', '$rootScope', 'ngAuthSettings', function ($http, $q, $rootScope, ngAuthSettings) {
     'use strict';
     var self = this;
@@ -330,6 +239,109 @@ angular.module('BrewMatic')
       return $sce.trustAsHtml(out + "<ul>");
     };
   }]);
+
+angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthSettings', 'pageHelperService', function ($http, $q, ngAuthSettings, pageHelperService) {
+    'use strict';
+
+    var self = this;
+
+    var serviceBase = ngAuthSettings.apiServiceBaseUri;
+
+    self.getDefaultSetup = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewGuide/GetDefaultSetup').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.getBrew = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewGuide/' + brewId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.getBrewHistory = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewGuide/getBrewHistory/' + brewId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.getCurrentBrew = function () {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'brewGuide/getLatest').success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.getDataCapture = function (brewStepId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'datacapture/'+brewStepId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+     self.getDefinedDataCaptureValues = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'datacapture/getDefinedValues/'+brewId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.saveDataCapture = function (dataCaptureValues) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'datacapture', dataCaptureValues).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Successfully saved data capture values");
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.startNewBrew = function (setup) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'brewGuide/StartNewBrew', setup).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Brew was started successfully");
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.goToNextStep = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'brewGuide/goToNextStep', brewId).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Successfully moved to next step");
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.goBackOneStep = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'brewGuide/goBackOneStep', brewId).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Successfully moved to previous step");
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    /*
+        self.listSomething = function () {
+            return $q(function (resolve, reject) {
+                $http.get(serviceBase + 'api/something/list').success(function (result) {
+                    resolve(result);
+                }).error(pageHelperService.handleError);
+            });
+        };
+        */
+
+}]);
 
 angular.module('BrewMatic').controller('tempLogController', ['$scope', '$window', 'tempLogService', function ($scope, $window, tempLogService) {
     'use strict';
@@ -380,13 +392,56 @@ angular.module('BrewMatic').service('tempLogService', ['$http', '$q', 'ngAuthSet
     */
 
 }]);
+angular.module("BrewMatic").directive('decimalChanger', function () {
+  return {
+    restrict: 'A',
+    scope: {
+      ngModel: '=',
+      min: '@',
+      max: '@'
+    },
+    link: function (scope, element, attrs) {
+      Number.prototype.round = function (p) {
+        p = p || 10;
+        return parseFloat(this.toFixed(p));
+      };
+
+      scope.changeTarget = function (value) {
+        var newVal = scope.ngModel.round(1) + value;
+        if (newVal >= scope.min && newVal <= scope.max) {
+          scope.ngModel += value;
+        }
+      };
+    },
+    templateUrl: 'html/shared/decimalChangerlDirective/index.html'
+  };
+})
 
 angular.module('BrewMatic').controller('displayController', ['$scope', '$window', 'BrewGuideService', '$stateParams', '$state', '$timeout', function ($scope, $window, service, $stateParams, $state, $timeout) {
     'use strict';
 
     var self = this;
 
+    var changeTimeout;
+    $scope.saving = null;
     var brewId = $stateParams.brewId;
+
+    self.saveIfNotChangedAfterNSeconds = function (seconds) {
+        if (changeTimeout) $timeout.cancel(changeTimeout);
+        changeTimeout = $timeout(function () {
+            service.saveDataCapture($scope.dataCaptureValues).then(function (result) {
+                $scope.saving = null;
+                console.log("Changes was saved");
+                self.getDefinedDataCaptureValues();
+            });
+        }, seconds * 1000); // delay n seconds
+    };
+
+    self.getDefinedDataCaptureValues = function () {
+        service.getDefinedDataCaptureValues(brewId).then(function (result) {
+            $scope.definedDataCaptureValues = result;
+        });
+    };
 
     self.loadData = function () {
         service.getBrew(brewId).then(function (result) {
@@ -399,8 +454,14 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
             }
             service.getDataCapture(result.currentStep.id).then(function (dataCaptureValues) {
                 $scope.dataCaptureValues = dataCaptureValues;
+                $scope.$watch('dataCaptureValues', function (newValue, oldValue, scope) {
+                    if (newValue !== oldValue) {
+                        $scope.saving = true;
+                        self.saveIfNotChangedAfterNSeconds(1);
+                    }
+                }, true);
             });
-
+            self.getDefinedDataCaptureValues();
         });
         service.getBrewHistory(brewId).then(function (result) {
             $scope.brewHistory = result;
@@ -442,26 +503,6 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
 
 }]);
 
-angular.module('BrewMatic').controller('resumeController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
-    'use strict';
-
-    var self = this;
-
-    self.loadData = function () {
-        service.getCurrentBrew().then(function (brewId) {
-            if (brewId > 0) {
-                $state.go("displayBrew", { brewId: brewId });
-            }
-            else {
-                $scope.nothingToResume = true;
-            }
-        });
-    };
-
-    self.loadData();
-
-}]);
-
 angular.module('BrewMatic').controller('newController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
     'use strict';
 
@@ -484,27 +525,23 @@ angular.module('BrewMatic').controller('newController', ['$scope', '$window', 'B
     };
 
 }]);
-angular.module("BrewMatic").directive('decimalChanger', function () {
-  return {
-    restrict: 'A',
-    scope: {
-      ngModel: '=',
-      min: '@',
-      max: '@'
-    },
-    link: function (scope, element, attrs) {
-      Number.prototype.round = function (p) {
-        p = p || 10;
-        return parseFloat(this.toFixed(p));
-      };
 
-      scope.changeTarget = function (value) {
-        var newVal = scope.ngModel.round(1) + value;
-        if (newVal >= scope.min && newVal <= scope.max) {
-          scope.ngModel += value;
-        }
-      };
-    },
-    templateUrl: 'html/shared/decimalChangerlDirective/index.html'
-  };
-})
+angular.module('BrewMatic').controller('resumeController', ['$scope', '$window', 'BrewGuideService', '$state', function ($scope, $window, service, $state) {
+    'use strict';
+
+    var self = this;
+
+    self.loadData = function () {
+        service.getCurrentBrew().then(function (brewId) {
+            if (brewId > 0) {
+                $state.go("displayBrew", { brewId: brewId });
+            }
+            else {
+                $scope.nothingToResume = true;
+            }
+        });
+    };
+
+    self.loadData();
+
+}]);

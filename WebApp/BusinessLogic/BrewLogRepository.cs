@@ -48,7 +48,10 @@ namespace WebApp.BusinessLogic
                     SpargeTemp = t.BrewLog.SpargeTemp,
                     MashOutTemp = t.BrewLog.MashOutTemp,
                     MashTimeInMinutes = t.BrewLog.MashTimeInMinutes,
-                    BoilTimeInMinutes = t.BrewLog.BoilTimeInMinutes
+                    BoilTimeInMinutes = t.BrewLog.BoilTimeInMinutes, 
+                    BatchSize = t.BrewLog.BatchSize, 
+                    MashWaterAmount = t.BrewLog.MashWaterAmount, 
+                    SpargeWaterAmount = t.BrewLog.SpargeWaterAmount
                 },
                 CurrentStep = new StepDto
                 {
@@ -60,7 +63,8 @@ namespace WebApp.BusinessLogic
                     TargetMashTemp = t.TargetMashTemp,
                     TargetSpargeTemp = t.TargetSpargeTemp,
                     CompleteButtonText = t.CompleteButtonText,
-                    Instructions = t.Instructions
+                    Instructions = t.Instructions, 
+                    ShowTimer = t.ShowTimer
                 }
             };
         }
@@ -87,6 +91,44 @@ namespace WebApp.BusinessLogic
             return list.AsEnumerable();
         }
 
+        public async Task<IEnumerable<DataCaptureValueDto>> GetDefinedDataCaptureValues(int brewId)
+        {
+            var v1 = _db.DataCaptureFloatValues.Where(x => x.BrewLogStep.BrewId == brewId && x.Value.HasValue).Select(x => new DataCaptureValueDto
+            {
+                Id = x.Id,
+                BrewStepId = x.BrewLogStepId,
+                Label = x.Label,
+                ValueAsString = x.Value.ToString(),
+                ValueType = "float",
+                Units = x.Units,
+                Optional = x.Optional
+            });
+            var v2 = _db.DataCaptureIntValues.Where(x => x.BrewLogStep.BrewId == brewId && x.Value.HasValue).Select(x => new DataCaptureValueDto
+            {
+                Id = x.Id,
+                BrewStepId = x.BrewLogStepId,
+                Label = x.Label,
+                ValueAsString = x.Value.ToString(),
+                ValueType = "int",
+                Units = x.Units,
+                Optional = x.Optional
+            });
+            var v3 = _db.DataCaptureStringValues.Where(x => x.BrewLogStep.BrewId == brewId && x.Value != null && x.Value != "").Select(x => new DataCaptureValueDto
+            {
+                Id = x.Id,
+                BrewStepId = x.BrewLogStepId,
+                Label = x.Label,
+                ValueAsString = x.Value,
+                ValueType = "string",
+                Units = x.Units,
+                Optional = x.Optional
+            });
+            var r = await v1.Union(v2).Union(v3).ToArrayAsync();
+            return r.AsEnumerable();
+        }
+
+
+
         public async Task<BrewLogStep> GetBrew(int brewId)
         {
             return await _db.BrewLogSteps.Include(x => x.BrewLog).OrderByDescending(x => x.Order).FirstOrDefaultAsync(x => x.BrewId == brewId);
@@ -112,7 +154,8 @@ namespace WebApp.BusinessLogic
                 Instructions = template.Instructions,
                 CompleteTime = ResolveCompleteTime(brewLog, template.CompleteTimeAdd),
                 TargetMashTemp = ResolveTemp(brewLog, template.Target1TempFrom),
-                TargetSpargeTemp = ResolveTemp(brewLog, template.Target2TempFrom)
+                TargetSpargeTemp = ResolveTemp(brewLog, template.Target2TempFrom), 
+                ShowTimer = template.ShowTimer
             };
 
         }
@@ -161,7 +204,10 @@ namespace WebApp.BusinessLogic
                 SpargeTemp = value.SpargeTemp,
                 MashOutTemp = value.MashOutTemp,
                 MashTimeInMinutes = value.MashTimeInMinutes,
-                BoilTimeInMinutes = value.BoilTimeInMinutes
+                BoilTimeInMinutes = value.BoilTimeInMinutes, 
+                BatchSize = value.BatchSize, 
+                MashWaterAmount = value.MashWaterAmount, 
+                SpargeWaterAmount = value.SpargeWaterAmount
             };
             _db.Add(l);
 
@@ -184,7 +230,8 @@ namespace WebApp.BusinessLogic
                 TargetMashTemp = step.TargetMashTemp,
                 TargetSpargeTemp = step.TargetSpargeTemp,
                 CompleteButtonText = step.CompleteButtonText,
-                Instructions = step.Instructions
+                Instructions = step.Instructions, 
+                ShowTimer = step.ShowTimer
             };
             _db.Add(brewStep);
 
@@ -198,8 +245,8 @@ namespace WebApp.BusinessLogic
                 {
                     _db.Add(new DataCaptureFloatValue
                     {
-                        BrewLogStep = brewStep, 
-                        Label = v.Label, 
+                        BrewLogStep = brewStep,
+                        Label = v.Label,
                         Optional = v.Optional,
                         Units = v.Units
                     });
@@ -208,8 +255,8 @@ namespace WebApp.BusinessLogic
                 {
                     _db.Add(new DataCaptureIntValue
                     {
-                        BrewLogStep = brewStep, 
-                        Label = v.Label, 
+                        BrewLogStep = brewStep,
+                        Label = v.Label,
                         Optional = v.Optional,
                         Units = v.Units
                     });
@@ -218,8 +265,8 @@ namespace WebApp.BusinessLogic
                 {
                     _db.Add(new DataCaptureStringValue
                     {
-                        BrewLogStep = brewStep, 
-                        Label = v.Label, 
+                        BrewLogStep = brewStep,
+                        Label = v.Label,
                         Optional = v.Optional,
                         Units = v.Units
                     });
@@ -297,9 +344,53 @@ namespace WebApp.BusinessLogic
 
         public void SaveDataCaptureValues(DataCaptureValueDto[] values)
         {
-            throw new NotImplementedException();
+            foreach (var value in values)
+            {
+                if (value.ValueType == "float")
+                {
+                    var thisValue = _db.DataCaptureFloatValues.Single(x => x.Id == value.Id);
+                    if (!string.IsNullOrEmpty(value.ValueAsString))
+                    {
+                        float floatValue;
+                        if (float.TryParse(value.ValueAsString, out floatValue))
+                        {
+                            thisValue.Value = floatValue;
+                        }
+                    }
+                    else
+                    {
+                        thisValue.Value = null;
+                    }
+                }
+                if (value.ValueType == "int")
+                {
+                    var thisValue = _db.DataCaptureIntValues.Single(x => x.Id == value.Id);
+                    if (!string.IsNullOrEmpty(value.ValueAsString))
+                    {
+                        int intValue;
+                        if (int.TryParse(value.ValueAsString, out intValue))
+                        {
+                            thisValue.Value = intValue;
+                        }
+                    }
+                    else
+                    {
+                        thisValue.Value = null;
+                    }
+                }
+                if (value.ValueType == "string")
+                {
+                    var thisValue = _db.DataCaptureStringValues.Single(x => x.Id == value.Id);
+                    if (!string.IsNullOrEmpty(value.ValueAsString))
+                    {
+                        thisValue.Value = value.ValueAsString;
+                    }
+                    else
+                    {
+                        thisValue.Value = null;
+                    }
+                }
+            }
         }
-
     }
-
 }

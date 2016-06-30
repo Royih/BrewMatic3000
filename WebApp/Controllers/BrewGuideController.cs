@@ -80,6 +80,9 @@ namespace WebApp.Controllers
                 MashOutTemp = 78.0f,
                 MashTimeInMinutes = 60,
                 BoilTimeInMinutes = 60,
+                BatchSize = 40, 
+                MashWaterAmount = 30,
+                SpargeWaterAmount = 20
             };
         }
 

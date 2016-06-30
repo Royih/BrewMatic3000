@@ -13,6 +13,7 @@ namespace WebApp.Model.BrewGuide
         public float TargetSpargeTemp { get; set; }
         public string CompleteButtonText { get; set; }
         public string Instructions { get; set; }
+        public bool ShowTimer { get; set; }
 
     }
 }

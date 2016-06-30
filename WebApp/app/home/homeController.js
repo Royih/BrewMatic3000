@@ -10,7 +10,7 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
             $scope.lastLog = result;
         });
     };
-    
+
     self.updateIfNotChangedAfterNSeconds = function (newValue1, newValue2, seconds) {
         if (changeTimeout) $timeout.cancel(changeTimeout);
         changeTimeout = $timeout(function () {
@@ -19,7 +19,7 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
             });
         }, seconds * 1000); // delay n seconds
     };
-    
+
 
     self.loadData = function () {
         self.loadLastLog();
@@ -31,15 +31,10 @@ angular.module('BrewMatic').controller('homeController', ['$scope', '$window', '
                 var newTemp2 = newValues[1];
                 var oldTemp1 = oldValues[0];
                 var oldTemp2 = oldValues[1];
-
-                console.log({ newTemp1: newTemp1, oldTemp1: oldTemp1, newTemp2: newTemp2, oldTemp2: oldTemp2 })
                 if (newTemp1 !== oldTemp1 || newTemp2 !== oldTemp2) {
-                    console.log("Changes found");
                     if (newTemp1 && newTemp1 !== "" && newTemp2 && newTemp2 !== "") {
-                        console.log("Input found");
                         console.log(angular.isNumber(parseFloat(newTemp1)));
                         if (angular.isNumber(parseFloat(newTemp1)) && angular.isNumber(parseFloat(newTemp2))) {
-                            console.log("Numeric input found");
                             self.updateIfNotChangedAfterNSeconds(newTemp1, newTemp2, 3);
                         }
                     }

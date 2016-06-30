@@ -36,7 +36,7 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
                 resolve(result);
             }).error(pageHelperService.handleError);
         });
-    }
+    };
 
     self.getDataCapture = function (brewStepId) {
         return $q(function (resolve, reject) {
@@ -44,7 +44,24 @@ angular.module('BrewMatic').service('BrewGuideService', ['$http', '$q', 'ngAuthS
                 resolve(result);
             }).error(pageHelperService.handleError);
         });
-    }
+    };
+
+     self.getDefinedDataCaptureValues = function (brewId) {
+        return $q(function (resolve, reject) {
+            $http.get(serviceBase + 'datacapture/getDefinedValues/'+brewId).success(function (result) {
+                resolve(result);
+            }).error(pageHelperService.handleError);
+        });
+    };
+
+    self.saveDataCapture = function (dataCaptureValues) {
+        return $q(function (resolve, reject) {
+            $http.post(serviceBase + 'datacapture', dataCaptureValues).success(function (result) {
+                resolve(result);
+                pageHelperService.pushOkMessage("Successfully saved data capture values");
+            }).error(pageHelperService.handleError);
+        });
+    };
 
     self.startNewBrew = function (setup) {
         return $q(function (resolve, reject) {

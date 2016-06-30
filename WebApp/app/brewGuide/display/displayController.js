@@ -4,7 +4,26 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
 
     var self = this;
 
+    var changeTimeout;
+    $scope.saving = null;
     var brewId = $stateParams.brewId;
+
+    self.saveIfNotChangedAfterNSeconds = function (seconds) {
+        if (changeTimeout) $timeout.cancel(changeTimeout);
+        changeTimeout = $timeout(function () {
+            service.saveDataCapture($scope.dataCaptureValues).then(function (result) {
+                $scope.saving = null;
+                console.log("Changes was saved");
+                self.getDefinedDataCaptureValues();
+            });
+        }, seconds * 1000); // delay n seconds
+    };
+
+    self.getDefinedDataCaptureValues = function () {
+        service.getDefinedDataCaptureValues(brewId).then(function (result) {
+            $scope.definedDataCaptureValues = result;
+        });
+    };
 
     self.loadData = function () {
         service.getBrew(brewId).then(function (result) {
@@ -17,8 +36,14 @@ angular.module('BrewMatic').controller('displayController', ['$scope', '$window'
             }
             service.getDataCapture(result.currentStep.id).then(function (dataCaptureValues) {
                 $scope.dataCaptureValues = dataCaptureValues;
+                $scope.$watch('dataCaptureValues', function (newValue, oldValue, scope) {
+                    if (newValue !== oldValue) {
+                        $scope.saving = true;
+                        self.saveIfNotChangedAfterNSeconds(1);
+                    }
+                }, true);
             });
-
+            self.getDefinedDataCaptureValues();
         });
         service.getBrewHistory(brewId).then(function (result) {
             $scope.brewHistory = result;

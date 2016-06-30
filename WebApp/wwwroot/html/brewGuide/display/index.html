@@ -4,47 +4,43 @@
         <div class="row">
             <div class="col-md-4">
                 <fieldset>
-                    <legend>Temperatures</legend>
-                    <p><label class="col-sm-7 control-label">Mash temp:</label>{{brew.setup.mashTemp}}ºC</p>
-                    <p><label class="col-sm-7 control-label">Strike temp:</label>{{brew.setup.strikeTemp}}ºC</p>
-                    <p><label class="col-sm-7 control-label">Sparge temp:</label>{{brew.setup.spargeTemp}}ºC</p>
-                    <p><label class="col-sm-7 control-label">Mash out temp:</label>{{brew.setup.mashOutTemp}}ºC</p>
+                    <legend>Setup summary</legend>
+                    <p><label class="col-sm-7 control-label">Mash temp:</label>{{brew.setup.mashTemp}} ºC</p>
+                    <p><label class="col-sm-7 control-label">Strike temp:</label>{{brew.setup.strikeTemp}} ºC</p>
+                    <p><label class="col-sm-7 control-label">Sparge temp:</label>{{brew.setup.spargeTemp}} ºC</p>
+                    <p><label class="col-sm-7 control-label">Mash out temp:</label>{{brew.setup.mashOutTemp}} ºC</p>
+                    <p><label class="col-sm-7 control-label">Mash time:</label> {{brew.setup.mashTimeInMinutes}} min</p>
+                    <p><label class="col-sm-7 control-label">Boil time:</label> {{brew.setup.boilTimeInMinutes}} min</p>
+                    <p><label class="col-sm-7 control-label">Batch size:</label> {{brew.setup.batchSize}} l</p>
+                    <p><label class="col-sm-7 control-label">Ms water amount:</label> {{brew.setup.mashWaterAmount}} l</p>
+                    <p><label class="col-sm-7 control-label">Sp water amount:</label> {{brew.setup.spargeWaterAmount}} l</p>
                 </fieldset>
             </div>
             <div class="col-md-4">
                 <fieldset>
-                    <legend>Times</legend>
-                    <p><label class="col-sm-7 control-label">Mash time:</label> {{brew.setup.mashTimeInMinutes}}min</p>
-                    <p><label class="col-sm-7 control-label">Boil time:</label> {{brew.setup.boilTimeInMinutes}}min</p>
+                    <legend>Data capture</legend>
+                    <form class="form-horizontal" name="form">
+                        <div class="form-group" ng-repeat="value in dataCaptureValues" ng-if="dataCaptureValues && dataCaptureValues.length>0">
+                            <label class="col-md-6 control-label">{{value.label}}:</label>
+                            <div class="col-md-4">
+                                <input type="text" name="dc{{value.id}}" ng-model="value.valueAsString" class="form-control temp" required />
+                            </div>
+                            <label class="col-md-1 ontrol-label not-bold">
+                                {{value.units}}
+                                <i class="glyphicon glyphicon-warning-sign error" ng-show="form.dc{{value.id}}.$touched && form.dc{{value.id}}.$error.required"></i>
+                            </label>
+                        </div>
+                    </form>
+                    <div class="alert alert-info" ng-if="!dataCaptureValues || dataCaptureValues.length==0">
+                        There are no values to be captured at this step</div>
                 </fieldset>
             </div>
             <div class="col-md-4">
-                <fieldset ng-if="brew.currentStep.completeButtonText && brew.currentStep.order>1">
+                <fieldset ng-if="brew.currentStep.completeButtonText && brew.currentStep.showTimer===true">
                     <legend>Step time</legend>
                     <h1>{{stepTime | date: 'HH:mm.ss'}}</h1>
                 </fieldset>
-            </div>
-        </div>
-        <div class="row top-buffer">
-            <div class="col-md-6">
-                <fieldset>
-                    <legend>Current step "{{brew.currentStep.name}}"</legend>
-                    <p><label class="col-sm-6 control-label">Start time: </label><span class="label label-default">{{brew.currentStep.startTime | date: 'medium'}}</span></p>
-                    <p><label class="col-sm-6 control-label">Target Mash temp:</label><span class="label label-default">{{brew.currentStep.targetMashTemp | number: 2}}</span></p>
-                    <p><label class="col-sm-6 control-label">Target Sparge temp:</label><span class="label label-default">{{brew.currentStep.targetSpargeTemp | number: 2}}</span></p>
-                </fieldset>
-            </div>
-            <div class="col-md-2">
-                <fieldset ng-if="brew.currentStep.completeButtonText">
-                    <legend>Actions</legend>
-                    <div>
-                        <button class="btn btn-danger" ng-if="brew.currentStep.order>1" ng-click="goBackOneStep()">Abort this step</button>
-                        <button class="btn btn-primary" ng-click="goToNextStep()">{{brew.currentStep.completeButtonText}}</button>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="col-md-4" ng-if="countDown">
-                <fieldset>
+                <fieldset class="top-buffer" ng-if="countDown">
                     <legend>Remaining time</legend>
                     <h1>{{countDown | date: 'HH:mm.ss'}}</h1>
                 </fieldset>
@@ -52,12 +48,25 @@
         </div>
         <div class="row top-buffer">
             <div class="col-md-12">
-                <fieldset>
-                    <legend>Instructions for "{{brew.currentStep.name}}"</legend>
-                    <div class="alert alert-info">
-                        <span ng-bind-html="brew.currentStep.instructions | splitInLines" />
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="btn-group pull-right" ng-if="brew.currentStep.completeButtonText">
+                            <button class="btn btn-danger" ng-if="brew.currentStep.order>1" ng-click="goBackOneStep()">Abort this step</button>
+                            <button class="btn btn-success" ng-click="goToNextStep()" ng-disabled="!form.$valid || saving">{{brew.currentStep.completeButtonText}}</button>
+                        </div>
+                        <h1>Brew step: {{brew.currentStep.name}}</h1>
+
                     </div>
-                </fieldset>
+                    <div class="panel-body">
+                        <h4><label class="col-sm-4 control-label">Started time: </label><span class="label label-primary">{{brew.currentStep.startTime | date: 'medium'}}</h4>
+                        <h4><label class="col-sm-4 control-label">Target Mash temp:</label> <span class="label label-danger">{{brew.currentStep.targetMashTemp | number: 1}} ºC</h4>
+                        <h4><label class="col-sm-4 control-label">Target Sparge temp:</label> <span class="label label-danger">{{brew.currentStep.targetSpargeTemp | number: 1}} ºC</h4>
+                         <div class="alert alert-info">
+                             <strong>Instrutions</strong>
+                            <span ng-bind-html="brew.currentStep.instructions | splitInLines" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -79,12 +88,23 @@
                 </tr>
             </table>
         </fieldset>
-        <fieldset ng-if="dataCaptureValues && dataCaptureValues.length>0">
-            <legend>Data capture</legend>
-            <p ng-repeat="value in dataCaptureValues" style="clear: both">
-                <label class="col-sm-6 control-label">{{value.label}}:</label><input type="text" ng-model="value.valueAsString"
-                    class="temp"> {{value.units}}
-            </p>
+
+        <fieldset ng-if="definedDataCaptureValues && definedDataCaptureValues.length > 0">
+            <legend>Captured values</legend>
+            <table class="table table-condensed table-striped">
+                <tr>
+                    <th>Label</th>
+                    <th>Value</th>
+                </tr>
+                <tr ng-repeat="val in definedDataCaptureValues">
+                    <td>
+                        {{val.label}}
+                    </td>
+                    <td>
+                        {{val.valueAsString}} {{val.units}}
+                    </td>
+                </tr>
+            </table>
         </fieldset>
     </div>
 </div>

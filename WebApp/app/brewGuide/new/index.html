@@ -59,6 +59,33 @@
         <span class="alert alert-warning" ng-show="form.boilTimeInMinutes.$error.min || form.boilTimeInMinutes.$error.max">The value must be in range 30 to 200!</span>
     </div>
     <div class="form-group">
+        <label for="batchSize" class="col-sm-2 control-label">Batch size</label>
+        <div class="col-sm-1">
+            <input id="batchSize" name="batchSize"" type="number" step="1" min="10" max="100" ng-model="setup.batchSize" class="form-control minutes"
+                required />
+        </div>
+        <span class="col-sm-1 control-label">l</span>
+        <span class="alert alert-warning" ng-show="form.batchSize.$error.min || form.batchSize.$error.max">The value must be in range 10 to 100!</span>
+    </div>
+    <div class="form-group">
+        <label for="mashWaterAmount" class="col-sm-2 control-label">Mash water amount</label>
+        <div class="col-sm-1">
+            <input id="mashWaterAmount" name="mashWaterAmount" type="number" step="0.1" min="1" max="100" ng-model="setup.mashWaterAmount" class="form-control temp"
+                required />
+        </div>
+        <span class="col-sm-1 control-label">l</span>
+        <span class="alert alert-warning" ng-show="form.mashWaterAmount.$error.min || form.mashWaterAmount.$error.max">The value must be in range 1 to 100!</span>
+    </div>
+    <div class="form-group">
+        <label for="spargeWaterAmount" class="col-sm-2 control-label">Sparge water amount</label>
+        <div class="col-sm-1">
+            <input id="spargeWaterAmount" name="spargeWaterAmount" type="number" step="0.1" min="1" max="100" ng-model="setup.spargeWaterAmount" class="form-control temp"
+                required />
+        </div>
+        <span class="col-sm-1 control-label">l</span>
+        <span class="alert alert-warning" ng-show="form.spargeWaterAmount.$error.min || form.spargeWaterAmount.$error.max">The value must be in range 1 to 100!</span>
+    </div>
+    <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <button class="btn btn-primary" ng-click="startNewBrew()" ng-disabled="!form.$valid">Start brew</button>
         </div>

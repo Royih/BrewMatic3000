@@ -53,7 +53,8 @@ namespace WebApp.Model
                         CompleteButtonText = "Start adding grain",
                         Instructions = "Wait and relax",
                         Target1TempFrom = "strikeTemp",
-                        Target2TempFrom = "spargeTemp"
+                        Target2TempFrom = "spargeTemp",
+                        ShowTimer = true
                     });
                     db.Add(new BrewStepTemplate
                     {
@@ -61,75 +62,80 @@ namespace WebApp.Model
                         CompleteButtonText = "Start Mash-timer",
                         Instructions = "Add grain to water in the mash kettle",
                         Target1TempFrom = "mashTemp",
-                        Target2TempFrom = "spargeTemp"
+                        Target2TempFrom = "spargeTemp",
+                        ShowTimer = true
                     });
                     db.Add(new BrewStepTemplate
                     {
                         Name = "Mash",
                         CompleteButtonText = "Start mash-out",
-                        Instructions = "Wait for the timer to reach zero. Stir the mash a few times. Pay attention to the temperature.",
+                        Instructions = "Wait for the timer to reach zero. Stir the mash a few times. Pay attention to the temperature",
                         CompleteTimeAdd = "mashTimeInMinutes",
                         Target1TempFrom = "mashTemp",
-                        Target2TempFrom = "spargeTemp"
+                        Target2TempFrom = "spargeTemp",
+                        ShowTimer = true
                     });
                     db.Add(new BrewStepTemplate
                     {
                         Name = "Mash out",
                         CompleteButtonText = "Start sparge",
-                        Instructions = "Wait for the temperature to reach the critical 75.6�C. ",
+                        Instructions = "Wait for the temperature to reach the critical 75,6ºC",
                         Target1TempFrom = "mashOutTemp",
-                        Target2TempFrom = "spargeTemp"
+                        Target2TempFrom = "spargeTemp",
+                        ShowTimer = true
                     });
                     db.Add(new BrewStepTemplate
                     {
                         Name = "Sparge",
                         CompleteButtonText = "Sparge complete",
-                        Instructions = "Add water to the top of the mash kettle.  Transfer wort from the bottom of the mash kettle to the boil kettle."
+                        Instructions = "Add water to the top of the mash kettle.  Transfer wort from the bottom of the mash kettle to the boil kettle",
+                        ShowTimer = true
                     });
                     var boilWarmupStep = new BrewStepTemplate
                     {
                         Name = "Boil warmup",
                         CompleteButtonText = "Start Boil-timer",
-                        Instructions = "Wait for the wort to boil. Sample OG (before boil). Note the volume of wort before boil. Take the Yiest out of the fridge now."
+                        Instructions = "Wait for the wort to boil. Sample OG (before boil). Note the volume of wort before boil. Take the Yiest out of the fridge now",
+                        ShowTimer = true
                     };
                     db.Add(boilWarmupStep);
                     db.Add(new BrewStepTemplate
                     {
                         Name = "Boil",
                         CompleteButtonText = "Start Cool-down",
-                        Instructions = "Let the wort boil until timer reaches zero. Add hops according to the hop bill. Add yiest nutrition. Add Whirl-flock (15 minutes before end). ",
-                        CompleteTimeAdd = "boilTimeInMinutes"
+                        Instructions = "Let the wort boil until timer reaches zero. Add hops according to the hop bill. Add yiest nutrition. Add Whirl-flock (15 minutes before end)",
+                        CompleteTimeAdd = "boilTimeInMinutes",
+                        ShowTimer = true
                     });
                     var cooldownStep = new BrewStepTemplate
                     {
                         Name = "Cooldown",
-                        CompleteButtonText = "Brew complete",
-                        Instructions = "Cool the wort to 18-20�C. Use whirlpool to gather remains of hop and grain. Clean the yiest tank now. "
+                        CompleteButtonText = "Cooldown complete",
+                        Instructions = "Cool the wort to 18-20ºC. Use whirlpool to gather remains of hop and grain. Clean the yiest tank now",
+                        ShowTimer = true
                     };
                     db.Add(cooldownStep);
-                    var completeStep = new BrewStepTemplate
+                    var prepareFermentationStep = new BrewStepTemplate
                     {
-                        Name = "Complete",
-                        Instructions = "Transfer to yiest tank(bucket). Sample the OG. Note the volume of wort. Add o2. Pitch yiest. Be happy. "
+                        Name = "Prepare fermentation",
+                        CompleteButtonText = "Begin Fermentation",
+                        Instructions = "Transfer to yiest tank(bucket). Note the volume of wort. Add o2. Pitch yiest. Clean up. Be happy:)",
+                        ShowTimer = true
                     };
-                    db.Add(completeStep);
+                    db.Add(prepareFermentationStep);
+                    var fermentationStep = new BrewStepTemplate
+                    {
+                        Name = "Fermentation",
+                        CompleteButtonText = "Archive",
+                        Instructions = "Hope. Pray. Dry hop. Whatever.",
+                    };
+                    db.Add(fermentationStep);
+                    db.Add(new BrewStepTemplate
+                    {
+                        Name = "Archived",
+                        Instructions = "Drink goddamnit!"
+                    });
 
-                    db.Add(new DataCaptureDefinition
-                    {
-                        BrewStepTemplate = initialStep,
-                        Label = "Water in Mash kettle",
-                        ValueType = "float",
-                        Optional = false,
-                        Units = "l"
-                    });
-                    db.Add(new DataCaptureDefinition
-                    {
-                        BrewStepTemplate = initialStep,
-                        Label = "Water in Sparge kettle",
-                        ValueType = "float",
-                        Optional = false,
-                        Units = "l"
-                    });
                     db.Add(new DataCaptureDefinition
                     {
                         BrewStepTemplate = boilWarmupStep,
@@ -156,7 +162,7 @@ namespace WebApp.Model
                     });
                     db.Add(new DataCaptureDefinition
                     {
-                        BrewStepTemplate = completeStep,
+                        BrewStepTemplate = prepareFermentationStep,
                         Label = "Wort after boil",
                         ValueType = "float",
                         Optional = false,
@@ -164,7 +170,7 @@ namespace WebApp.Model
                     });
                     db.Add(new DataCaptureDefinition
                     {
-                        BrewStepTemplate = completeStep,
+                        BrewStepTemplate = prepareFermentationStep,
                         Label = "Wort to yiest tank",
                         ValueType = "float",
                         Optional = false,
@@ -172,7 +178,7 @@ namespace WebApp.Model
                     });
                     db.Add(new DataCaptureDefinition
                     {
-                        BrewStepTemplate = completeStep,
+                        BrewStepTemplate = fermentationStep,
                         Label = "FG",
                         ValueType = "int",
                         Optional = false,
@@ -214,6 +220,9 @@ namespace WebApp.Model
         public float MashOutTemp { get; set; }
         public int MashTimeInMinutes { get; set; }
         public int BoilTimeInMinutes { get; set; }
+        public int BatchSize { get; set; }
+        public float MashWaterAmount { get; set; }
+        public float SpargeWaterAmount { get; set; }
     }
 
     public class BrewLogStep
@@ -231,6 +240,7 @@ namespace WebApp.Model
         public float TargetSpargeTemp { get; set; }
         public string CompleteButtonText { get; set; }
         public string Instructions { get; set; }
+        public bool ShowTimer { get; set; }
     }
 
     public class BrewStepTemplate
@@ -243,6 +253,7 @@ namespace WebApp.Model
         public string Target1TempFrom { get; set; }
         public string Target2TempFrom { get; set; }
         public string CompleteTimeAdd { get; set; }
+        public bool ShowTimer { get; set; }
     }
 
     public class BrewTargetTemperature
@@ -264,7 +275,7 @@ namespace WebApp.Model
         public string Label { get; set; }
         public string ValueType { get; set; }
         public bool Optional { get; set; }
-        public string Units {get; set;}
+        public string Units { get; set; }
     }
 
     public class DataCaptureFloatValue
@@ -277,7 +288,7 @@ namespace WebApp.Model
         public string Label { get; set; }
         public bool Optional { get; set; }
         public float? Value { get; set; }
-        public string Units {get; set;}
+        public string Units { get; set; }
     }
 
     public class DataCaptureStringValue
@@ -290,7 +301,7 @@ namespace WebApp.Model
         public string Label { get; set; }
         public bool Optional { get; set; }
         public string Value { get; set; }
-        public string Units {get; set;}
+        public string Units { get; set; }
     }
 
     public class DataCaptureIntValue
@@ -303,7 +314,7 @@ namespace WebApp.Model
         public string Label { get; set; }
         public bool Optional { get; set; }
         public int? Value { get; set; }
-        public string Units {get; set;}
+        public string Units { get; set; }
     }
 
 }

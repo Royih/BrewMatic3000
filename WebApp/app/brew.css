@@ -7,3 +7,9 @@
 .minutes {
     width: 80px;
 }
+.not-bold {
+    font-weight: normal;
+}
+.error{
+    color: #f00;
+}

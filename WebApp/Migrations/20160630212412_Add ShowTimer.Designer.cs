@@ -8,9 +8,10 @@ using WebApp.Model;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(BrewMaticContext))]
-    partial class BrewMaticContextModelSnapshot : ModelSnapshot
+    [Migration("20160630212412_Add ShowTimer")]
+    partial class AddShowTimer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");
@@ -20,8 +21,6 @@ namespace WebApp.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("BatchSize");
-
                     b.Property<int>("BoilTimeInMinutes");
 
                     b.Property<float>("MashOutTemp");
@@ -30,13 +29,9 @@ namespace WebApp.Migrations
 
                     b.Property<int>("MashTimeInMinutes");
 
-                    b.Property<float>("MashWaterAmount");
-
                     b.Property<string>("Name");
 
                     b.Property<float>("SpargeTemp");
-
-                    b.Property<float>("SpargeWaterAmount");
 
                     b.Property<float>("StrikeTemp");
 
