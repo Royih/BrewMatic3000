@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Model;
 using WebApp.Model.BrewGuide;
+using WebApp.Model.BrewLogs;
 
 namespace WebApp.BusinessLogic
 {
@@ -48,9 +49,9 @@ namespace WebApp.BusinessLogic
                     SpargeTemp = t.BrewLog.SpargeTemp,
                     MashOutTemp = t.BrewLog.MashOutTemp,
                     MashTimeInMinutes = t.BrewLog.MashTimeInMinutes,
-                    BoilTimeInMinutes = t.BrewLog.BoilTimeInMinutes, 
-                    BatchSize = t.BrewLog.BatchSize, 
-                    MashWaterAmount = t.BrewLog.MashWaterAmount, 
+                    BoilTimeInMinutes = t.BrewLog.BoilTimeInMinutes,
+                    BatchSize = t.BrewLog.BatchSize,
+                    MashWaterAmount = t.BrewLog.MashWaterAmount,
                     SpargeWaterAmount = t.BrewLog.SpargeWaterAmount
                 },
                 CurrentStep = new StepDto
@@ -63,7 +64,7 @@ namespace WebApp.BusinessLogic
                     TargetMashTemp = t.TargetMashTemp,
                     TargetSpargeTemp = t.TargetSpargeTemp,
                     CompleteButtonText = t.CompleteButtonText,
-                    Instructions = t.Instructions, 
+                    Instructions = t.Instructions,
                     ShowTimer = t.ShowTimer
                 }
             };
@@ -154,7 +155,7 @@ namespace WebApp.BusinessLogic
                 Instructions = template.Instructions,
                 CompleteTime = ResolveCompleteTime(brewLog, template.CompleteTimeAdd),
                 TargetMashTemp = ResolveTemp(brewLog, template.Target1TempFrom),
-                TargetSpargeTemp = ResolveTemp(brewLog, template.Target2TempFrom), 
+                TargetSpargeTemp = ResolveTemp(brewLog, template.Target2TempFrom),
                 ShowTimer = template.ShowTimer
             };
 
@@ -204,9 +205,9 @@ namespace WebApp.BusinessLogic
                 SpargeTemp = value.SpargeTemp,
                 MashOutTemp = value.MashOutTemp,
                 MashTimeInMinutes = value.MashTimeInMinutes,
-                BoilTimeInMinutes = value.BoilTimeInMinutes, 
-                BatchSize = value.BatchSize, 
-                MashWaterAmount = value.MashWaterAmount, 
+                BoilTimeInMinutes = value.BoilTimeInMinutes,
+                BatchSize = value.BatchSize,
+                MashWaterAmount = value.MashWaterAmount,
                 SpargeWaterAmount = value.SpargeWaterAmount
             };
             _db.Add(l);
@@ -230,7 +231,7 @@ namespace WebApp.BusinessLogic
                 TargetMashTemp = step.TargetMashTemp,
                 TargetSpargeTemp = step.TargetSpargeTemp,
                 CompleteButtonText = step.CompleteButtonText,
-                Instructions = step.Instructions, 
+                Instructions = step.Instructions,
                 ShowTimer = step.ShowTimer
             };
             _db.Add(brewStep);
@@ -391,6 +392,20 @@ namespace WebApp.BusinessLogic
                     }
                 }
             }
+        }
+        public IEnumerable<BrewLogsDto> ListBrewLogs()
+        {
+            var lastSteps = _db.BrewLogSteps.GroupBy(x => x.BrewId).Select(x => x.OrderByDescending(y => y.Id).First());
+            return lastSteps.Select(x => new BrewLogsDto
+            {
+                Id = x.BrewId, 
+                Name = x.BrewLog.Name, 
+                BatchSize = x.BrewLog.BatchSize, 
+                Initiated = x.BrewLog.TimeStamp, 
+                BrewDate = x.BrewLog.TimeStamp, /*Resolve actual brewdate somehow*/
+                CurrentStep = x.Name
+            });
+
         }
     }
 }
