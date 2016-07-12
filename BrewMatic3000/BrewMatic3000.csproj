@@ -56,6 +56,7 @@
     <Compile Include="RealHW\LiquidCrystal_I2C.cs" />
     <Compile Include="RealHW\PT100Reader.cs" />
     <Compile Include="RealHW\Wire.cs" />
+    <Compile Include="SlaveMode.cs" />
     <Compile Include="States\Brew\State9Complete.cs" />
     <Compile Include="States\Brew\State8Cooldown.cs" />
     <Compile Include="States\Setup\StateSetupBoilTime.cs" />
